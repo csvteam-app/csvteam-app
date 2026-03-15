@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 280" width="120" height="280">
+  <!-- MUSCLE3: Moderately trained — balanced proportions, clear shoulder width -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Head -->
+    <ellipse cx="60" cy="23" rx="14" ry="17"/>
+    <!-- Neck -->
+    <rect x="52" y="40" width="16" height="10" rx="3"/>
+    <!-- Torso: moderate chest, clear waist taper, balanced -->
+    <path d="M38,50 C34,50 31,54 30,60 L30,106 C30,120 32,132 35,140 L39,150 C40,152 42,152 44,152 L76,152 C78,152 80,152 81,150 L85,140 C88,132 90,120 90,106 L90,60 C90,54 87,50 82,50 Z"/>
+    <!-- Left arm: moderate -->
+    <path d="M30,54 C24,56 21,62 20,70 L18,110 C17,120 18,124 22,126 L25,126 C28,124 29,120 29,114 L30,70 Z"/>
+    <!-- Right arm: moderate -->
+    <path d="M90,54 C96,56 99,62 100,70 L102,110 C103,120 102,124 98,126 L95,126 C92,124 91,120 91,114 L90,70 Z"/>
+    <!-- Left leg: moderate -->
+    <path d="M42,152 L40,210 C39,230 40,244 41,252 L44,262 C45,264 47,264 48,262 L51,252 C52,244 51,230 50,210 L53,152 Z"/>
+    <!-- Right leg: moderate -->
+    <path d="M67,152 L70,210 C71,230 70,244 69,252 L72,262 C73,264 75,264 76,262 L79,252 C80,244 79,230 78,210 L76,152 Z"/>
+  </g>
+</svg>

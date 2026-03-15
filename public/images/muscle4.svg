@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 280" width="120" height="280">
+  <!-- MUSCLE4: Clearly athletic — broad shoulders, defined arms, V-taper -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Head -->
+    <ellipse cx="60" cy="23" rx="14" ry="17"/>
+    <!-- Neck: thicker -->
+    <rect x="51" y="40" width="18" height="10" rx="3"/>
+    <!-- Torso: broad chest, V-taper, athletic waist -->
+    <path d="M36,50 C31,50 28,54 27,60 L27,104 C27,118 29,130 33,138 L37,148 C38,150 40,150 42,150 L78,150 C80,150 82,150 83,148 L87,138 C91,130 93,118 93,104 L93,60 C93,54 90,50 84,50 Z"/>
+    <!-- Left arm: athletic, fuller -->
+    <path d="M27,54 C20,56 16,62 15,72 L13,112 C12,122 14,126 18,128 L22,128 C26,126 27,122 27,114 L28,72 Z"/>
+    <!-- Right arm: athletic, fuller -->
+    <path d="M93,54 C100,56 104,62 105,72 L107,112 C108,122 106,126 102,128 L98,128 C94,126 93,122 93,114 L92,72 Z"/>
+    <!-- Left leg: athletic -->
+    <path d="M40,150 L38,208 C37,228 38,244 39,252 L42,262 C43,264 46,264 47,262 L50,252 C51,244 50,228 49,208 L53,150 Z"/>
+    <!-- Right leg: athletic -->
+    <path d="M67,150 L71,208 C72,228 71,244 70,252 L73,262 C74,264 77,264 78,262 L81,252 C82,244 81,228 80,208 L76,150 Z"/>
+  </g>
+</svg>

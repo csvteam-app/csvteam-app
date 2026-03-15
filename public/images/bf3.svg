@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 280" width="120" height="280">
+  <!-- BF3: Normal body fat — average healthy body, natural proportions -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Head -->
+    <ellipse cx="60" cy="23" rx="14" ry="17"/>
+    <!-- Neck -->
+    <rect x="53" y="40" width="14" height="10" rx="3"/>
+    <!-- Torso: normal proportions, slight natural midsection -->
+    <path d="M38,50 C35,50 32,55 31,62 L30,110 C29,126 31,138 34,146 L38,154 C39,156 41,156 43,156 L77,156 C79,156 81,156 82,154 L86,146 C89,138 91,126 90,110 L89,62 C89,55 86,50 82,50 Z"/>
+    <!-- Left arm -->
+    <path d="M31,54 C26,56 22,62 20,72 L18,112 C17,122 18,126 21,128 L24,128 C27,126 28,122 28,116 L30,72 Z"/>
+    <!-- Right arm -->
+    <path d="M89,54 C94,56 98,62 100,72 L102,112 C103,122 102,126 99,128 L96,128 C93,126 92,122 92,116 L90,72 Z"/>
+    <!-- Left leg -->
+    <path d="M40,156 L38,212 C37,232 38,246 39,254 L42,264 C43,266 46,266 47,264 L50,254 C51,246 50,232 49,212 L52,156 Z"/>
+    <!-- Right leg -->
+    <path d="M68,156 L71,212 C72,232 71,246 70,254 L73,264 C74,266 77,266 78,264 L81,254 C82,246 81,232 80,212 L77,156 Z"/>
+  </g>
+</svg>

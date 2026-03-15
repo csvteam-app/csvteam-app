@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 280" width="120" height="280">
+  <!-- MUSCLE2: Slightly toned — slightly broader shoulders, mild arm shape -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Head -->
+    <ellipse cx="60" cy="23" rx="14" ry="17"/>
+    <!-- Neck -->
+    <rect x="53" y="40" width="14" height="10" rx="3"/>
+    <!-- Torso: slightly broader chest, mild taper -->
+    <path d="M40,50 C37,50 35,54 34,60 L34,108 C34,122 35,132 38,140 L41,148 C42,150 44,150 46,150 L74,150 C76,150 78,150 79,148 L82,140 C85,132 86,122 86,108 L86,60 C86,54 84,50 80,50 Z"/>
+    <!-- Left arm: slightly fuller -->
+    <path d="M34,54 C29,55 26,60 25,68 L24,108 C23,118 24,121 27,123 L29,123 C32,121 32,118 32,112 L33,68 Z"/>
+    <!-- Right arm: slightly fuller -->
+    <path d="M86,54 C91,55 94,60 95,68 L96,108 C97,118 96,121 93,123 L91,123 C88,121 88,118 88,112 L87,68 Z"/>
+    <!-- Left leg -->
+    <path d="M43,150 L42,208 C41,228 42,244 43,252 L45,262 C46,264 48,264 49,262 L51,252 C52,244 51,228 50,208 L52,150 Z"/>
+    <!-- Right leg -->
+    <path d="M68,150 L70,208 C71,228 70,244 69,252 L72,262 C73,264 75,264 76,262 L78,252 C78,244 78,228 77,208 L75,150 Z"/>
+  </g>
+</svg>

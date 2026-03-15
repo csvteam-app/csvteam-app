@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 280" width="120" height="280">
+  <!-- MUSCLE1: Very low muscle tone — narrow shoulders, thin limbs, flat chest -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Head -->
+    <ellipse cx="60" cy="23" rx="14" ry="17"/>
+    <!-- Neck -->
+    <rect x="54" y="40" width="12" height="10" rx="3"/>
+    <!-- Torso: narrow, flat, minimal muscle -->
+    <path d="M42,50 C40,50 38,54 37,60 L37,108 C37,122 38,132 40,140 L42,148 C43,150 45,150 47,150 L73,150 C75,150 77,150 78,148 L80,140 C82,132 83,122 83,108 L83,60 C83,54 81,50 78,50 Z"/>
+    <!-- Left arm: thin -->
+    <path d="M37,54 C33,55 30,60 29,68 L28,108 C28,116 29,120 31,121 L33,121 C35,120 35,116 35,110 L36,68 Z"/>
+    <!-- Right arm: thin -->
+    <path d="M83,54 C87,55 90,60 91,68 L92,108 C92,116 91,120 89,121 L87,121 C85,120 85,116 85,110 L84,68 Z"/>
+    <!-- Left leg: thin -->
+    <path d="M44,150 L43,208 C43,228 43,244 44,252 L46,262 C47,264 49,264 50,262 L51,252 C52,244 51,228 51,208 L52,150 Z"/>
+    <!-- Right leg: thin -->
+    <path d="M68,150 L69,208 C69,228 69,244 68,252 L71,262 C72,264 74,264 75,262 L76,252 C76,244 76,228 76,208 L74,150 Z"/>
+  </g>
+</svg>

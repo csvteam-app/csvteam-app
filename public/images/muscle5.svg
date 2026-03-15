@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 280" width="120" height="280">
+  <!-- MUSCLE5: Highly muscular but natural — very broad shoulders, thick arms/legs, strong V-taper -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Head -->
+    <ellipse cx="60" cy="23" rx="14" ry="17"/>
+    <!-- Neck: thick, strong -->
+    <rect x="49" y="40" width="22" height="10" rx="4"/>
+    <!-- Torso: very broad chest, strong V-taper, powerful build -->
+    <path d="M34,50 C28,50 24,54 23,60 L23,102 C23,116 26,128 30,136 L35,148 C36,150 38,150 40,150 L80,150 C82,150 84,150 85,148 L90,136 C94,128 97,116 97,102 L97,60 C97,54 94,50 86,50 Z"/>
+    <!-- Left arm: thick, powerful -->
+    <path d="M23,54 C15,56 11,64 10,74 L8,114 C7,124 9,128 14,130 L19,130 C24,128 25,124 25,116 L25,74 Z"/>
+    <!-- Right arm: thick, powerful -->
+    <path d="M97,54 C105,56 109,64 110,74 L112,114 C113,124 111,128 106,130 L101,130 C96,128 95,124 95,116 L95,74 Z"/>
+    <!-- Left leg: powerful -->
+    <path d="M38,150 L36,206 C35,226 36,242 37,252 L41,262 C42,264 45,264 46,262 L50,252 C51,244 51,226 50,206 L54,150 Z"/>
+    <!-- Right leg: powerful -->
+    <path d="M66,150 L70,206 C71,226 70,242 69,252 L73,262 C74,264 77,264 78,262 L82,252 C83,244 82,226 81,206 L78,150 Z"/>
+  </g>
+</svg>

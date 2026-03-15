@@ -1,0 +1,1085 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CSV TEAM — HOMEPAGE V2 — PREMIUM CONVERSION LANDING
+     Insert this entire block into an Elementor "Custom HTML" widget
+     on the Homepage V2 page (Canvas template, no header/footer).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style>
+    /* ── RESET & BASE ────────────────────────────────────────── */
+    .csv-hp * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .csv-hp {
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        color: #fff;
+        background: #070709;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .csv-hp img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .csv-hp a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .csv-hp .section {
+        padding: 80px 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .csv-hp .section-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #FDF5E6;
+        margin-bottom: 12px;
+    }
+
+    .csv-hp h2 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: clamp(1.8rem, 6vw, 3rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 20px;
+    }
+
+    .csv-hp .sub {
+        font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.65;
+        max-width: 650px;
+    }
+
+    /* ── BUTTONS ────────────────────────────────────────────── */
+    .csv-hp .btn-gold {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 16px 36px;
+        border-radius: 14px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        color: #2A1F11;
+        background: linear-gradient(135deg, #FDF5E6 0%, #F5DEB3 100%);
+        box-shadow: 0 6px 24px rgba(253, 245, 230, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+    }
+
+    .csv-hp .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 32px rgba(253, 245, 230, 0.45);
+    }
+
+    .csv-hp .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.88rem;
+        letter-spacing: 0.04em;
+        color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.04);
+        transition: all 0.2s;
+    }
+
+    .csv-hp .btn-outline:hover {
+        border-color: rgba(253, 245, 230, 0.4);
+        color: #FDF5E6;
+    }
+
+    /* ── GLASS CARD ─────────────────────────────────────────── */
+    .csv-hp .glass {
+        background: linear-gradient(135deg, rgba(22, 20, 18, 0.85) 0%, rgba(12, 10, 10, 0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-top-color: rgba(255, 215, 170, 0.12);
+        border-radius: 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ═══════════ SECTION 1: HERO ═══════════ */
+    .csv-hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 100px 20px 60px;
+        position: relative;
+        background: #070709;
+        overflow: hidden;
+    }
+
+    .csv-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(253, 245, 230, 0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    .csv-hero .logo {
+        width: 80px;
+        height: auto;
+        margin-bottom: 32px;
+        filter: brightness(1.2);
+    }
+
+    .csv-hero .pre {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #FDF5E6;
+        margin-bottom: 16px;
+    }
+
+    .csv-hero h1 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: clamp(2.2rem, 8vw, 4rem);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        margin-bottom: 24px;
+        max-width: 800px;
+    }
+
+    .csv-hero h1 span {
+        background: linear-gradient(90deg, #FDF5E6, #FFFFFF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .csv-hero .hero-sub {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        color: rgba(255, 255, 255, 0.55);
+        max-width: 600px;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    .csv-hero .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+        margin-bottom: 48px;
+    }
+
+    .csv-hero .trust-row {
+        display: flex;
+        gap: 32px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .csv-hero .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+    }
+
+    .csv-hero .trust-num {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #FDF5E6;
+    }
+
+    /* ═══════════ SECTION 2: SOCIAL PROOF / TRANSFORMATIONS ═══════════ */
+    .csv-proof {
+        padding: 80px 0;
+        background: linear-gradient(180deg, rgba(253, 245, 230, 0.03) 0%, transparent 100%);
+        overflow: hidden;
+    }
+
+    .csv-proof .header-block {
+        padding: 0 20px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .csv-proof .carousel-wrapper {
+        padding: 0 20px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        display: flex;
+        gap: 24px;
+        padding-bottom: 32px;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .csv-proof .carousel-wrapper::after { content: ""; flex: 0 0 1px; display: block; }
+    .csv-proof .carousel-wrapper::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari */
+    }
+
+    .csv-proof .proof-card {
+        scroll-snap-align: center;
+        flex: 0 0 calc(90vw - 40px);
+        max-width: 400px;
+        padding: 24px;
+        border-radius: 16px;
+        transition: border-color 0.3s;
+    }
+
+    @media (min-width: 768px) {
+        .csv-proof .proof-card {
+            flex: 0 0 350px;
+        }
+    }
+
+    .csv-proof .img-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        margin-bottom: 20px;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .csv-proof .img-placeholder {
+        aspect-ratio: 3/4;
+        background: rgba(255, 255, 255, 0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .csv-proof .img-label {
+        position: absolute;
+        top: 12px;
+        padding: 4px 10px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        border-radius: 4px;
+    }
+
+    .csv-proof .label-prima {
+        left: 12px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .csv-proof .label-dopo {
+        right: 12px;
+        color: #FDF5E6;
+    }
+
+    .csv-proof .proof-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .csv-proof .proof-name {
+        font-weight: 900;
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+    }
+
+    .csv-proof .proof-dur {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .csv-proof .proof-res {
+        text-align: right;
+    }
+
+    .csv-proof .proof-res-main {
+        font-weight: 800;
+        color: #FDF5E6;
+        font-size: 1.1rem;
+    }
+
+    .csv-proof .proof-res-sub {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .csv-proof .proof-quote {
+        font-size: 0.9rem;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.5;
+    }
+
+    .csv-proof .micro-cta {
+        text-align: center;
+        margin-top: 20px;
+        padding: 0 20px;
+    }
+
+    .csv-proof .micro-cta p {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 4px;
+    }
+
+    .csv-proof .micro-cta h3 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .csv-proof .arrow-down {
+        color: #FDF5E6;
+        font-size: 1.2rem;
+        transition: transform 0.3s;
+        display: inline-block;
+    }
+
+    .csv-proof .micro-link:hover .arrow-down {
+        transform: translateY(4px);
+    }
+
+    /* ═══════════ SECTION 3: IL METODO ═══════════ */
+    .csv-method .pillars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .csv-method .pillar {
+        padding: 28px 24px;
+    }
+
+    .csv-method .pillar-icon {
+        font-size: 2rem;
+        margin-bottom: 14px;
+    }
+
+    .csv-method .pillar h3 {
+        font-weight: 800;
+        font-size: 1.05rem;
+        margin-bottom: 8px;
+    }
+
+    .csv-method .pillar p {
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.45);
+        line-height: 1.55;
+    }
+
+    /* ═══════════ SECTION 4: PHYSIQUE ANALYSIS ═══════════ */
+    .csv-quiz {
+        padding: 80px 20px;
+        background: linear-gradient(180deg, #070709 0%, #0d0b08 50%, #070709 100%);
+        position: relative;
+    }
+
+    .csv-quiz::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(253, 245, 230, 0.06) 0%, transparent 55%);
+        pointer-events: none;
+    }
+
+    .csv-quiz .quiz-card {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 40px 32px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        border-top-color: rgba(253, 245, 230, 0.25);
+    }
+
+    .csv-quiz .steps-visual {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin: 32px 0;
+        flex-wrap: wrap;
+    }
+
+    .csv-quiz .step-dot {
+        text-align: center;
+    }
+
+    .csv-quiz .step-dot .num {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #161412, #070709);
+        border: 1px solid rgba(253, 245, 230, 0.3);
+        color: #FDF5E6;
+        font-weight: 900;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+    }
+
+    .csv-quiz .step-dot p {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 600;
+        max-width: 120px;
+    }
+
+    .csv-quiz .email-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        max-width: 480px;
+        margin: 24px auto 0;
+    }
+
+    .csv-quiz .email-row input {
+        flex: 1;
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 0.92rem;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .csv-quiz .email-row input::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .csv-quiz .email-row input:focus {
+        border-color: rgba(253, 245, 230, 0.4);
+    }
+
+    .csv-quiz .note {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.3);
+        margin-top: 16px;
+    }
+
+    /* ═══════════ SECTION 5: COME FUNZIONA ═══════════ */
+    .csv-steps .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        margin-top: 32px;
+    }
+
+    .csv-steps .tl-item {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .csv-steps .tl-num {
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(253, 245, 230, 0.15), rgba(253, 245, 230, 0.05));
+        border: 1px solid rgba(253, 245, 230, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.1rem;
+        color: #FDF5E6;
+    }
+
+    .csv-steps .tl-item h3 {
+        font-weight: 800;
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .csv-steps .tl-item p {
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.45);
+        line-height: 1.55;
+    }
+
+    /* ═══════════ SECTION 6: APP E PRICING ... (Style combinato per brevità testuale, riprende layout base) ═══════════ */
+    .csv-pricing .price-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .csv-pricing .price-card {
+        padding: 32px 24px;
+        position: relative;
+        transition: transform 0.2s;
+    }
+
+    .csv-pricing .price-card.featured {
+        border-color: rgba(253, 245, 230, 0.3);
+        background: linear-gradient(135deg, rgba(30, 26, 20, 0.95) 0%, rgba(14, 12, 10, 0.98) 100%);
+    }
+
+    .csv-pricing .price-badge {
+        position: absolute;
+        top: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #FDF5E6, #F5DEB3);
+        color: #2A1F11;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 4px 16px;
+        border-radius: 0 0 10px 10px;
+        letter-spacing: 0.08em;
+    }
+
+    .csv-pricing .price-name {
+        font-weight: 800;
+        font-size: 1rem;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .csv-pricing .price-amount {
+        font-weight: 900;
+        font-size: 2.4rem;
+        margin-bottom: 4px;
+    }
+
+    .csv-pricing .price-features li {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.5);
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .csv-pricing .price-features li::before {
+        content: '✓';
+        color: #FDF5E6;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .csv-faq .faq-q {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 0;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .csv-final {
+        text-align: center;
+        padding: 100px 20px;
+    }
+
+    .csv-foot {
+        padding: 48px 20px 32px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (max-width: 600px) {
+        .csv-hp .section {
+            padding: 60px 16px;
+        }
+
+        .csv-hero {
+            padding: 80px 16px 48px;
+            min-height: 90vh;
+        }
+
+        .csv-quiz .email-row {
+            flex-direction: column;
+        }
+
+        .csv-quiz .email-row input,
+        .csv-quiz .email-row button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="csv-hp">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: HERO                                             -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="csv-hero">
+        <img src="https://www.csvteam.com/wp-content/uploads/2024/02/CSV-logo-completo-senza-scritte-bianco.png"
+            class="logo" alt="CSV Team" fetchpriority="high" />
+        <p class="pre">IL PROGRAMMA DI COACHING N°1 IN ITALIA</p>
+        <h1>In Quante Settimane Puoi Trasformare il Tuo Fisico?</h1>
+        <p class="hero-sub">Fai la CSV Physique Analysis™ — in 60 secondi scopri il tuo punto di partenza e una stima
+            scientifica del tempo che ti serve. Gratuita. Basata su +500 trasformazioni reali.</p>
+        <div class="cta-row">
+            <a href="#physique-analysis" class="btn-gold">🔬 QUANTO TI MANCA? SCOPRILO GRATIS</a>
+            <a href="#transformations" class="btn-outline">GUARDA LE TRASFORMAZIONI ↓</a>
+        </div>
+        <div class="trust-row">
+            <div class="trust-item"><span class="trust-num">+500</span> Risultati</div>
+            <div class="trust-item"><span class="trust-num">App</span> Dedicata</div>
+            <div class="trust-item"><span class="trust-num">Coach</span> 7/7</div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: SOCIAL PROOF / PROOF BEFORE PITCH                -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="csv-proof" id="transformations">
+        <div class="header-block">
+            <p class="section-label">RISULTATI DOCUMENTATI</p>
+            <h2>La Differenza tra Chi Spera e Chi Esegue.</h2>
+            <p class="sub" style="margin:0 auto">Oltre 500 fisici trasformati. Zero scuse. Lavoratori. Imprenditori.
+                Padri di famiglia. Hanno smesso di improvvisare e hanno applicato il nostro sistema. I risultati parlano
+                da soli.</p>
+        </div>
+
+        <div class="carousel-wrapper">
+            <!-- Card 1 -->
+            <div class="proof-card glass">
+                <div class="img-split">
+                    <span class="img-label label-prima">PRIMA</span>
+                    <span class="img-label label-dopo">DOPO</span>
+                    <div class="img-placeholder">Foto Prima</div>
+                    <div class="img-placeholder">Foto Dopo</div>
+                </div>
+                <div class="proof-stats">
+                    <div>
+                        <div class="proof-name">Marco, 32</div>
+                        <div class="proof-dur">16 Settimane</div>
+                    </div>
+                    <div class="proof-res">
+                        <div class="proof-res-main">-12kg</div>
+                        <div class="proof-res-sub">Definizione Addominale</div>
+                    </div>
+                </div>
+                <p class="proof-quote">"Il coach non ti lascia margini d'errore. Applichi il metodo, ottieni il
+                    risultato."</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="proof-card glass">
+                <div class="img-split">
+                    <span class="img-label label-prima">PRIMA</span>
+                    <span class="img-label label-dopo">DOPO</span>
+                    <div class="img-placeholder">Foto Prima</div>
+                    <div class="img-placeholder">Foto Dopo</div>
+                </div>
+                <div class="proof-stats">
+                    <div>
+                        <div class="proof-name">Verusca, 52</div>
+                        <div class="proof-dur">20 Settimane</div>
+                    </div>
+                    <div class="proof-res">
+                        <div class="proof-res-main">Ricomposizione</div>
+                        <div class="proof-res-sub">Costruzione Muscolare</div>
+                    </div>
+                </div>
+                <p class="proof-quote">"A 52 anni pensavo fosse tardi. Questo sistema ha cambiato il mio corpo e la mia
+                    testa."</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="proof-card glass">
+                <div class="img-split">
+                    <span class="img-label label-prima">PRIMA</span>
+                    <span class="img-label label-dopo">DOPO</span>
+                    <div class="img-placeholder">Foto Prima</div>
+                    <div class="img-placeholder">Foto Dopo</div>
+                </div>
+                <div class="proof-stats">
+                    <div>
+                        <div class="proof-name">Luca, 34</div>
+                        <div class="proof-dur">12 Settimane</div>
+                    </div>
+                    <div class="proof-res">
+                        <div class="proof-res-main">-9kg</div>
+                        <div class="proof-res-sub">Massima Densità</div>
+                    </div>
+                </div>
+                <p class="proof-quote">"Lavoro 10 ore al giorno. Il piano si è incastrato esattamente nella mia vita."
+                </p>
+            </div>
+        </div>
+
+        <div class="micro-cta">
+            <p>Il loro punto di partenza era peggiore del tuo.</p>
+            <h3>Vuoi sapere quanto tempo servirebbe a te?</h3>
+            <a href="#physique-analysis" class="micro-link"
+                style="color: #fff; font-size: 0.9rem; font-weight: 700; text-transform: uppercase;">
+                <span class="arrow-down">↓</span> Continua l'Analisi <span class="arrow-down">↓</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: IL METODO CSV                                    -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="csv-method section">
+        <p class="section-label">COSA CI RENDE DIVERSI</p>
+        <h2>Non è una Scheda.<br>È un <span style="color:#FDF5E6">Sistema.</span></h2>
+        <p class="sub">Chiunque può scaricare una scheda. Ma una scheda non si adatta e non ti corregge. Il Metodo CSV
+            integra quattro pilastri progettati attorno al tuo fisico.</p>
+        <div class="pillars">
+            <div class="pillar glass">
+                <div class="pillar-icon">🏋️</div>
+                <h3>Allenamento Periodizzato</h3>
+                <p>Ogni fase ha uno scopo vitale. Nessun esercizio a caso, progressione matematica.</p>
+            </div>
+            <div class="pillar glass">
+                <div class="pillar-icon">🥩</div>
+                <h3>Nutrizione Ingegnerizzata</h3>
+                <p>I tuoi macro calcolati sul tuo metabolismo. Si adatta alla tua vita, non viceversa.</p>
+            </div>
+            <div class="pillar glass">
+                <div class="pillar-icon">📊</div>
+                <h3>Monitoraggio Continuo</h3>
+                <p>Ogni settimana analizziamo i tuoi dati e aggiustiamo il tiro prima di stallare.</p>
+            </div>
+            <div class="pillar glass">
+                <div class="pillar-icon">📱</div>
+                <h3>Tecnologia Dedicata</h3>
+                <p>App proprietaria per logbook, diario alimenti, video tutorial e chat diretta col coach.</p>
+            </div>
+        </div>
+    </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: CSV PHYSIQUE ANALYSIS (Interactive Quiz)         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style>
+  /* ── QUIZ INTERACTIVE STYLES ── */
+  .quiz-pill-interactive {
+    padding: 12px 18px; 
+    border-radius: 8px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    background: rgba(255,255,255,0.03); 
+    color: rgba(255,255,255,0.7); 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: all 0.25s ease;
+    flex: 1; 
+    min-width: calc(33.333% - 10px); 
+    text-align: center;
+  }
+  
+  @media (hover: hover) {
+    .quiz-pill-interactive:hover {
+      border-color: rgba(253, 245, 230, 0.4); 
+      color: #FDF5E6;
+    }
+  }
+
+  .quiz-pill-interactive.active {
+    border-color: #FDF5E6; 
+    color: #2A1F11;
+    background: linear-gradient(135deg, #FDF5E6 0%, #F5DEB3 100%);
+    box-shadow: 0 4px 15px rgba(253, 245, 230, 0.25);
+    transform: scale(0.98);
+  }
+
+  html { scroll-behavior: smooth; }
+</style>
+
+<section class="csv-quiz" id="physique-analysis">
+  <div class="quiz-card glass">
+    <p class="section-label" style="text-align:center;">STRUMENTO ESCLUSIVO</p>
+    <h2 style="text-align:center;">CSV Physique Analysis™</h2>
+    <p class="sub" style="text-align:center;margin:0 auto 24px;">Una prima analisi del tuo fisico per stimare quanto puoi migliorare e in quali tempi.</p>
+
+    <!-- Progress Bar -->
+    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 20px 0 12px; overflow: hidden; position: relative;">
+      <div style="width: 75%; height: 100%; background: linear-gradient(90deg, #F5DEB3, #FDF5E6); border-radius: 4px; position: relative;"></div>
+    </div>
+    <span style="font-size: 0.75rem; color: #F5DEB3; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 32px; display: block; text-align: right;">Analisi Completata al 75%</span>
+
+    <!-- Interactive Questions -->
+    <div style="text-align: left; margin-bottom: 32px;">
+      
+      <!-- Domanda 1 -->
+      <div id="quiz-q1" class="quiz-step" style="margin-bottom: 24px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span style="color: #FDF5E6; font-size: 1.2rem;">1.</span> Qual è il tuo obiettivo principale?
+        </div>
+        <div class="quiz-options-group" data-question="goal" data-target-scroll="quiz-q2" style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <div class="quiz-pill-interactive" data-value="Ricomposizione corporea">Ricomposizione corporea</div>
+          <div class="quiz-pill-interactive" data-value="Perdere grasso">Perdere grasso</div>
+          <div class="quiz-pill-interactive" data-value="Costruire muscolo">Costruire muscolo</div>
+        </div>
+      </div>
+
+      <!-- Domanda 2 -->
+      <div id="quiz-q2" class="quiz-step" style="margin-bottom: 24px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span style="color: #FDF5E6; font-size: 1.2rem;">2.</span> Quante volte ti alleni a settimana?
+        </div>
+        <div class="quiz-options-group" data-question="training_frequency" data-target-scroll="quiz-q3" style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <div class="quiz-pill-interactive" data-value="1-2 volte">1–2 volte</div>
+          <div class="quiz-pill-interactive" data-value="3-4 volte">3–4 volte</div>
+          <div class="quiz-pill-interactive" data-value="5+ volte">5+ volte</div>
+        </div>
+      </div>
+
+      <!-- Domanda 3 -->
+      <div id="quiz-q3" class="quiz-step" style="margin-bottom: 24px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <span style="color: #FDF5E6; font-size: 1.2rem;">3.</span> Quanto sei disposto a impegnarti davvero?
+        </div>
+        <div class="quiz-options-group" data-question="commitment_level" data-target-scroll="quiz-final-cta" style="display: flex; flex-wrap: wrap; gap: 10px; flex-direction: column;">
+          <div class="quiz-pill-interactive" data-value="Il minimo necessario" style="text-align: left;">Il minimo necessario</div>
+          <div class="quiz-pill-interactive" data-value="Sostenibile" style="text-align: left;">Mi adatto se è sostenibile</div>
+          <div class="quiz-pill-interactive" data-value="Sul serio" style="text-align: left;">Sono pronto a fare sul serio</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Report Preview -->
+    <div style="max-width: 400px; margin: 0 auto 32px; padding: 24px; border-radius: 16px; background: rgba(253, 245, 230, 0.03); border: 1px solid rgba(253, 245, 230, 0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; text-align: center;">
+      <div style="position: absolute; top:0; left:0; width: 4px; height: 100%; background: #FDF5E6;"></div>
+      <p style="font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Potenziale stimato</p>
+      <p style="font-size: 2.2rem; font-weight: 900; color: #FDF5E6; margin-bottom: 16px; letter-spacing: 0.05em; text-shadow: 0 0 15px rgba(253, 245, 230, 0.3);">ALTO</p>
+      <div style="font-size: 1rem; color: #F5DEB3; font-weight: 700; background: rgba(245, 222, 179, 0.1); padding: 8px 16px; border-radius: 6px; display: inline-block;">Tempo realistico: 12–16 settimane</div>
+    </div>
+
+    <!-- CTA & Email Capture Form -->
+    <div id="quiz-final-cta">
+      <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 6px; font-weight: 600;">Abbiamo quasi completato la tua analisi.</p>
+      <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 24px; line-height: 1.5;">Ci manca solo l'ultimo passaggio per mostrarti il tuo potenziale di trasformazione e una stima realistica dei tempi.</p>
+
+      <form id="physique-analysis-form" onsubmit="submitQuiz(event)" style="margin: 0; padding: 0;">
+        
+        <!-- Hidden Inputs for dynamic data -->
+        <input type="hidden" id="quiz_hidden_goal" name="goal" value="">
+        <input type="hidden" id="quiz_hidden_frequency" name="training_frequency" value="">
+        <input type="hidden" id="quiz_hidden_commitment" name="commitment_level" value="">
+
+        <div class="email-row" style="display: flex; gap: 8px; max-width: 480px; margin: 24px auto 0; flex-wrap: wrap;">
+          <input 
+            type="email" 
+            id="quiz-email-input"
+            name="email"
+            placeholder="Dove inviamo la tua analisi?" 
+            autocomplete="email" 
+            inputmode="email"
+            required
+            style="flex: 1; padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.92rem; outline: none; font-family: 'Inter', sans-serif; min-width: 250px;" 
+          />
+          <button type="submit" class="btn-gold" style="white-space:nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 36px; border-radius: 14px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em; color: #2A1F11; background: linear-gradient(135deg, #FDF5E6 0%, #F5DEB3 100%); box-shadow: 0 6px 24px rgba(253, 245, 230, 0.3), inset 0 1px 0 rgba(255,255,255,0.2); text-transform: uppercase;">
+            SBLOCCA LA TUA ANALISI
+          </button>
+        </div>
+        
+        <!-- Premium Error/Success Message Wrapper -->
+        <div id="quiz-msg-feedback" style="display: none; padding-top: 16px; font-size: 0.85rem; font-weight: 600; text-align: center;"></div>
+
+      </form>
+      <p class="note" style="font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 16px;">🔒 Nessuno spam. Solo il tuo accesso alla prima analisi CSV.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Vanilla JS for Interactive Quiz Data Collection -->
+<script>
+  let quizStore = {
+    goal: null,
+    training_frequency: null,
+    commitment_level: null
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const groups = document.querySelectorAll(".quiz-options-group");
+    const feedbackBox = document.getElementById("quiz-msg-feedback");
+    
+    groups.forEach(group => {
+      const pills = group.querySelectorAll(".quiz-pill-interactive");
+      const targetId = group.getAttribute("data-target-scroll");
+      const dataKey = group.getAttribute("data-question");
+      
+      pills.forEach(pill => {
+        pill.addEventListener("click", function() {
+          
+          quizStore[dataKey] = this.getAttribute("data-value");
+
+          pills.forEach(p => p.classList.remove("active"));
+          this.classList.add("active");
+          feedbackBox.style.display = "none"; 
+          
+          setTimeout(() => {
+            const targetElement = document.getElementById(targetId);
+            if(targetElement) {
+              const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY - 100;
+              window.scrollTo({
+                top: offsetTop,
+                behavior: "smooth"
+              });
+            }
+          }, 300);
+        });
+      });
+    });
+  });
+
+  window.submitQuiz = function(event) {
+    event.preventDefault(); 
+    
+    const feedbackBox = document.getElementById("quiz-msg-feedback");
+    const emailInput = document.getElementById("quiz-email-input");
+    feedbackBox.style.display = "none";
+
+    if (!quizStore.goal || !quizStore.training_frequency || !quizStore.commitment_level) {
+      feedbackBox.style.color = "#ff6b6b"; 
+      feedbackBox.innerText = "⚠️ Rispondi a tutte le 3 rapide domande per permetterci di calcolare il report.";
+      feedbackBox.style.display = "block";
+      return; 
+    }
+
+    const emailValue = emailInput.value.trim();
+    if (!emailValue || !emailValue.includes("@")) {
+      feedbackBox.style.color = "#ff6b6b"; 
+      feedbackBox.innerText = "⚠️ Inserisci un indirizzo email valido dove poterti recapitare l\'analisi.";
+      feedbackBox.style.display = "block";
+      return;
+    }
+
+    document.getElementById("quiz_hidden_goal").value = quizStore.goal;
+    document.getElementById("quiz_hidden_frequency").value = quizStore.training_frequency;
+    document.getElementById("quiz_hidden_commitment").value = quizStore.commitment_level;
+
+    feedbackBox.style.color = "#FDF5E6"; 
+    feedbackBox.innerText = "Analisi in preparazione... (Dati salvati e pronti per invio)";
+    feedbackBox.style.display = "block";
+
+    console.log("Valori salvati nei campi hidden e pronti per l\'invio: ", {
+      email: emailValue,
+      goal: document.getElementById("quiz_hidden_goal").value,
+      frequency: document.getElementById("quiz_hidden_frequency").value,
+      commitment: document.getElementById("quiz_hidden_commitment").value
+    });
+  }
+</script>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: PRICING -->
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="csv-pricing section" id="pricing">
+        <p class="section-label" style="text-align:center;">IL TUO INVESTIMENTO</p>
+        <h2 style="text-align:center;">Scegli il Percorso. Inizia a Costruire.</h2>
+
+        <div class="price-grid">
+            <div class="price-card glass" style="text-align:center;">
+                <p class="price-name">Trimestrale</p>
+                <p style="text-decoration:line-through;color:rgba(255,255,255,0.3)">€299</p>
+                <p class="price-amount">€219</p>
+                <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:20px;">3 mesi di coaching</p>
+                <a href="https://www.csvteam.com/prodotto/trimestrale/" class="btn-outline"
+                    style="width:100%;margin-bottom:24px;">SELEZIONA</a>
+                <ul
+                    style="list-style:none;text-align:left;font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:2;">
+                    <li>✓ Programma personalizzato</li>
+                    <li>✓ Piano alimentare</li>
+                    <li>✓ Accesso App CSV</li>
+                    <li>✓ Supporto WhatsApp 7/7</li>
+                </ul>
+            </div>
+
+            <div class="price-card glass featured" style="text-align:center;">
+                <div class="price-badge">⭐ PIÙ POPOLARE</div>
+                <p class="price-name" style="margin-top:16px;">Semestrale</p>
+                <p style="text-decoration:line-through;color:rgba(255,255,255,0.3)">€539</p>
+                <p class="price-amount" style="color:#FDF5E6;">€399</p>
+                <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:20px;">6 mesi di coaching</p>
+                <a href="https://www.csvteam.com/prodotto/semestrale/" class="btn-gold"
+                    style="width:100%;margin-bottom:24px;">INIZIA ORA</a>
+                <ul
+                    style="list-style:none;text-align:left;font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:2;">
+                    <li>✓ Programma personalizzato</li>
+                    <li>✓ Piano alimentare</li>
+                    <li>✓ Accesso App CSV</li>
+                    <li>✓ Supporto WhatsApp 7/7</li>
+                    <li>✓ Priorità Check-in</li>
+                </ul>
+            </div>
+
+            <div class="price-card glass" style="text-align:center;">
+                <div class="price-badge" style="background:rgba(255,255,255,0.1);color:#fff;">💎 MIGLIOR VALORE</div>
+                <p class="price-name" style="margin-top:16px;">Annuale</p>
+                <p style="text-decoration:line-through;color:rgba(255,255,255,0.3)">€869</p>
+                <p class="price-amount">€649</p>
+                <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:20px;">12 mesi di coaching</p>
+                <a href="https://www.csvteam.com/prodotto/annuale/" class="btn-outline"
+                    style="width:100%;margin-bottom:24px;">SELEZIONA</a>
+                <ul
+                    style="list-style:none;text-align:left;font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:2;">
+                    <li>✓ Programma personalizzato</li>
+                    <li>✓ Tutte le funzioni incluse</li>
+                    <li>✓ Massima trasformazione</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: FINAL CTA & FOOTER                               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="csv-final">
+        <h2>Il Fisico che Vuoi Non Si Costruisce Domani.</h2>
+        <a href="#physique-analysis" class="btn-gold" style="margin-top:24px;">🔬 SCOPRI IL TUO POTENZIALE</a>
+    </section>
+
+    <footer class="csv-foot">
+        <div style="text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.4);">
+            <p>CSV Team © 2024 · Premium Bodybuilding Coaching</p>
+            <p style="margin-top:16px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://www.csvteam.com/privacy-policy/" style="padding: 8px;">Privacy</a> <a
+                    href="https://www.csvteam.com/terms/" style="padding: 8px;">Termini</a> <a href="https://app.csvteam.com" style="padding: 8px;">App CSV</a>
+            </p>
+        </div>
+    </footer>
+
+</div>
