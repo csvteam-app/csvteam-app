@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CSV Team</string>
+    <string name="title_activity_main">CSV Team</string>
+    <string name="package_name">com.csvteam.app</string>
+    <string name="custom_url_scheme">com.csvteam.app</string>
+</resources>

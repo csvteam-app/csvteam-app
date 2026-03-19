@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Silhouette Preview Grid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; padding: 40px 20px; background: #070709; color: #fff; font-family: 'Inter', sans-serif; }
+    h1 { text-align: center; font-size: 1.8rem; color: #D4AF37; margin-bottom: 8px; }
+    h2 { text-align: center; font-size: 1.1rem; color: rgba(255,255,255,0.5); font-weight: 600; margin-bottom: 40px; }
+    .scale-title { text-align: center; font-size: 1.2rem; font-weight: 800; margin: 40px 0 20px; color: #FDF5E6; letter-spacing: 0.1em; text-transform: uppercase; }
+    .grid { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; max-width: 900px; margin: 0 auto 60px; }
+    .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px 16px; text-align: center; width: 140px; }
+    .card img { width: 90px; height: 140px; margin: 0 auto 12px; display: block;  }
+    .card .label { font-weight: 800; font-size: 0.85rem; margin-bottom: 4px; }
+    .card .level { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+    .specs { max-width: 600px; margin: 0 auto; padding: 30px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; }
+    .specs h3 { font-size: 1rem; color: #D4AF37; margin-bottom: 12px; }
+    .specs p { font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 6px; }
+    .specs code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; color: #FDF5E6; }
+  </style>
+</head>
+<body>
+
+<h1>CSV Silhouette System — Preview Grid</h1>
+<h2>Medical-style diagnostic silhouettes for body transformation quiz</h2>
+
+<div class="scale-title">Body Fat Scale</div>
+<div class="grid">
+  <div class="card">
+    <img src="/images/bf1.png" alt="BF Level 1">
+    <div class="label">Molto alta</div>
+    <div class="level">Level 1 — bf1.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/bf2.png" alt="BF Level 2">
+    <div class="label">Alta</div>
+    <div class="level">Level 2 — bf2.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/bf3.png" alt="BF Level 3">
+    <div class="label">Leggermente alta</div>
+    <div class="level">Level 3 — bf3.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/bf4.png" alt="BF Level 4">
+    <div class="label">Normale</div>
+    <div class="level">Level 4 — bf4.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/bf5.png" alt="BF Level 5">
+    <div class="label">Bassa</div>
+    <div class="level">Level 5 — bf5.svg</div>
+  </div>
+</div>
+
+<div class="scale-title">Muscle Mass Scale</div>
+<div class="grid">
+  <div class="card">
+    <img src="/images/muscle1.png" alt="Muscle Level 1">
+    <div class="label">Poco tonico</div>
+    <div class="level">Level 1 — muscle1.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/muscle2.png" alt="Muscle Level 2">
+    <div class="label">Normale</div>
+    <div class="level">Level 2 — muscle2.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/muscle3.png" alt="Muscle Level 3">
+    <div class="label">Leggermente tonico</div>
+    <div class="level">Level 3 — muscle3.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/muscle4.png" alt="Muscle Level 4">
+    <div class="label">Tonico</div>
+    <div class="level">Level 4 — muscle4.svg</div>
+  </div>
+  <div class="card">
+    <img src="/images/muscle5.png" alt="Muscle Level 5">
+    <div class="label">Muscoloso</div>
+    <div class="level">Level 5 — muscle5.svg</div>
+  </div>
+</div>
+
+<div class="specs">
+  <h3>Technical Specifications</h3>
+  <p><strong>Format:</strong> SVG (vector)</p>
+  <p><strong>ViewBox:</strong> <code>0 0 120 280</code></p>
+  <p><strong>Fill:</strong> <code>#000</code> (black silhouette on transparent background)</p>
+  <p><strong>Recommended quiz UI size:</strong> <code>width: 90px; height: 140px;</code></p>
+  <p><strong>Mobile display:</strong> <code>width: 70px; height: 110px;</code></p>
+  <p><strong>All paths use:</strong> vector only, no gradients, no shadows, no textures</p>
+  <p><strong>Scaling:</strong> ✅ SVG scales perfectly to any resolution without quality loss</p>
+</div>
+
+</body>
+</html>

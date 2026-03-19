@@ -1,0 +1,28 @@
+{
+  "allTablesValid": true,
+  "tableResults": {
+    "profiles": "OK (Readable)",
+    "exercises": "OK (Readable)",
+    "programs": "OK (Readable)",
+    "program_days": "OK (Readable)",
+    "program_exercises": "OK (Readable)",
+    "athlete_programs": "OK (Readable)",
+    "workout_sessions": "OK (Readable)",
+    "logbook_sets": "OK (Readable)",
+    "gamification_profiles": "OK (Readable)",
+    "daily_tasks_log": "OK (Readable)",
+    "lessons": "OK (Readable)",
+    "user_lessons_completed": "OK (Readable)",
+    "nutrition_logs": "OK (Readable)",
+    "coaching_appointments": "OK (Readable)",
+    "chat_messages": "OK (RLS Active)"
+  },
+  "allBucketsValid": true,
+  "bucketResults": {
+    "tutorial-videos": "OK",
+    "academy-videos": "OK",
+    "chat-attachments": "OK",
+    "user-avatars": "OK"
+  },
+  "timestamp": "2026-03-09T23:06:26.042Z"
+}

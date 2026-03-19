@@ -1,0 +1,120 @@
+-- ============================================================
+-- CSV TEAM — STEP 2C: SEED FATS, FRUITS, VEGETABLES, NUTS, 
+--                      SWEETS, BEVERAGES, FITNESS FOODS
+-- Run AFTER step2b
+-- ============================================================
+
+INSERT INTO food_items (name, category, subcategory, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, fiber_per_100g, raw_or_cooked, searchable_aliases) VALUES
+-- FATS & OILS
+('Olio Extravergine d''Oliva', 'fats', 'oils', 899, 0.0, 0.0, 99.9, 0, 'na', '{"olio evo","olive oil","olio oliva"}'),
+('Olio di semi', 'fats', 'oils', 899, 0.0, 0.0, 99.9, 0, 'na', '{"olio semi","seed oil","olio girasole"}'),
+('Olio di cocco', 'fats', 'oils', 862, 0.0, 0.0, 99.1, 0, 'na', '{"coconut oil","olio cocco"}'),
+('Burro', 'fats', 'butter', 717, 0.8, 0.1, 81.1, 0, 'na', '{"butter","burro"}'),
+('Burro d''arachidi', 'fats', 'nut_butter', 588, 25.0, 20.0, 50.0, 6.0, 'na', '{"peanut butter","crema arachidi","pb"}'),
+('Burro di mandorle', 'fats', 'nut_butter', 614, 21.0, 19.0, 56.0, 4.0, 'na', '{"almond butter","crema mandorle"}'),
+('Crema di nocciole e cacao', 'fats', 'nut_butter', 539, 6.0, 57.0, 31.0, 2.0, 'na', '{"nutella","crema nocciole","hazelnut spread"}'),
+('Tahini (crema di sesamo)', 'fats', 'nut_butter', 595, 17.0, 21.0, 54.0, 9.0, 'na', '{"tahini","sesame paste"}'),
+('Maionese', 'fats', 'condiments', 680, 1.0, 1.0, 75.0, 0, 'na', '{"mayo","maionese"}'),
+('Maionese light', 'fats', 'condiments', 260, 1.0, 6.0, 25.0, 0, 'na', '{"mayo light","maionese leggera"}'),
+('Avocado', 'fats', 'fruit', 160, 2.0, 8.5, 14.7, 6.7, 'raw', '{"avocado"}'),
+
+-- NUTS & SEEDS
+('Mandorle (sgusciate)', 'nuts', 'nuts', 579, 21.2, 21.6, 49.9, 12.5, 'na', '{"almonds","mandorle"}'),
+('Noci (sgusciate)', 'nuts', 'nuts', 654, 15.2, 13.7, 65.2, 6.7, 'na', '{"walnuts","noci"}'),
+('Nocciole (sgusciate)', 'nuts', 'nuts', 628, 15.0, 17.0, 61.0, 9.7, 'na', '{"hazelnuts","nocciole"}'),
+('Anacardi', 'nuts', 'nuts', 553, 18.2, 30.2, 44.0, 3.3, 'na', '{"cashews","anacardi"}'),
+('Pistacchi (sgusciati)', 'nuts', 'nuts', 562, 20.2, 27.0, 45.0, 10.6, 'na', '{"pistachios","pistacchi"}'),
+('Arachidi tostate', 'nuts', 'nuts', 585, 26.0, 16.0, 49.0, 8.0, 'na', '{"peanuts","arachidi","noccioline"}'),
+('Noci del Brasile', 'nuts', 'nuts', 656, 14.3, 12.3, 66.0, 7.5, 'na', '{"brazil nuts","noci brasile"}'),
+('Noci di macadamia', 'nuts', 'nuts', 718, 8.0, 14.0, 76.0, 8.6, 'na', '{"macadamia"}'),
+('Mix frutta secca', 'nuts', 'nuts', 607, 20.0, 17.0, 54.0, 7.0, 'na', '{"trail mix","frutta secca mista","mixed nuts"}'),
+('Semi di chia', 'nuts', 'seeds', 486, 17.0, 42.0, 31.0, 34.4, 'na', '{"chia seeds","semi chia"}'),
+('Semi di lino', 'nuts', 'seeds', 534, 18.3, 29.0, 42.0, 27.3, 'na', '{"flax seeds","semi lino","linseed"}'),
+('Semi di zucca', 'nuts', 'seeds', 559, 30.0, 11.0, 49.0, 6.0, 'na', '{"pumpkin seeds","semi zucca"}'),
+('Semi di girasole', 'nuts', 'seeds', 584, 21.0, 20.0, 51.0, 9.0, 'na', '{"sunflower seeds","semi girasole"}'),
+
+-- FRUITS
+('Mela', 'fruit', 'common', 52, 0.3, 13.8, 0.2, 2.4, 'na', '{"apple","mela"}'),
+('Banana', 'fruit', 'common', 89, 1.1, 22.8, 0.3, 2.6, 'na', '{"banana"}'),
+('Arancia', 'fruit', 'common', 47, 0.9, 11.8, 0.1, 2.4, 'na', '{"orange","arancia"}'),
+('Mandarino', 'fruit', 'common', 53, 0.8, 13.3, 0.3, 1.8, 'na', '{"tangerine","mandarino","clementina"}'),
+('Fragole', 'fruit', 'berries', 32, 0.7, 7.7, 0.3, 2.0, 'na', '{"strawberries","fragole"}'),
+('Mirtilli', 'fruit', 'berries', 57, 0.7, 14.5, 0.3, 2.4, 'na', '{"blueberries","mirtilli"}'),
+('Lamponi', 'fruit', 'berries', 52, 1.2, 12.0, 0.7, 6.5, 'na', '{"raspberries","lamponi"}'),
+('Kiwi', 'fruit', 'common', 61, 1.1, 14.7, 0.5, 3.0, 'na', '{"kiwi","kiwi verde"}'),
+('Pera', 'fruit', 'common', 57, 0.4, 15.2, 0.1, 3.1, 'na', '{"pear","pera"}'),
+('Uva', 'fruit', 'common', 69, 0.7, 18.1, 0.2, 0.9, 'na', '{"grapes","uva"}'),
+('Pesca', 'fruit', 'common', 39, 0.9, 9.5, 0.3, 1.5, 'na', '{"peach","pesca"}'),
+('Ananas', 'fruit', 'common', 50, 0.5, 13.1, 0.1, 1.4, 'na', '{"pineapple","ananas"}'),
+('Anguria', 'fruit', 'common', 30, 0.6, 7.6, 0.2, 0.4, 'na', '{"watermelon","anguria","cocomero"}'),
+('Melone', 'fruit', 'common', 34, 0.8, 8.2, 0.2, 0.9, 'na', '{"melon","cantalupo"}'),
+('Mango', 'fruit', 'common', 60, 0.8, 15.0, 0.4, 1.6, 'na', '{"mango"}'),
+('Datteri (secchi)', 'fruit', 'dried', 277, 1.8, 75.0, 0.2, 7.0, 'na', '{"dates","datteri","medjool"}'),
+('Uvetta', 'fruit', 'dried', 299, 3.1, 79.2, 0.5, 3.7, 'na', '{"raisins","uvetta","uvetta sultanina"}'),
+('Fichi secchi', 'fruit', 'dried', 249, 3.3, 63.9, 0.9, 9.8, 'na', '{"dried figs","fichi secchi"}'),
+('Cocco grattugiato', 'fruit', 'dried', 660, 6.0, 24.0, 62.0, 16.0, 'na', '{"coconut flakes","cocco"}'),
+
+-- VEGETABLES (meaningful calories or high logging relevance)
+('Patate (crude)', 'vegetables', 'tubers', 77, 2.0, 17.5, 0.1, 1.8, 'raw', '{"potatoes","patata"}'),
+('Mais dolce (in scatola)', 'vegetables', 'starchy', 86, 3.3, 19.0, 1.2, 2.0, 'na', '{"corn","mais","sweet corn"}'),
+('Zucca', 'vegetables', 'starchy', 26, 1.0, 6.5, 0.1, 0.5, 'raw', '{"pumpkin","zucca"}'),
+('Carote', 'vegetables', 'root', 41, 0.9, 10.0, 0.2, 2.8, 'raw', '{"carrots","carote"}'),
+('Barbabietola', 'vegetables', 'root', 43, 1.6, 10.0, 0.2, 2.8, 'raw', '{"beetroot","barbabietola"}'),
+('Pomodori', 'vegetables', 'common', 18, 0.9, 3.9, 0.2, 1.2, 'raw', '{"tomato","pomodoro","pomodori"}'),
+('Broccoli', 'vegetables', 'common', 34, 2.8, 6.6, 0.4, 2.6, 'raw', '{"broccoli","broccolo"}'),
+('Spinaci', 'vegetables', 'common', 23, 2.9, 3.6, 0.4, 2.2, 'raw', '{"spinach","spinaci"}'),
+('Zucchine', 'vegetables', 'common', 17, 1.2, 3.1, 0.3, 1.0, 'raw', '{"zucchini","zucchine"}'),
+('Peperoni', 'vegetables', 'common', 20, 0.9, 4.6, 0.2, 1.7, 'raw', '{"bell pepper","peperoni","peppers"}'),
+('Melanzane', 'vegetables', 'common', 25, 1.0, 5.9, 0.2, 3.0, 'raw', '{"eggplant","melanzana"}'),
+('Insalata / Lattuga', 'vegetables', 'common', 15, 1.4, 2.9, 0.2, 1.3, 'raw', '{"lettuce","insalata","iceberg"}'),
+('Funghi champignon', 'vegetables', 'common', 22, 3.1, 3.3, 0.3, 1.0, 'raw', '{"mushrooms","funghi","champignon"}'),
+('Cipolla', 'vegetables', 'common', 40, 1.1, 9.3, 0.1, 1.7, 'raw', '{"onion","cipolla"}'),
+('Cavolfiore', 'vegetables', 'common', 25, 1.9, 5.0, 0.3, 2.0, 'raw', '{"cauliflower","cavolfiore"}'),
+
+-- SWEETS & SNACKS
+('Pizza Margherita (media da pizzeria)', 'sweets', 'pizza', 266, 11.0, 33.0, 10.0, 1.5, 'cooked', '{"pizza","margherita","pizza al taglio"}'),
+('Cioccolato fondente (85%)', 'sweets', 'chocolate', 598, 8.8, 19.3, 51.6, 11.0, 'na', '{"dark chocolate","cioccolato fondente"}'),
+('Cioccolato fondente (70%)', 'sweets', 'chocolate', 530, 7.0, 36.0, 41.0, 8.0, 'na', '{"cioccolato 70","dark chocolate 70"}'),
+('Cioccolato al latte', 'sweets', 'chocolate', 535, 7.6, 59.4, 30.0, 3.4, 'na', '{"milk chocolate","cioccolato latte","kinder"}'),
+('Gelato artigianale (media creme)', 'sweets', 'ice_cream', 200, 3.5, 24.0, 10.0, 0.5, 'na', '{"gelato","ice cream","gelato artigianale"}'),
+('Gelato artigianale (media frutta)', 'sweets', 'ice_cream', 130, 1.5, 24.0, 3.0, 0.5, 'na', '{"sorbetto","fruit gelato"}'),
+('Cornetto vuoto (da bar)', 'sweets', 'pastry', 410, 8.0, 50.0, 20.0, 1.5, 'na', '{"croissant","brioche","cornetto"}'),
+('Cornetto con crema', 'sweets', 'pastry', 350, 7.0, 44.0, 16.0, 1.0, 'na', '{"cornetto crema","cream croissant"}'),
+('Panino Hamburger (Fast Food)', 'sweets', 'fast_food', 254, 12.0, 31.0, 9.0, 1.5, 'cooked', '{"burger","hamburger","mcdonalds"}'),
+('Patatine fritte', 'sweets', 'fast_food', 312, 3.4, 41.0, 15.0, 3.8, 'cooked', '{"french fries","patatine","fries"}'),
+('Marmellata / Confettura', 'sweets', 'spreads', 250, 0.6, 60.0, 0.1, 1.0, 'na', '{"jam","marmellata","confettura"}'),
+('Miele', 'sweets', 'spreads', 304, 0.3, 82.0, 0.0, 0, 'na', '{"honey","miele"}'),
+('Biscotti secchi', 'sweets', 'cookies', 440, 7.0, 67.0, 16.0, 2.5, 'na', '{"biscuits","cookies","biscotti"}'),
+('Biscotti frollini', 'sweets', 'cookies', 480, 6.0, 63.0, 22.0, 2.0, 'na', '{"frollini","shortbread cookies"}'),
+('Cereali da colazione (corn flakes)', 'sweets', 'cereal', 357, 7.0, 84.0, 0.9, 3.0, 'na', '{"corn flakes","cereali colazione","cereal"}'),
+('Granola classica', 'sweets', 'cereal', 471, 10.0, 64.0, 20.0, 5.0, 'na', '{"granola","muesli croccante"}'),
+('Tiramisù', 'sweets', 'desserts', 283, 6.0, 24.0, 18.0, 0.5, 'na', '{"tiramisu","tiramisù"}'),
+('Torta di mele', 'sweets', 'desserts', 237, 3.0, 30.0, 12.0, 1.0, 'na', '{"apple cake","torta mele"}'),
+
+-- CALORIC BEVERAGES
+('Succo d''arancia', 'beverages', 'juice', 45, 0.7, 10.4, 0.2, 0.2, 'na', '{"orange juice","succo arancia"}'),
+('Succo di mela', 'beverages', 'juice', 46, 0.1, 11.3, 0.1, 0.2, 'na', '{"apple juice","succo mela"}'),
+('Coca-Cola', 'beverages', 'soda', 42, 0.0, 10.6, 0.0, 0, 'na', '{"coca cola","cola","coke"}'),
+('Sprite / Limonata', 'beverages', 'soda', 40, 0.0, 10.2, 0.0, 0, 'na', '{"sprite","limonata","lemonade","fanta"}'),
+('Birra (media 5%)', 'beverages', 'alcohol', 43, 0.5, 3.5, 0.0, 0, 'na', '{"beer","birra"}'),
+('Vino rosso', 'beverages', 'alcohol', 83, 0.1, 2.6, 0.0, 0, 'na', '{"red wine","vino rosso","vino"}'),
+('Vino bianco', 'beverages', 'alcohol', 82, 0.1, 2.6, 0.0, 0, 'na', '{"white wine","vino bianco"}'),
+
+-- FITNESS FOODS & SUPPLEMENTS
+('Proteine del Siero (Whey)', 'fitness', 'supplement', 375, 78.0, 5.0, 4.5, 0, 'na', '{"whey","whey protein","proteine polvere","polvere proteica"}'),
+('Proteine della Caseina', 'fitness', 'supplement', 360, 80.0, 4.0, 1.5, 0, 'na', '{"casein","caseina","casein protein"}'),
+('Proteine Vegane (pisello/riso)', 'fitness', 'supplement', 370, 75.0, 8.0, 5.0, 3.0, 'na', '{"vegan protein","proteine vegane"}'),
+('Barretta Proteica (generica)', 'fitness', 'bars', 360, 33.0, 35.0, 12.0, 3.0, 'na', '{"protein bar","barretta proteica","barretta"}'),
+('Pancake proteici (mix secco)', 'fitness', 'prepared', 350, 35.0, 40.0, 5.0, 3.0, 'na', '{"protein pancake","pancake proteici"}'),
+('Crema di riso (per sportivi)', 'fitness', 'prepared', 356, 7.0, 80.0, 1.0, 0.5, 'na', '{"cream of rice","crema di riso"}'),
+('Burro di arachidi proteico', 'fitness', 'nut_butter', 450, 35.0, 15.0, 28.0, 5.0, 'na', '{"protein peanut butter","pb proteico"}'),
+('Wafer proteici', 'fitness', 'bars', 380, 30.0, 30.0, 15.0, 2.0, 'na', '{"protein wafer","wafer proteico"}'),
+
+-- SAUCES & CONDIMENTS
+('Passata di pomodoro', 'vegetables', 'sauce', 24, 1.3, 4.2, 0.1, 1.0, 'na', '{"tomato sauce","passata","sugo pomodoro"}'),
+('Pesto alla genovese', 'fats', 'sauce', 435, 5.0, 5.0, 43.0, 2.0, 'na', '{"pesto","basil pesto"}'),
+('Salsa di soia', 'beverages', 'sauce', 53, 5.0, 5.0, 0.1, 0, 'na', '{"soy sauce","salsa soia","tamari"}'),
+('Aceto balsamico', 'beverages', 'condiment', 88, 0.5, 17.0, 0.0, 0, 'na', '{"balsamic vinegar","aceto balsamico"}'),
+('Ketchup', 'sweets', 'sauce', 112, 1.0, 26.0, 0.2, 0.3, 'na', '{"ketchup"}'),
+('Senape', 'fats', 'condiment', 66, 4.0, 6.0, 3.0, 3.0, 'na', '{"mustard","senape"}')
+ON CONFLICT DO NOTHING;

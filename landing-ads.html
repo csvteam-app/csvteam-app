@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSV Team — Il tuo fisico, senza improvvisazione</title>
+  <meta name="description" content="Smetti di improvvisare. Scopri quanto margine hai davvero con la CSV Physique Analysis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060606;
+      --bg-soft: #0b0b0c;
+      --text: rgba(255,255,255,0.96);
+      --muted: rgba(255,255,255,0.6);
+      --muted-2: rgba(255,255,255,0.4);
+      --gold: #f1e3c5;
+      --gold-2: #d8c39a;
+      --line: rgba(255,255,255,0.08);
+      --max: 1100px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #060606;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; height: auto; object-fit: cover; }
+
+    /* Background glow */
+    .csv-site::before {
+      content: ""; position: fixed; top: -15rem; left: 50%; transform: translateX(-50%);
+      width: 40rem; height: 40rem; border-radius: 999px; filter: blur(100px);
+      background: radial-gradient(circle, rgba(241,227,197,0.15), transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .container {
+      width: min(calc(100% - 40px), var(--max));
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section { padding: 90px 0; }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* TYPOGRAPHY */
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: 1; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 24px; }
+    h2 { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.1; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 16px; }
+    h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: 12px; }
+    
+    .lead { font-size: clamp(1.1rem, 2vw, 1.25rem); color: var(--muted); max-width: 680px; margin-bottom: 32px; }
+    
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 12px; margin-bottom: 20px;
+      font-size: 0.75rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+    }
+    .eyebrow::before { content: ""; width: 30px; height: 1px; background: var(--gold); opacity: 0.5; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 60px; padding: 0 32px; border-radius: 16px;
+      font-size: 1rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+      border: none; text-decoration: none;
+    }
+    .btn-primary {
+      color: #111;
+      background: linear-gradient(135deg, #f5ead1 0%, #dcc59a 100%);
+      box-shadow: 0 10px 30px rgba(216,195,154,0.15), inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(216,195,154,0.25), inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    /* HERO */
+    .hero { min-height: 85vh; display: grid; align-items: center; text-align: center; padding-top: 120px; }
+    .hero .container { display: flex; flex-direction: column; align-items: center; }
+    .hero h1 span { color: var(--gold); }
+    
+    /* TRANSFORMATIONS (New Grid) */
+    .transf-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: -40px; margin-bottom: 60px;
+      position: relative; z-index: 2;
+    }
+    .transf-card {
+      position: relative; border-radius: 24px; overflow: hidden; height: 480px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .transf-card img { width: 100%; height: 100%; object-fit: cover; }
+    .transf-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(0deg, rgba(6,6,6,0.95) 0%, rgba(6,6,6,0.4) 40%, transparent 100%);
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 32px;
+    }
+    .transf-badge {
+      display: inline-block; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800;
+      letter-spacing: 0.1em; text-transform: uppercase; background: rgba(241,227,197,0.1); color: var(--gold); border: 1px solid rgba(241,227,197,0.2);
+      margin-bottom: 12px; align-self: flex-start;
+    }
+    .transf-overlay h3 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; line-height: 1.1; }
+    .transf-overlay p { color: var(--muted); font-size: 1.05rem; }
+
+    /* REAL COACHING (New Section) */
+    .coaching-section { padding: 120px 0; border-top: 1px solid var(--line); background: rgba(255,255,255,0.01); }
+    .coaching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .coaching-content h2 { font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 24px; }
+    .coaching-content p { font-size: 1.15rem; color: var(--muted); margin-bottom: 32px; line-height: 1.7; }
+    .coaching-visuals { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; position: relative; }
+    .coach-img { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+    .coach-img:nth-child(2) { transform: translateY(40px); }
+    .coaching-badge {
+      position: absolute; bottom: 10%; left: -20px; background: #060606; border: 1px solid var(--line);
+      padding: 16px 24px; border-radius: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .coaching-badge span { font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em; color: var(--gold); }
+
+    /* STRUCTURE (3 Columns) */
+    .structure-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
+    .struct-card { padding: 32px; border-radius: 24px; }
+    .struct-num { color: var(--gold-2); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.1em; margin-bottom: 16px; display: block; }
+    .struct-card p { color: var(--muted); font-size: 0.95rem; }
+
+    /* TRUST BAR */
+    .trust-bar { margin: 40px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 30px 0; text-align: center; }
+    .trust-stats { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+    .stat { display: flex; flex-direction: column; align-items: center; }
+    .stat strong { font-size: 2.5rem; color: var(--gold); font-weight: 900; line-height: 1; }
+    .stat span { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px; }
+
+    /* QUIZ SECTION */
+    .quiz-section { background: #0b0b0c; padding: 100px 0; border-top: 1px solid var(--line); }
+    .quiz-card { max-width: 800px; margin: 0 auto; padding: 48px; border-radius: 32px; box-shadow: 0 40px 100px rgba(0,0,0,0.5); }
+    
+    .quiz-progress-wrap { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 30px 0 12px; overflow: hidden; }
+    .quiz-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #dcc59a, #f1e3c5); transition: width 0.3s ease; }
+    .quiz-progress-text { font-size: 0.75rem; color: var(--gold); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; text-align: right; display: block; margin-bottom: 40px; }
+    
+    .question { margin-bottom: 24px; padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; }
+    .q-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    .q-title span { color: var(--gold); font-size: 1.3rem; }
+    
+    .options-row { display: flex; flex-wrap: wrap; gap: 12px; }
+    .options-col { display: flex; flex-direction: column; gap: 12px; }
+    
+    .qp {
+      padding: 14px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
+      color: var(--muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; flex: 1; text-align: center; transition: all 0.2s;
+    }
+    .qp:hover { border-color: rgba(241,227,197,0.4); color: var(--gold); }
+    .qp.active { background: linear-gradient(135deg, #f5ead1 0%, #dcc59a 100%); color: #111; border-color: transparent; }
+    
+    .report-preview {
+      margin: 40px auto; padding: 32px; border-radius: 20px; text-align: center; position: relative; overflow: hidden;
+      background: rgba(241,227,197,0.04); border: 1px solid rgba(241,227,197,0.15);
+    }
+    .report-preview::before { content:""; position:absolute; top:0; left:0; width:4px; height:100%; background: var(--gold); }
+    .rp-label { font-size: 0.8rem; color: var(--muted); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+    .rp-value { font-size: 2.8rem; font-weight: 900; color: var(--gold); line-height: 1; margin-bottom: 16px; }
+    .rp-time { display: inline-block; font-size: 1rem; color: var(--gold); font-weight: 700; background: rgba(241,227,197,0.1); padding: 10px 20px; border-radius: 8px; }
+    
+    .email-capture { display: flex; gap: 16px; margin-top: 24px; }
+    .email-input {
+      flex: 1; padding: 0 24px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+      color: #fff; font-size: 1rem; outline: none; transition: border-color 0.2s;
+    }
+    .email-input:focus { border-color: var(--gold); }
+    .email-btn { padding: 0 40px; }
+    
+    .quiz-feedback { margin-top: 16px; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; display: none; }
+    .quiz-feedback.error { display: block; background: rgba(255,100,100,0.1); color: #ff8888; border: 1px solid rgba(255,100,100,0.2); }
+    .quiz-feedback.success { display: block; background: rgba(241,227,197,0.1); color: var(--gold); border: 1px solid rgba(241,227,197,0.2); }
+
+    /* FOOTER */
+    footer { padding: 40px 0; text-align: center; color: var(--muted-2); font-size: 0.85rem; border-top: 1px solid var(--line); }
+
+    @media (max-width: 900px) {
+      .structure-grid, .transf-grid, .coaching-grid { grid-template-columns: 1fr; }
+      .transf-card { height: 400px; }
+      .coaching-grid { gap: 40px; }
+      .coach-img:nth-child(2) { transform: none; display: none; }
+      .coaching-badge { left: 50%; transform: translateX(-50%); bottom: -20px; width: max-content; }
+      .email-capture { flex-direction: column; }
+      .email-input { min-height: 60px; }
+      .quiz-card { padding: 32px 20px; }
+      .hero { padding-top: 100px; min-height: auto; padding-bottom: 80px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="csv-site">
+    
+    <!-- HEADER NOMENU -->
+    <header style="padding: 24px 0; position: absolute; width: 100%; top: 0; z-index: 10;">
+      <div class="container" style="display: flex; justify-content: center;">
+        <img src="https://www.csvteam.com/wp-content/uploads/2024/02/CSV-logo-completo-senza-scritte-bianco.png" alt="CSV Team" style="width: 60px; opacity: 0.9;" />
+      </div>
+    </header>
+
+    <!-- HERO (Universal ma forte) -->
+    <section class="hero">
+      <div class="container">
+        <div class="eyebrow">Premium Bodybuilding Coaching</div>
+        <h1>Ti alleni da anni, ma il tuo fisico <span>non cambia più?</span></h1>
+        <p class="lead">Mangi bene. Spingi in palestra. Ma sei rimasto uguale. I programmi standard non funzionano oltre un certo livello. Smetti di improvvisare e applica un sistema reale.</p>
+        <a href="#quiz" class="btn btn-primary" style="margin-top: 10px;">Costruisci la tua base vera</a>
+      </div>
+    </section>
+
+    <!-- TRASFORMAZIONI: Visual Proof (subito dopo Hero come richiesto) -->
+    <section>
+      <div class="container">
+        <div class="transf-grid">
+          <div class="transf-card">
+            <img src="https://via.placeholder.com/600x800/111/333?text=Prima+Dopo+1" alt="Trasformazione 1" />
+            <div class="transf-overlay">
+              <span class="transf-badge">Ricomposizione</span>
+              <h3>6 mesi. Metodo corretto.</h3>
+              <p>Stesso tempo investito. Risultato completamente opposto.</p>
+            </div>
+          </div>
+          <div class="transf-card">
+            <img src="https://via.placeholder.com/600x800/111/444?text=Prima+Dopo+2" alt="Trasformazione 2" />
+            <div class="transf-overlay">
+              <span class="transf-badge">Costruzione</span>
+              <h3>Risultato reale. Non casuale.</h3>
+              <p>Non è genetica magica, è un piano che si adatta alle tue risposte.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REAL COACHING (Nuova Sezione Visiva) -->
+    <section class="coaching-section">
+      <div class="container coaching-grid">
+        <div class="coaching-visuals">
+          <div class="coach-img"><img src="https://via.placeholder.com/500x700/111/444?text=Check+Plicometria" alt="Coaching Real 1" /></div>
+          <div class="coach-img"><img src="https://via.placeholder.com/500x700/111/333?text=Relazione+Cliente" alt="Coaching Real 2" /></div>
+          <div class="coaching-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Rapporto Diretto</span>
+          </div>
+        </div>
+        <div class="coaching-content">
+          <div class="eyebrow">Il dietro le quinte</div>
+          <h2>Ogni piano nasce da qui.</h2>
+          <p>Non inviamo schede Excel identiche per tutti sperando che funzionino. Il Coaching CSV si basa su analisi della composizione corporea vera, misurazioni precise e check settimanali che non si limitano a "come va?".</p>
+          <p><strong>Non è una scheda. È un lavoro su misura che evolve con te.</strong> Perché il corpo cambia, i ritmi di vita cambiano e il piano deve adattarsi prima che arrivi lo stallo.</p>
+          <a href="#quiz" class="btn btn-secondary" style="border: 1px solid rgba(255,255,255,0.2); margin-top: 16px; background: rgba(255,255,255,0.05); padding: 0 24px; min-height: 52px; border-radius: 12px; color: #fff;">Inizia dal tuo punto di partenza</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST BAR -->
+    <div class="trust-bar">
+      <div class="container">
+        <div class="trust-stats">
+          <div class="stat"><strong>+500</strong><span>Trasformazioni vere</span></div>
+          <div class="stat"><strong>100%</strong><span>Piani personalizzati</span></div>
+          <div class="stat"><strong>7/7</strong><span>Supporto in-app</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRUTTURA (Method 3 blocks) -->
+    <section class="section" style="padding-top: 40px;">
+      <div class="container">
+        <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+          <h2>Il problema non è l'impegno.<br>È l'assenza di struttura.</h2>
+          <p class="lead" style="margin: 20px auto 0;">Cambiare davvero richiede una direzione chiara, misurabile e adattabile nel tempo.</p>
+        </div>
+        <div class="structure-grid">
+          <div class="struct-card glass">
+            <span class="struct-num">01. STRATEGIA</span>
+            <h3>Costruita sui tuoi dati</h3>
+            <p>Allenamento e macro vengono calcolati sul tuo storico, i tuoi ritmi e il tuo reale livello di esecuzione.</p>
+          </div>
+          <div class="struct-card glass">
+            <span class="struct-num">02. TECNOLOGIA</span>
+            <h3>Tutto nell'App CSV</h3>
+            <p>Logbook, video tutorial, check-in e chat diretta col coach. Non hai bisogno di decine di file sparsi.</p>
+          </div>
+          <div class="struct-card glass">
+            <span class="struct-num">03. CORREZIONE</span>
+            <h3>Evoluzione continua</h3>
+            <p>Ogni settimana analizziamo i tuoi feedback e modifichiamo il piano. Niente attese, niente stalli infiniti.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ (Soluzione e Conversione) -->
+    <section class="section quiz-section" id="quiz">
+      <div class="container">
+        <div class="quiz-card glass">
+          <div class="eyebrow" style="justify-content: center; width: 100%;">Primo Passo</div>
+          <h2 style="text-align: center;">CSV Physique Analysis™</h2>
+          <p style="text-align: center; color: var(--muted); margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">Smetti di chiederti quanto ci vorrà. Fai l'analisi in 30 secondi e ottieni una stima realistica del tuo percorso ideale.</p>
+          
+          <div class="quiz-progress-wrap"><div class="quiz-progress-fill" id="q-fill"></div></div>
+          <span class="quiz-progress-text" id="q-label">Analisi 0%</span>
+
+          <form id="quiz-form">
+            <div class="question" data-q="goal">
+              <div class="q-title"><span>1.</span> Qual è il tuo obiettivo principale?</div>
+              <div class="options-row">
+                <div class="qp" data-val="Ricomposizione">Ricomposizione corporea</div>
+                <div class="qp" data-val="Dimagrimento">Perdere grasso</div>
+                <div class="qp" data-val="Ipertrofia">Costruire muscolo</div>
+              </div>
+            </div>
+
+            <div class="question" data-q="freq">
+              <div class="q-title"><span>2.</span> Quante volte ti alleni a settimana?</div>
+              <div class="options-row">
+                <div class="qp" data-val="1-2">1–2 volte</div>
+                <div class="qp" data-val="3-4">3–4 volte</div>
+                <div class="qp" data-val="5+">5+ volte</div>
+              </div>
+            </div>
+
+            <div class="question" data-q="commit">
+              <div class="q-title"><span>3.</span> Quanto sei disposto a impegnarti davvero?</div>
+              <div class="options-col">
+                <div class="qp" style="text-align: left;" data-val="Minimo">Il minimo necessario, senza stravolgere nulla</div>
+                <div class="qp" style="text-align: left;" data-val="Medio">Un impegno solido, purché sia sostenibile con il lavoro</div>
+                <div class="qp" style="text-align: left;" data-val="Massimo">Sono pronto a fare sul serio e portare tutto al 100%</div>
+              </div>
+            </div>
+
+            <div class="report-preview">
+              <div class="rp-label">Potenziale Stimato</div>
+              <div class="rp-value" id="rp-pot">Da definire</div>
+              <div class="rp-time" id="rp-time">Compila tutte le domande per scoprire la stima</div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+              <h3>Ottieni subito l'esito.</h3>
+              <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 24px;">Inserisci la mail. Rivedremo i tuoi dati e ti proporremo il percorso e lo scaling più adatto a te.</p>
+              
+              <div class="email-capture">
+                <input type="email" id="q-email" class="email-input" placeholder="Tua email (verificheremo l'identità)..." required />
+                <button type="submit" class="btn btn-primary email-btn">Sblocca il report definitivo</button>
+              </div>
+              
+              <div id="q-feedback" class="quiz-feedback"></div>
+              <p style="font-size: 0.8rem; color: var(--muted-2); margin-top: 16px;">🔒 Nessuno spam. Rispettiamo privacy e dati al 100%.</p>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        &copy; 2026 CSV Team. Tutti i diritti riservati.<br>
+        Landing page riservata per le campagne pubblicitarie.
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const state = { goal: null, freq: null, commit: null };
+    const fill = document.getElementById('q-fill');
+    const label = document.getElementById('q-label');
+    const rpPot = document.getElementById('rp-pot');
+    const rpTime = document.getElementById('rp-time');
+    const feedback = document.getElementById('q-feedback');
+
+    function updateView() {
+      const answered = Object.values(state).filter(Boolean).length;
+      const pct = Math.round((answered / 3) * 100);
+      fill.style.width = pct + '%';
+      label.textContent = 'Analisi ' + pct + '%';
+      
+      if (answered < 3) {
+        rpPot.textContent = 'Da definire';
+        rpTime.textContent = 'Compila le domande per sbloccare la stima';
+        return;
+      }
+      
+      let pot = "OTTIMO";
+      let time = "16–20 settimane";
+      
+      if (state.commit === "Massimo" && state.freq === "5+") {
+        pot = "ALTISSIMO"; time = "12–16 settimane";
+      } else if (state.commit === "Massimo" || state.freq === "3-4") {
+        pot = "ALTO"; time = "14–18 settimane";
+      } else {
+        pot = "PROGRESSIVO"; time = "20–24 settimane";
+      }
+      
+      rpPot.textContent = pot;
+      rpTime.textContent = "Tempo realistico: " + time;
+    }
+
+    document.querySelectorAll('.question').forEach(q => {
+      const key = q.dataset.q;
+      const options = q.querySelectorAll('.qp');
+      options.forEach(opt => {
+        opt.addEventListener('click', () => {
+          options.forEach(o => o.classList.remove('active'));
+          opt.classList.add('active');
+          state[key] = opt.dataset.val;
+          feedback.style.display = 'none';
+          updateView();
+        });
+      });
+    });
+
+    document.getElementById('quiz-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('q-email').value;
+      if (Object.values(state).filter(Boolean).length < 3) {
+        feedback.className = 'quiz-feedback error';
+        feedback.textContent = 'Rispondi a tutte le domande per continuare.';
+        return;
+      }
+      feedback.className = 'quiz-feedback success';
+      feedback.textContent = 'Analisi completata! Controlla la tua casella email (anche in spam).';
+      console.log('Lead acquisito:', email, state);
+    });
+  </script>
+</body>
+</html>

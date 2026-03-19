@@ -1,0 +1,37 @@
+--- /Users/danielecasavecchia/Desktop/csvteam-app/src/components/user/VoiceLoggerModal.jsx
++++ /Users/danielecasavecchia/Desktop/csvteam-app/src/components/user/VoiceLoggerModal.jsx
+@@ -107,24 +107,25 @@
+                         matches.push({
+                             food: mapFood(data[0]),
+                             grams: item.grams,
+                             originalQuery: item.original_query || item.food_name
+                         });
+                     } else {
+                         // Fallback se non trova il nome completo: cerchiamo solo la prima parola (es: "pane integrale" -> "pane")
+                         const words = item.food_name.split(' ');
+                         if (words.length > 1) {
+                             const { data: fallbackData } = await supabase
+                                 .from('food_items')
+                                 .select('id, name, category, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, serving_type')
+                                 .eq('is_core', true)
+                                 .ilike('name', `%${words[0]}%`)
+                                 .limit(1);
+ 
+                             if (fallbackData && fallbackData.length > 0) {
+                                 matches.push({
+                                     food: mapFood(fallbackData[0]),
+                                     grams: item.grams,
+                                     originalQuery: item.original_query || item.food_name
+                                 });
+                             }
+                         }
+                     }
+                 }
+                 setParsedMatchedFoods(matches);
+             } catch (err) {
+                 console.error("Errore durante il parsing AI:", err);
+                 alert("Errore AI: " + err.message);
+             } finally {
+                 setIsProcessing(false);
+             }
+         };
