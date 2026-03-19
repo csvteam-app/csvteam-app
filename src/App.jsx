@@ -46,10 +46,11 @@ import LeaguePopup from './components/gamification/LeaguePopup';
 
 /* ── Global Overlays (inside AppProvider context) ── */
 function GamificationOverlays() {
+  const { rewardPopup } = useAppContext();
+
   // Launch Light: non montare overlay se REWARDS è disattivato
   if (!FEATURE_FLAGS.REWARDS) return null;
 
-  const { rewardPopup } = useAppContext();
   return (
     <>
       {rewardPopup && <RewardAnimation xp={rewardPopup.xp} points={rewardPopup.points} />}
