@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider, useAppContext } from './context/AppContext';
 import ErrorBoundary from './ErrorBoundary';
@@ -72,7 +73,7 @@ function App() {
 
               {/* User Portal */}
               <Route element={<UserLayout />}>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
                 <Route element={<UserProtectedRoute />}>
                   <Route path="/dashboard" element={<Dashboard />} />
@@ -112,6 +113,7 @@ function App() {
                 </Route>
               </Route>
             </Routes>
+            <Analytics />
           </BrowserRouter>
         </AppProvider>
       </AuthProvider>

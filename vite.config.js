@@ -33,11 +33,8 @@ export default defineConfig({
     })
   ],
   server: {
-    host: true,
-    allowedHosts: true,
-    hmr: {
-      clientPort: 443,
-      protocol: 'wss'
-    }
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: true
   }
 })
