@@ -44,9 +44,11 @@ Questo documento contiene il codice sorgente completo dell'app CSV Team frontend
     "@capacitor/android": "^8.2.0",
     "@capacitor/core": "^8.2.0",
     "@capacitor/ios": "^8.2.0",
+    "@capacitor/preferences": "^8.0.1",
     "@stripe/react-stripe-js": "^5.6.1",
     "@stripe/stripe-js": "^8.9.0",
     "@supabase/supabase-js": "^2.99.0",
+    "@vercel/analytics": "^2.0.1",
     "dotenv": "^17.3.1",
     "framer-motion": "^12.35.1",
     "html5-qrcode": "^2.3.8",
@@ -112,12 +114,9 @@ export default defineConfig({
     })
   ],
   server: {
-    host: true,
-    allowedHosts: true,
-    hmr: {
-      clientPort: 443,
-      protocol: 'wss'
-    }
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: true
   }
 })
 
@@ -176,35 +175,6 @@ export default class ErrorBoundary extends Component {
         return this.props.children;
     }
 }
-
-```
-
-## File: `src/tmp_check.js`
-```js
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-    'https://jypimakyzazshxaesmoc.supabase.co',
-    'sb_publishable_RgKBjd7DXNnodgxe0E0xhg_4ExtwWv9'
-);
-
-async function cols(table) {
-    const { data, error } = await supabase.from(table).select('*').limit(1);
-    if (error) { console.log(`${table} error: ${error.message}`); return; }
-    console.log(`\n=== ${table} ===`);
-    if (data && data.length > 0) { console.log('Columns:', Object.keys(data[0])); console.log('Sample:', JSON.stringify(data[0], null, 2)); }
-    else { console.log('Table is EMPTY — triggering column name error to discover schema...'); }
-
-    // Trigger a known pattern error to extract column list
-    const { error: e2 } = await supabase.from(table).select('_fake_col_').limit(1);
-    if (e2) console.log('Error details:', e2.message);
-}
-
-async function main() {
-    await cols('athlete_programs');
-    await cols('workout_logs');
-}
-main();
 
 ```
 
@@ -739,7 +709,7 @@ button {
 /* ══ GLOBAL APP CONTAINER ══ */
 .global-container {
   width: 100%;
-  max-width: 420px;
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 16px;
@@ -749,6 +719,39 @@ button {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* ══ RESPONSIVE GRID UTILITIES ══ */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+.responsive-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .responsive-grid-2col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
 }
 
 .global-container>* {
@@ -1273,6 +1276,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 ## File: `src/App.jsx`
 ```jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider, useAppContext } from './context/AppContext';
 import ErrorBoundary from './ErrorBoundary';
@@ -1319,10 +1323,11 @@ import LeaguePopup from './components/gamification/LeaguePopup';
 
 /* ── Global Overlays (inside AppProvider context) ── */
 function GamificationOverlays() {
+  const { rewardPopup } = useAppContext();
+
   // Launch Light: non montare overlay se REWARDS è disattivato
   if (!FEATURE_FLAGS.REWARDS) return null;
 
-  const { rewardPopup } = useAppContext();
   return (
     <>
       {rewardPopup && <RewardAnimation xp={rewardPopup.xp} points={rewardPopup.points} />}
@@ -1346,7 +1351,7 @@ function App() {
 
               {/* User Portal */}
               <Route element={<UserLayout />}>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
                 <Route element={<UserProtectedRoute />}>
                   <Route path="/dashboard" element={<Dashboard />} />
@@ -1386,6 +1391,7 @@ function App() {
                 </Route>
               </Route>
             </Routes>
+            <Analytics />
           </BrowserRouter>
         </AppProvider>
       </AuthProvider>
@@ -1786,7 +1792,10 @@ export function AppProvider({ children }) {
     const [leaguePopup, setLeaguePopup] = useState(null); // league object
 
     useEffect(() => {
-        localStorage.setItem('csvteam_data_v3', JSON.stringify(state));
+        // PERF FIX: Disabling sync saving of massive mock state to localStorage
+        // This was freezing the main thread on every state update.
+        // Persistence should now happen purely via Supabase.
+        // localStorage.setItem('csvteam_data_v3', JSON.stringify(state));
     }, [state]);
 
     /* ── helpers ── */
@@ -4372,6 +4381,13 @@ const UserLayout = () => {
     const tabIndex = getTabIndex(pathname);
     const isTabRoute = tabIndex !== -1;
     const [visualTab, setVisualTab] = useState(tabIndex >= 0 ? tabIndex : 2);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Reset didMount when leaving carousel so re-entry syncs correctly
     useEffect(() => {
@@ -4460,21 +4476,23 @@ const UserLayout = () => {
         scrollTimeout.current = setTimeout(handleScrollEnd, 50);
     }, [handleScrollEnd]);
 
-    // ── Non-tab routes: render with Outlet ──
-    if (!isTabRoute) {
+    // ── Non-tab routes OR Desktop mode: render with Outlet ──
+    if (!isTabRoute || !isMobile) {
         const hideNav = pathname.startsWith('/chat');
         return (
             <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {!hideNav && <PremiumHeader />}
                 <div style={{
-                    flex: 1, overflowY: hideNav ? 'hidden' : 'auto',
+                    flex: 1, 
+                    overflowY: hideNav ? 'hidden' : 'auto',
                     overscrollBehaviorY: 'contain',
                     WebkitOverflowScrolling: 'touch',
-                    paddingBottom: hideNav ? '0' : 'calc(20px + env(safe-area-inset-bottom))',
+                    paddingTop: !hideNav && !isMobile ? '60px' : '0', // Offset for PremiumHeader on desktop
+                    paddingBottom: hideNav || !isMobile ? '0' : 'calc(20px + env(safe-area-inset-bottom))',
                 }}>
                     <Outlet />
                 </div>
-                {!hideNav && <Navbar />}
+                {(!hideNav && isMobile) && <Navbar />}
             </div>
         );
     }
@@ -4836,6 +4854,7 @@ const Navbar = ({ activeTab }) => {
     };
 
     const activeIndex = getActiveIndex();
+    const isChatActive = activeIndex === 1;
 
     return (
         <nav
@@ -4856,6 +4875,10 @@ const Navbar = ({ activeTab }) => {
                 padding: '6px 0 0 0',
                 paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
                 zIndex: 9999,
+                transform: isChatActive ? 'translateY(100%)' : 'translateY(0)',
+                opacity: isChatActive ? 0 : 1,
+                pointerEvents: isChatActive ? 'none' : 'auto',
+                transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
         >
             {navItems.map((item, idx) => {
@@ -5576,7 +5599,7 @@ const FoodSearch = ({ meal, onSelect, onClose }) => {
                             ))}
                         </div>
 
-                        <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
+                        <div style={{ marginTop: 'auto', paddingTop: '24px', paddingBottom: 'calc(72px + env(safe-area-inset-bottom))' }}>
                             <button
                                 className="csv-btn-food-glow"
                                 onClick={handleAdd}
@@ -6268,6 +6291,229 @@ export default BarcodeScanner;
 
 ```
 
+## File: `src/components/user/DateStrip.jsx`
+```jsx
+import React, { useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+/** Return YYYY-MM-DD in local timezone (avoids UTC shift from toISOString) */
+function toLocalDateStr(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+/**
+ * FatSecret-style horizontal date strip.
+ * Shows 7 days centered on current selection (3 back + today + 3 forward).
+ */
+const DateStrip = ({ selectedDate, onDateChange }) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = toLocalDateStr(today);
+
+    // Build +/- 3 days from selectedDate
+    const selected = new Date(selectedDate + 'T12:00:00'); // noon to avoid DST edge
+    const days = [];
+    for (let i = -3; i <= 3; i++) {
+        const d = new Date(selected);
+        d.setDate(d.getDate() + i);
+        const dStr = toLocalDateStr(d);
+        days.push({
+            date: dStr,
+            dayName: d.toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', ''),
+            dayNum: d.getDate(),
+            isToday: dStr === todayStr,
+            isSelected: dStr === selectedDate,
+        });
+    }
+
+    const goBack = () => {
+        const d = new Date(selectedDate + 'T12:00:00');
+        d.setDate(d.getDate() - 1);
+        onDateChange(toLocalDateStr(d));
+    };
+
+    const goForward = () => {
+        const d = new Date(selectedDate + 'T12:00:00');
+        d.setDate(d.getDate() + 1);
+        onDateChange(toLocalDateStr(d));
+    };
+
+    const goToToday = () => {
+        onDateChange(todayStr);
+    };
+
+    // Format header label
+    const getHeaderLabel = () => {
+        if (selectedDate === todayStr) return 'Oggi';
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (selectedDate === toLocalDateStr(yesterday)) return 'Ieri';
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        if (selectedDate === toLocalDateStr(tomorrow)) return 'Domani';
+        return selected.toLocaleDateString('it-IT', { day: 'numeric', month: 'long' });
+    };
+
+    return (
+        <div style={{ marginBottom: '20px' }}>
+            {/* Navigation row: arrows + label */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px',
+            }}>
+                <button
+                    onClick={goBack}
+                    style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        width: '36px', height: '36px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: 'rgba(255,255,255,0.6)',
+                        transition: 'all 0.2s',
+                    }}
+                >
+                    <ChevronLeft size={18} />
+                </button>
+
+                <button
+                    onClick={goToToday}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '2px',
+                    }}
+                >
+                    <span style={{
+                        fontFamily: 'Outfit, sans-serif',
+                        fontWeight: 700,
+                        fontSize: '1.05rem',
+                        color: '#fff',
+                        letterSpacing: '0.02em',
+                    }}>
+                        {getHeaderLabel()}
+                    </span>
+                    <span style={{
+                        fontSize: '0.68rem',
+                        color: 'rgba(255,255,255,0.35)',
+                        fontWeight: 500,
+                        letterSpacing: '0.04em',
+                    }}>
+                        {selected.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </span>
+                </button>
+
+                <button
+                    onClick={goForward}
+                    style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        width: '36px', height: '36px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: 'rgba(255,255,255,0.6)',
+                        transition: 'all 0.2s',
+                    }}
+                >
+                    <ChevronRight size={18} />
+                </button>
+            </div>
+
+            {/* Day pills strip */}
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: '4px',
+                    padding: '4px',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(255,255,255,0.04)',
+                }}
+            >
+                {days.map((day) => (
+                    <button
+                        key={day.date}
+                        onClick={() => onDateChange(day.date)}
+                        style={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '8px 0 6px',
+                            borderRadius: '12px',
+                            cursor: 'pointer',
+                            border: 'none',
+                            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                            background: day.isSelected
+                                ? 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)'
+                                : 'transparent',
+                            boxShadow: day.isSelected
+                                ? '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)'
+                                : 'none',
+                            position: 'relative',
+                        }}
+                    >
+                        {/* Day abbreviation */}
+                        <span style={{
+                            fontSize: '0.6rem',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.06em',
+                            color: day.isSelected
+                                ? 'var(--accent-gold, #FFDCA0)'
+                                : 'rgba(255,255,255,0.35)',
+                            transition: 'color 0.3s',
+                        }}>
+                            {day.dayName}
+                        </span>
+
+                        {/* Day number */}
+                        <span style={{
+                            fontSize: '1rem',
+                            fontWeight: day.isSelected ? 800 : 600,
+                            color: day.isSelected ? '#fff' : 'rgba(255,255,255,0.5)',
+                            transition: 'all 0.3s',
+                            fontFamily: 'Outfit, sans-serif',
+                        }}>
+                            {day.dayNum}
+                        </span>
+
+                        {/* Today indicator dot */}
+                        {day.isToday && (
+                            <div style={{
+                                width: '4px',
+                                height: '4px',
+                                borderRadius: '50%',
+                                background: 'var(--accent-gold, #FFDCA0)',
+                                boxShadow: '0 0 6px rgba(255,220,160,0.6)',
+                                position: 'absolute',
+                                bottom: '3px',
+                            }} />
+                        )}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default DateStrip;
+
+```
+
 ## File: `src/hooks/useGamification.js`
 ```js
 import { useState, useEffect } from 'react';
@@ -6538,16 +6784,26 @@ export const useSpeechRecognition = () => {
 
 ## File: `src/hooks/useNutrition.js`
 ```js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
-export function useNutrition() {
+/**
+ * useNutrition — date-aware nutrition log hook.
+ * @param {string} [dateStr] - ISO date string (YYYY-MM-DD). Defaults to today.
+ */
+export function useNutrition(dateStr) {
     const { user } = useAuth();
     const [logs, setLogs] = useState({});
     const [isLoading, setIsLoading] = useState(true);
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Local timezone date string (avoid UTC shift from toISOString)
+    const getLocalDateStr = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    const activeDate = dateStr || getLocalDateStr();
 
     useEffect(() => {
         if (!user) return;
@@ -6558,10 +6814,9 @@ export function useNutrition() {
                 .from('nutrition_logs')
                 .select('*')
                 .eq('athlete_id', user.id)
-                .eq('date', todayStr);
+                .eq('date', activeDate);
 
             if (!error && data) {
-                // Transform flat rows into { colazione: [...], pranzo: [...], cena: [...], snack: [...] }
                 const mealsMap = { colazione: [], pranzo: [], cena: [], snack: [] };
                 data.forEach(row => {
                     const mealKey = row.meal_type || 'snack';
@@ -6579,14 +6834,16 @@ export function useNutrition() {
                     }
                 });
                 setLogs(mealsMap);
+            } else {
+                setLogs({ colazione: [], pranzo: [], cena: [], snack: [] });
             }
             setIsLoading(false);
         };
 
         fetchLogs();
-    }, [user, todayStr]);
+    }, [user, activeDate]);
 
-    const addFoodLog = async (mealType, food, grams) => {
+    const addFoodLog = useCallback(async (mealType, food, grams) => {
         if (!user) return;
         const ratio = grams / 100;
 
@@ -6594,7 +6851,7 @@ export function useNutrition() {
             .from('nutrition_logs')
             .insert([{
                 athlete_id: user.id,
-                date: todayStr,
+                date: activeDate,
                 food_id: food.id || null,
                 custom_food_name: food.name,
                 amount_g: grams,
@@ -6616,7 +6873,7 @@ export function useNutrition() {
                     food_id: data.food_id,
                     name: data.custom_food_name,
                     grams: parseFloat(data.amount_g),
-                    kcal: parseFloat(data.kcal) / ratio, // Rebuild original / 100g values for UI consistency if needed
+                    kcal: parseFloat(data.kcal) / ratio,
                     p: parseFloat(data.protein_g) / ratio,
                     c: parseFloat(data.carbs_g) / ratio,
                     f: parseFloat(data.fat_g) / ratio,
@@ -6624,9 +6881,9 @@ export function useNutrition() {
                 return updated;
             });
         }
-    };
+    }, [user, activeDate]);
 
-    const removeFoodLog = async (mealType, loggedId) => {
+    const removeFoodLog = useCallback(async (mealType, loggedId) => {
         if (!user) return;
 
         const { error } = await supabase
@@ -6644,7 +6901,7 @@ export function useNutrition() {
                 return updated;
             });
         }
-    };
+    }, [user]);
 
     return { logs, isLoading, addFoodLog, removeFoodLog };
 }
@@ -6794,7 +7051,8 @@ export function useCoachData() {
             const { data: assignmentsData, error: assignmentsErr } = await supabase
                 .from('athlete_programs')
                 .select('athlete_id, program_id, assigned_at')
-                .order('assigned_at', { ascending: false });
+                .order('assigned_at', { ascending: false })
+                .limit(1000);
 
             if (assignmentsErr) throw assignmentsErr;
 
@@ -6802,7 +7060,8 @@ export function useCoachData() {
             const { data: checkinData, error: checkinErr } = await supabase
                 .from('workout_checkins')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .limit(50);
 
             if (!checkinErr && checkinData) {
                 setCheckins(checkinData);
@@ -8340,6 +8599,8 @@ function overlaps(s1, e1, s2, e2) {
 // Uses VITE_ env vars (exposed by Vite at build time via import.meta.env).
 
 import { createClient } from '@supabase/supabase-js';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -8350,6 +8611,30 @@ if (!supabaseUrl || !supabaseAnon) {
     );
 }
 
+// Hybrid Storage adapter:
+// - Native (iOS/Android): Capacitor Preferences (solves token wipe issues)
+// - Web (browser): localStorage (standard, no Capacitor dependency)
+const isNative = Capacitor.isNativePlatform();
+
+const hybridStorage = isNative
+  ? {
+      getItem: async (key) => {
+        const { value } = await Preferences.get({ key });
+        return value;
+      },
+      setItem: async (key, value) => {
+        await Preferences.set({ key, value });
+      },
+      removeItem: async (key) => {
+        await Preferences.remove({ key });
+      },
+    }
+  : {
+      getItem: (key) => Promise.resolve(localStorage.getItem(key)),
+      setItem: (key, value) => { localStorage.setItem(key, value); return Promise.resolve(); },
+      removeItem: (key) => { localStorage.removeItem(key); return Promise.resolve(); },
+    };
+
 // Bypass the Web Locks API used by GoTrue-JS for cross-tab localStorage coordination.
 // The lock causes AbortError timeouts when multiple browser tabs are open simultaneously.
 // This no-op lock is safe: session persistence and auth still work normally.
@@ -8357,6 +8642,10 @@ const noopLock = async (_name, _acquireTimeout, fn) => fn();
 
 export const supabase = createClient(supabaseUrl, supabaseAnon, {
     auth: {
+        storage: hybridStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
         lock: noopLock,
     },
 });
@@ -8721,6 +9010,37 @@ const AdminDashboard = () => {
         setExpandedClient(null);
     };
 
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteName, setInviteName] = useState('');
+    const [inviting, setInviting] = useState(false);
+
+    const handleInviteAthlete = async () => {
+        if (!inviteEmail) return;
+        setInviting(true);
+        try {
+            const { error } = await supabase.auth.signInWithOtp({
+                email: inviteEmail,
+                options: {
+                    data: {
+                        name: inviteName,
+                        full_name: inviteName,
+                        role: 'athlete'
+                    }
+                }
+            });
+            if (error) throw error;
+            alert('Magic Link inviato con successo a ' + inviteEmail);
+            setShowInviteModal(false);
+            setInviteEmail('');
+            setInviteName('');
+        } catch (err) {
+            alert('Errore invio invito: ' + err.message);
+        } finally {
+            setInviting(false);
+        }
+    };
+
     return (
         <div className="global-container" style={{ margin: '0 auto' }}>
 
@@ -8730,13 +9050,43 @@ const AdminDashboard = () => {
                     <p className="text-label" style={{ marginBottom: '8px' }}>Gestione Atleti</p>
                     <h1 className="text-h1" style={{ color: '#fff' }}>Lista Atleti</h1>
                 </div>
-                <div className="flex-row gap-2 items-center" style={{ width: '100%', maxWidth: '420px', minWidth: '200px' }}>
+                <div className="flex-row gap-2 items-center" style={{ width: '100%', maxWidth: '480px', minWidth: '200px' }}>
                     <Input placeholder="Cerca atleta..." style={{ flex: 1 }} />
+                    <Button variant="primary" onClick={() => setShowInviteModal(true)} style={{ whiteSpace: 'nowrap', background: 'var(--accent-gold)', color: '#000' }}>
+                        + Invita
+                    </Button>
                     <Button variant="outline" onClick={handleSyncWc} disabled={syncingWc} style={{ whiteSpace: 'nowrap', borderColor: 'rgba(212,175,55,0.3)', color: 'var(--accent-gold)' }}>
                         {syncingWc ? 'Sincronizzo...' : 'Sync Negozio'}
                     </Button>
                 </div>
             </div>
+
+            {/* Invite Modal */}
+            {showInviteModal && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowInviteModal(false)}>
+                    <div style={{ background: '#111', padding: '32px', borderRadius: '16px', border: '1px solid #333', maxWidth: '400px', width: '100%' }} onClick={e => e.stopPropagation()}>
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>Invita un nuovo atleta</h2>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '24px' }}>Invia un Magic Link per far accedere l&apos;atleta all&apos;app senza password.</p>
+                        
+                        <label style={{ display: 'block', marginBottom: '12px' }}>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Nome Completo</span>
+                            <Input value={inviteName} onChange={e => setInviteName(e.target.value)} placeholder="Mario Rossi" style={{ width: '100%' }} />
+                        </label>
+                        
+                        <label style={{ display: 'block', marginBottom: '24px' }}>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Email Atleta</span>
+                            <Input value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="mario@email.com" type="email" style={{ width: '100%' }} />
+                        </label>
+
+                        <div className="flex-row justify-end gap-2">
+                            <Button variant="ghost" onClick={() => setShowInviteModal(false)}>Annulla</Button>
+                            <Button variant="primary" onClick={handleInviteAthlete} disabled={inviting || !inviteEmail} style={{ background: 'var(--accent-gold)', color: '#000' }}>
+                                {inviting ? 'Invio in corso...' : 'Invia Magic Link'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* KPIs — Glass Cards (Real Data) */}
             <div className="flex-row gap-2 animate-fade-in" style={{ flexWrap: 'wrap' }}>
@@ -10200,25 +10550,55 @@ const AdminChat = () => {
 
     // --- Media Upload Logic ---
     const uploadFile = async (file, typePrefix) => {
-        const fileExt = file.name ? file.name.split('.').pop() : (typePrefix === 'audio' ? 'webm' : 'bin');
-        const fileName = `${selectedUserId}_${Date.now()}_coach.${fileExt}`;
-        const filePath = `${selectedUserId}/${fileName}`;
+        try {
+            // Determine extension and content type
+            let fileExt, contentType;
+            if (file.name) {
+                fileExt = file.name.split('.').pop().toLowerCase();
+                contentType = file.type || 'application/octet-stream';
+            } else if (typePrefix === 'audio') {
+                fileExt = 'webm';
+                contentType = file.type || 'audio/webm';
+            } else {
+                fileExt = 'bin';
+                contentType = file.type || 'application/octet-stream';
+            }
 
-        const { error } = await supabase.storage
-            .from('chat_attachments')
-            .upload(filePath, file);
+            // iOS HEIC → treat as jpeg for compatibility
+            if (fileExt === 'heic' || fileExt === 'heif') {
+                fileExt = 'jpg';
+                contentType = 'image/jpeg';
+            }
 
-        if (error) {
-            console.error('Upload Error:', error);
-            alert("Errore caricamento media.");
+            const fileName = `${selectedUserId}_${Date.now()}_coach.${fileExt}`;
+            const filePath = `${selectedUserId}/${fileName}`;
+
+            // Convert File/Blob to ArrayBuffer for Capacitor iOS compatibility
+            const arrayBuffer = await file.arrayBuffer();
+
+            const { error } = await supabase.storage
+                .from('chat_attachments')
+                .upload(filePath, arrayBuffer, {
+                    contentType,
+                    upsert: false
+                });
+
+            if (error) {
+                console.error('Upload Error:', error.message, error);
+                alert("Errore caricamento media: " + error.message);
+                return null;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('chat_attachments')
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        } catch (err) {
+            console.error('Upload exception:', err);
+            alert("Errore caricamento media: " + (err.message || 'errore sconosciuto'));
             return null;
         }
-
-        const { data: { publicUrl } } = supabase.storage
-            .from('chat_attachments')
-            .getPublicUrl(filePath);
-
-        return publicUrl;
     };
 
     const handleFileSelect = async (e) => {
@@ -13361,148 +13741,157 @@ const Profile = () => {
                 )}
             </div>
 
-            {/* 2. PROGRESS SUMMARY (solo se XP attivo) */}
-            {FEATURE_FLAGS.XP && (
-                <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                        <div>
-                            <span className="text-label" style={{ color: 'var(--text-muted)' }}>LEGA ATTUALE</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                                <span style={{ fontSize: '1.5rem' }}>{currentLeague.icon}</span>
-                                <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>
-                                    Lega {currentLeague.name}
-                                </span>
-                            </div>
-                        </div>
+            {/* RESPONSIVE CONTENT GRID */}
+            <div className="responsive-grid-2col w-full" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                
+                {/* ═══ LEFT COLUMN (Stats & Settings) ═══ */}
+                <div className="flex-col gap-6">
+                    {/* 2. PROGRESS SUMMARY (solo se XP attivo) */}
+                    {FEATURE_FLAGS.XP && (
+                        <div className="glass-card" style={{ padding: '24px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                                <div>
+                                    <span className="text-label" style={{ color: 'var(--text-muted)' }}>LEGA ATTUALE</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                                        <span style={{ fontSize: '1.5rem' }}>{currentLeague.icon}</span>
+                                        <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>
+                                            Lega {currentLeague.name}
+                                        </span>
+                                    </div>
+                                </div>
 
-                        {FEATURE_FLAGS.STREAK && (
-                            <div style={{ textAlign: 'right' }}>
-                                <span className="text-label" style={{ color: 'var(--text-muted)' }}>STREAK</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', justifyContent: 'flex-end' }}>
-                                    <Flame size={16} color="var(--accent-coral)" />
-                                    <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
-                                        {currentStreak} Giorni
+                                {FEATURE_FLAGS.STREAK && (
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span className="text-label" style={{ color: 'var(--text-muted)' }}>STREAK</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', justifyContent: 'flex-end' }}>
+                                            <Flame size={16} color="var(--accent-coral)" />
+                                            <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
+                                                {currentStreak} Giorni
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'flex-end' }}>
+                                    <span style={{ fontSize: '0.9rem', color: 'var(--accent-gold)', fontWeight: 700 }}>
+                                        {xp} XP
+                                    </span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                        / {xpForNext} XP
                                     </span>
                                 </div>
+                                <div className="progress-bar-premium" style={{ height: '8px' }}>
+                                    <div className="progress-fill" style={{ width: `${progressPerc}%` }} />
+                                </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* 3. QUICK STATS (solo se gamification attiva) */}
+                    {FEATURE_FLAGS.XP && (
+                        <div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff', marginBottom: '16px' }}>
+                                Statistiche rapide
+                            </h3>
+                            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '8px', msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="no-scrollbar">
+                                {/* Stat 1 */}
+                                <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
+                                    <Dumbbell size={20} color="var(--accent-teal)" style={{ marginBottom: '8px' }} />
+                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>{workoutsCompleted}</span>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Workout Totali</span>
+                                </div>
+
+                                {/* Stat 2 */}
+                                <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
+                                    <Target size={20} color="var(--accent-warm)" style={{ marginBottom: '8px' }} />
+                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>34</span>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Sfide Vinte</span>
+                                </div>
+
+                                {/* Stat 3 */}
+                                <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
+                                    <Flame size={20} color="var(--accent-coral)" style={{ marginBottom: '8px' }} />
+                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>{bestStreak}</span>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Best Streak</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* NAVIGAZIONE AGGIUNTIVA */}
+                    <div>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff', marginBottom: '16px' }}>
+                            Impostazioni Lezioni
+                        </h3>
+                        <div
+                            onClick={() => navigate('/profile/availability')}
+                            className="glass-card flex-row items-center justify-between"
+                            style={{ padding: '20px 16px', cursor: 'pointer', borderLeft: '3px solid var(--accent-gold)' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(212,175,55,0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Calendar size={22} color="var(--accent-gold)" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 600, color: '#fff', fontSize: '1rem' }}>La mia Disponibilità</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>Gestisci i tuoi orari per le lezioni</div>
+                                </div>
+                            </div>
+                            <div style={{ color: 'var(--text-muted)' }}>→</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ═══ RIGHT COLUMN (Timeline) ═══ */}
+                <div className="glass-card" style={{ padding: '24px', height: 'fit-content' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+                        <History size={18} color="var(--accent-gold)" />
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
+                            Cronologia Progressi
+                        </h3>
+                    </div>
+
+                    <div style={{ position: 'relative', paddingLeft: '16px' }}>
+                        {/* Vertical Line */}
+                        <div style={{ position: 'absolute', top: 0, bottom: 0, left: '32px', width: '2px', background: 'var(--glass-border)' }} />
+
+                        {timeline.length === 0 ? (
+                            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '32px 0' }}>Nessuna attività registrata.</p>
+                        ) : (
+                            timeline.map((event, index) => (
+                                <div key={event.id} className="animate-fade-in" style={{ display: 'flex', gap: '24px', marginBottom: '32px', position: 'relative', animationDelay: `${index * 50}ms` }}>
+                                    {/* Icon Bubble */}
+                                    <div style={{
+                                        width: '34px', height: '34px', borderRadius: '17px',
+                                        background: 'linear-gradient(135deg, #1A1A24 0%, #0F0F16 100%)',
+                                        border: '1px solid var(--glass-border)', zIndex: 2,
+                                        display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                                    }}>
+                                        {getTimelineIcon(event.type)}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div style={{ flex: 1, paddingTop: '4px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                                            <h4 style={{ color: '#fff', fontSize: '1rem', fontWeight: 600 }}>{event.title}</h4>
+                                            {event.xpGained && (
+                                                <span style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                                                    +{event.xpGained} XP
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                                            {formatDate(event.date)}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
-
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'flex-end' }}>
-                            <span style={{ fontSize: '0.9rem', color: 'var(--accent-gold)', fontWeight: 700 }}>
-                                {xp} XP
-                            </span>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                / {xpForNext} XP
-                            </span>
-                        </div>
-                        <div className="progress-bar-premium" style={{ height: '8px' }}>
-                            <div className="progress-fill" style={{ width: `${progressPerc}%` }} />
-                        </div>
-                    </div>
                 </div>
-            )}
-
-            {/* 3. QUICK STATS (solo se gamification attiva) */}
-            {FEATURE_FLAGS.XP && (
-                <>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff', marginBottom: '16px' }}>
-                        Statistiche rapide
-                    </h3>
-                    <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '8px', marginBottom: '32px', msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="no-scrollbar">
-
-                        {/* Stat 1 */}
-                        <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
-                            <Dumbbell size={20} color="var(--accent-teal)" style={{ marginBottom: '8px' }} />
-                            <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>{workoutsCompleted}</span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Workout Totali</span>
-                        </div>
-
-                        {/* Stat 2 */}
-                        <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
-                            <Target size={20} color="var(--accent-warm)" style={{ marginBottom: '8px' }} />
-                            <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>34</span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Sfide Vinte</span>
-                        </div>
-
-                        {/* Stat 3 */}
-                        <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
-                            <Flame size={20} color="var(--accent-coral)" style={{ marginBottom: '8px' }} />
-                            <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>{bestStreak}</span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Best Streak</span>
-                        </div>
-
-                    </div>
-                </>
-            )}
-
-            {/* NAVIGAZIONE AGGIUNTIVA */}
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff', marginBottom: '16px' }}>
-                Impostazioni Lezioni
-            </h3>
-            <div
-                onClick={() => navigate('/profile/availability')}
-                className="glass-card flex-row items-center justify-between"
-                style={{ padding: '16px', marginBottom: '32px', cursor: 'pointer', borderLeft: '3px solid var(--accent-gold)' }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(212,175,55,0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Calendar size={20} color="var(--accent-gold)" />
-                    </div>
-                    <div>
-                        <div style={{ fontWeight: 600, color: '#fff', fontSize: '1rem' }}>La mia Disponibilità</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>Gestisci i tuoi orari per le lezioni</div>
-                    </div>
-                </div>
-                <div style={{ color: 'var(--text-muted)' }}>→</div>
-            </div>
-
-            {/* 4. PROGRESS TIMELINE */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-                <History size={18} color="var(--accent-gold)" />
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
-                    Cronologia Progressi
-                </h3>
-            </div>
-
-            <div style={{ position: 'relative', paddingLeft: '16px' }}>
-                {/* Vertical Line */}
-                <div style={{ position: 'absolute', top: 0, bottom: 0, left: '32px', width: '2px', background: 'var(--glass-border)' }} />
-
-                {timeline.length === 0 ? (
-                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '32px 0' }}>Nessuna attività registrata.</p>
-                ) : (
-                    timeline.map((event, index) => (
-                        <div key={event.id} className="animate-fade-in" style={{ display: 'flex', gap: '24px', marginBottom: '32px', position: 'relative', animationDelay: `${index * 50}ms` }}>
-                            {/* Icon Bubble */}
-                            <div style={{
-                                width: '34px', height: '34px', borderRadius: '17px',
-                                background: 'linear-gradient(135deg, #1A1A24 0%, #0F0F16 100%)',
-                                border: '1px solid var(--glass-border)', zIndex: 2,
-                                display: 'flex', justifyContent: 'center', alignItems: 'center',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-                            }}>
-                                {getTimelineIcon(event.type)}
-                            </div>
-
-                            {/* Content */}
-                            <div style={{ flex: 1, paddingTop: '4px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                                    <h4 style={{ color: '#fff', fontSize: '1rem', fontWeight: 600 }}>{event.title}</h4>
-                                    {event.xpGained && (
-                                        <span style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
-                                            +{event.xpGained} XP
-                                        </span>
-                                    )}
-                                </div>
-                                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                                    {formatDate(event.date)}
-                                </span>
-                            </div>
-                        </div>
-                    ))
-                )}
             </div>
 
         </div>
@@ -13525,16 +13914,24 @@ import Badge from '../../components/ui/Badge';
 import { Plus, Trash2, ChevronRight, Apple, Info, Mic } from 'lucide-react';
 import FoodSearch from '../../components/user/FoodSearch';
 import VoiceLoggerModal from '../../components/user/VoiceLoggerModal';
+import DateStrip from '../../components/user/DateStrip';
 import FEATURE_FLAGS from '../../config/featureFlags';
 
 const Nutrition = () => {
     const { state } = useAppContext();
     const { nutritionTargets } = useAthleteData();
-    const { logs, addFoodLog, removeFoodLog } = useNutrition();
+
+    // ── Date state (default: today) ──
+    // ── Date state (default: today, local timezone) ──
+    const todayStr = useMemo(() => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }, []);
+    const [selectedDate, setSelectedDate] = useState(todayStr);
+
+    const { logs, addFoodLog, removeFoodLog } = useNutrition(selectedDate);
     const [activeMeal, setActiveMeal] = useState(null);
     const [activeVoiceMeal, setActiveVoiceMeal] = useState(null);
-
-    const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
     // Source goals: Supabase (coach-set) targets take priority, then AppContext fallback
     const userGoals = useMemo(() => {
@@ -13551,7 +13948,7 @@ const Nutrition = () => {
         return client?.nutritionTargets || state.nutritionGoals || { kcal: 2000, p: 150, c: 200, f: 60 };
     }, [nutritionTargets, state.clients, state.userAuth, state.nutritionGoals]);
 
-    // Safely get the log for today
+    // Safely get the log for the selected date
     const log = useMemo(() => {
         return {
             meals: logs || { colazione: [], pranzo: [], cena: [], snack: [] },
@@ -13598,11 +13995,34 @@ const Nutrition = () => {
         return { k: Math.round(k), p: Math.round(p), c: Math.round(c), f: Math.round(f) };
     };
 
+    // Build friendly date label for header
+    const getDateLabel = () => {
+        if (selectedDate === todayStr) {
+            return `Oggi, ${new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+        }
+        const d = new Date(selectedDate + 'T00:00:00');
+        const yest = new Date();
+        yest.setDate(yest.getDate() - 1);
+        if (selectedDate === yest.toISOString().split('T')[0]) {
+            return `Ieri, ${d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+        }
+        const tmrw = new Date();
+        tmrw.setDate(tmrw.getDate() + 1);
+        if (selectedDate === tmrw.toISOString().split('T')[0]) {
+            return `Domani, ${d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+        }
+        return d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+    };
+
     return (
         <div className="global-container animate-fade-in" style={{ paddingBottom: '144px' }}>
+            <div className="w-full" style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
+
+                {/* ═══ DATE STRIP — FatSecret-style ═══ */}
+                <DateStrip selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
             <div className="flex-col gap-1" style={{ marginBottom: '16px' }}>
-                <p className="text-label" style={{ color: 'rgba(255,255,255,0.5)' }}>Oggi, {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                <p className="text-label" style={{ color: 'rgba(255,255,255,0.5)' }}>{getDateLabel()}</p>
                 <h1 className="text-h1">Diario</h1>
             </div>
 
@@ -13692,7 +14112,7 @@ const Nutrition = () => {
                                                 {item.grams}g • <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{Math.round((item.kcal || 0) * (item.grams || 0) / 100)} kcal</span>
                                             </p>
                                         </div>
-                                        <button onClick={() => removeFoodLog(today, mKey, item.logged_id)} style={{ padding: '8px', opacity: 0.4, transition: 'opacity 0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.4}>
+                                        <button onClick={() => removeFoodLog(mKey, item.logged_id)} style={{ padding: '8px', opacity: 0.4, transition: 'opacity 0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.4}>
                                             <Trash2 size={16} color="var(--accent-coral)" />
                                         </button>
                                     </div>
@@ -13737,6 +14157,7 @@ const Nutrition = () => {
                     }}
                 />
             )}
+            </div>
         </div>
     );
 };
@@ -14138,25 +14559,55 @@ const Chat = () => {
 
     // --- Media Upload Logic ---
     const uploadFile = async (file, typePrefix) => {
-        const fileExt = file.name ? file.name.split('.').pop() : (typePrefix === 'audio' ? 'webm' : 'bin');
-        const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-        const filePath = `${user.id}/${fileName}`;
+        try {
+            // Determine extension and content type
+            let fileExt, contentType;
+            if (file.name) {
+                fileExt = file.name.split('.').pop().toLowerCase();
+                contentType = file.type || 'application/octet-stream';
+            } else if (typePrefix === 'audio') {
+                fileExt = 'webm';
+                contentType = file.type || 'audio/webm';
+            } else {
+                fileExt = 'bin';
+                contentType = file.type || 'application/octet-stream';
+            }
 
-        const { error } = await supabase.storage
-            .from('chat_attachments')
-            .upload(filePath, file);
+            // iOS HEIC → treat as jpeg for compatibility
+            if (fileExt === 'heic' || fileExt === 'heif') {
+                fileExt = 'jpg';
+                contentType = 'image/jpeg';
+            }
 
-        if (error) {
-            console.error('Upload Error:', error);
-            alert("Errore caricamento media.");
+            const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+            const filePath = `${user.id}/${fileName}`;
+
+            // Convert File/Blob to ArrayBuffer for Capacitor iOS compatibility
+            const arrayBuffer = await file.arrayBuffer();
+
+            const { error } = await supabase.storage
+                .from('chat_attachments')
+                .upload(filePath, arrayBuffer, {
+                    contentType,
+                    upsert: false
+                });
+
+            if (error) {
+                console.error('Upload Error:', error.message, error);
+                alert("Errore caricamento media: " + error.message);
+                return null;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('chat_attachments')
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        } catch (err) {
+            console.error('Upload exception:', err);
+            alert("Errore caricamento media: " + (err.message || 'errore sconosciuto'));
             return null;
         }
-
-        const { data: { publicUrl } } = supabase.storage
-            .from('chat_attachments')
-            .getPublicUrl(filePath);
-
-        return publicUrl;
     };
 
     const handleFileSelect = async (e) => {
@@ -15313,7 +15764,17 @@ const ActiveWorkout = () => {
             background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(8px)', padding: '20px'
         }} onClick={() => setShowVideo(false)}>
             <div style={{ width: '100%', maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
-                <video src={exercise.videoUrl} controls autoPlay playsInline style={{ width: '100%', borderRadius: '16px', maxHeight: '70vh', border: '1px solid rgba(255,215,170,0.1)' }} />
+                {exercise.videoUrl.includes('youtube.com') || exercise.videoUrl.includes('youtu.be') ? (
+                    <iframe 
+                        src={exercise.videoUrl.replace('watch?v=', 'embed/').split('&')[0].replace('youtu.be/', 'youtube.com/embed/')} 
+                        style={{ width: '100%', aspectRatio: '16/9', borderRadius: '16px', border: '1px solid rgba(255,215,170,0.1)' }} 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowFullScreen 
+                    />
+                ) : (
+                    <video src={exercise.videoUrl} controls autoPlay playsInline style={{ width: '100%', borderRadius: '16px', maxHeight: '70vh', border: '1px solid rgba(255,215,170,0.1)' }} />
+                )}
                 <button onClick={() => setShowVideo(false)} style={{
                     marginTop: '12px', width: '100%', padding: '14px',
                     background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
@@ -15559,210 +16020,216 @@ const Dashboard = () => {
             </div>
 
             {/* ═══ Main Content Container ═══ */}
-            <div className="animate-fade-in w-full flex-col" style={{ maxWidth: '420px', gap: '24px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column' }}>
-
-                {/* ═══ SECTION 2 – USER PROGRESS CARD (solo se XP attivo) ═══ */}
-                {FEATURE_FLAGS.XP && (
-                    <div className="glass-card flex-col gap-3" style={{ padding: '24px', borderColor: 'rgba(212,175,55,0.4)', boxShadow: '0 0 30px rgba(212,175,55,0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <p className="dopamine-text-glow" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--accent-gold)', fontWeight: 700 }}>
-                                    Il Tuo Livello
-                                </p>
-                                <h2 className="dopamine-text-glow" style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', marginTop: '4px' }}>
-                                    <Trophy size={18} color="var(--accent-gold)" strokeWidth={2.5} className="drop-shadow-gold" />
-                                    Lega {currentLeagueObj ? currentLeagueObj.name : 'Bronzo'}
-                                </h2>
-                            </div>
-                            {currentLeagueObj && (
-                                <span className="drop-shadow-gold" style={{ fontSize: '2.5rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }}>{currentLeagueObj.icon}</span>
-                            )}
-                        </div>
-
-                        {/* Progress Bar & Streak */}
-                        <div style={{ marginTop: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                                <span style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>{xp.toLocaleString()} XP</span>
-                                <span>{xpForNext.toLocaleString()} XP</span>
-                            </div>
-                            <div className="progress-bar-premium">
-                                <div className="progress-fill" style={{ width: `${progressPct}%` }} />
-                            </div>
-
-                            {FEATURE_FLAGS.STREAK && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.2)', padding: '6px 12px', borderRadius: '16px' }}>
-                                        <Flame size={14} color="#ff6b6b" />
-                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ff6b6b' }}>Streak: {streak} Giorni</span>
+            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="responsive-grid-2col">
+                    {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
+                    <div className="flex-col gap-4">
+                        {/* ═══ SECTION 2 – USER PROGRESS CARD (solo se XP attivo) ═══ */}
+                        {FEATURE_FLAGS.XP && (
+                            <div className="glass-card flex-col gap-3" style={{ padding: '24px', borderColor: 'rgba(212,175,55,0.4)', boxShadow: '0 0 30px rgba(212,175,55,0.1)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <p className="dopamine-text-glow" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--accent-gold)', fontWeight: 700 }}>
+                                            Il Tuo Livello
+                                        </p>
+                                        <h2 className="dopamine-text-glow" style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', marginTop: '4px' }}>
+                                            <Trophy size={18} color="var(--accent-gold)" strokeWidth={2.5} className="drop-shadow-gold" />
+                                            Lega {currentLeagueObj ? currentLeagueObj.name : 'Bronzo'}
+                                        </h2>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <Zap size={14} color="var(--accent-gold)" />
-                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Mancano {Math.max(xpForNext - xp, 0)} XP</span>
+                                    {currentLeagueObj && (
+                                        <span className="drop-shadow-gold" style={{ fontSize: '2.5rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }}>{currentLeagueObj.icon}</span>
+                                    )}
+                                </div>
+
+                                {/* Progress Bar & Streak */}
+                                <div style={{ marginTop: '8px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                                        <span style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>{xp.toLocaleString()} XP</span>
+                                        <span>{xpForNext.toLocaleString()} XP</span>
+                                    </div>
+                                    <div className="progress-bar-premium">
+                                        <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+                                    </div>
+
+                                    {FEATURE_FLAGS.STREAK && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.2)', padding: '6px 12px', borderRadius: '16px' }}>
+                                                <Flame size={14} color="#ff6b6b" />
+                                                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ff6b6b' }}>Streak: {streak} Giorni</span>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <Zap size={14} color="var(--accent-gold)" />
+                                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Mancano {Math.max(xpForNext - xp, 0)} XP</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ═══ SECTION 5 – DAILY PROGRESS (solo se DAILY_TASKS attivo) ═══ */}
+                        {FEATURE_FLAGS.DAILY_TASKS && (
+                            <div className="glass-card" style={{
+                                padding: '24px',
+                                borderColor: d.claimed ? 'rgba(212,175,55,0.4)' : 'var(--glass-border)',
+                                boxShadow: d.claimed ? '0 8px 32px rgba(212,175,55,0.1)' : 'var(--glass-shadow)',
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                    <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '1.05rem', color: '#fff' }}>I Tuoi Progressi Quotidiani</h3>
+                                    {d.claimed && (
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-gold)', background: 'rgba(212,175,55,0.1)', padding: '4px 8px', borderRadius: '12px' }}>
+                                            +20 XP Bonus
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Progress Visualizer */}
+                                <div style={{ marginBottom: '24px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                                        <span>Progresso</span>
+                                        <span style={{ fontWeight: 700, color: '#fff' }}>
+                                            {[d.steps, d.workout, d.photo].filter(Boolean).length} / 3 task completate
+                                        </span>
+                                    </div>
+                                    <div className="progress-bar-premium" style={{ height: '6px' }}>
+                                        <div className="progress-fill" style={{ width: `${([d.steps, d.workout, d.photo].filter(Boolean).length / 3) * 100}%` }} />
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                )}
 
-                {/* ═══ SECTION 3 – PRIMARY ACTION ═══ */}
-                <button
-                    onClick={() => navigate('/training')}
-                    className="csv-btn csv-btn-primary-glow"
-                    style={{
-                        width: '100%',
-                        padding: '24px 24px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                        borderRadius: '16px',
-                        marginBottom: '0',
-                        marginTop: 'auto'
-                    }}
-                >
-                    <Dumbbell size={24} strokeWidth={2.5} color="#FFF3E0" style={{ filter: 'drop-shadow(0 0 6px rgba(255,120,0,0.6))' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                        <span style={{
-                            fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem',
-                            letterSpacing: '0.04em', textTransform: 'uppercase',
-                            color: '#FFF3E0',
-                            /* Luce Night Shift e Colore Avorio */
-                            textShadow: `
-                                0 0 6px rgba(255, 120, 0, 0.6),
-                                0 0 12px rgba(255, 120, 0, 0.4),
-                                0 0 20px rgba(255, 120, 0, 0.2),
-                                0 0 30px rgba(255, 120, 0, 0.1)
-                            `
-                        }}>
-                            Training
-                        </span>
-                        {program && (
-                            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#FFF3E0', opacity: 0.8, textTransform: 'none', letterSpacing: '0' }}>
-                                {program.name}
-                            </span>
+                                {/* Task Checklist */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        {d.steps ? <CheckCircle2 size={20} color="var(--accent-gold)" /> : <Circle size={20} color="var(--text-muted)" />}
+                                        <span style={{ fontSize: '0.9rem', color: d.steps ? '#fff' : 'var(--text-secondary)', textDecoration: d.steps ? 'line-through' : 'none' }}>
+                                            Raggiungi 8000 passi
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        {d.workout ? <CheckCircle2 size={20} color="var(--accent-gold)" /> : <Circle size={20} color="var(--text-muted)" />}
+                                        <span style={{ fontSize: '0.9rem', color: d.workout ? '#fff' : 'var(--text-secondary)', textDecoration: d.workout ? 'line-through' : 'none' }}>
+                                            Completa la sessione di allenamento
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        {d.photo ? <CheckCircle2 size={20} color="var(--accent-gold)" /> : <Circle size={20} color="var(--text-muted)" />}
+                                        <span style={{ fontSize: '0.9rem', color: d.photo ? '#fff' : 'var(--text-secondary)', textDecoration: d.photo ? 'line-through' : 'none' }}>
+                                            Carica una foto pump
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {d.claimed && (
+                                    <div className="animate-fade-in" style={{ marginTop: '24px', textAlign: 'center', padding: '16px', background: 'rgba(212,175,55,0.05)', borderRadius: '16px', border: '1px solid rgba(212,175,55,0.1)' }}>
+                                        <h4 style={{ color: 'var(--accent-gold)', fontSize: '1rem', fontFamily: 'Outfit', fontWeight: 800 }}>Daily Completed 🎉</h4>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '4px' }}>Ritorna domani per sbloccare di nuovo il bonus giornaliero.</p>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
-                </button>
 
-                {/* ═══ SECTION 4 – SECONDARY NAVIGATION ═══ */}
-                <div style={{ display: 'flex', gap: '16px', marginTop: '20px', marginBottom: '8px' }}>
-                    <button
-                        className="csv-card-3d"
-                        style={{
-                            flex: 1,
-                            padding: '24px 16px',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                            cursor: 'default',
-                            opacity: 0.45,
-                            position: 'relative',
-                        }}
-                        disabled
-                    >
-                        <div style={{
-                            position: 'absolute', top: '-12px', right: '-12px',
-                            background: 'linear-gradient(135deg, rgba(50,50,60,0.95), rgba(20,20,30,1))',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)',
-                            color: '#FFFFFF',
-                            fontSize: '0.62rem', fontWeight: 800, padding: '4px 10px', borderRadius: '6px',
-                            zIndex: 10, textTransform: 'uppercase', letterSpacing: '0.08em',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2)',
-                            border: '1px solid rgba(255,255,255,0.15)',
-                            transform: 'rotate(6deg)'
-                        }}>
-                            Prossimamente
+                    {/* ═══ RIGHT COLUMN (Actions) ═══ */}
+                    <div className="flex-col gap-4" style={{ height: '100%' }}>
+                        {/* ═══ SECTION 3 – PRIMARY ACTION ═══ */}
+                        <button
+                            onClick={() => navigate('/training')}
+                            className="csv-btn csv-btn-primary-glow"
+                            style={{
+                                width: '100%',
+                                padding: '32px 24px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px',
+                                borderRadius: '16px',
+                                flex: 1,
+                            }}
+                        >
+                            <Dumbbell size={32} strokeWidth={2.5} color="#FFF3E0" style={{ filter: 'drop-shadow(0 0 6px rgba(255,120,0,0.6))' }} />
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+                                <span style={{
+                                    fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.4rem',
+                                    letterSpacing: '0.04em', textTransform: 'uppercase',
+                                    color: '#FFF3E0',
+                                    /* Luce Night Shift e Colore Avorio */
+                                    textShadow: `
+                                        0 0 6px rgba(255, 120, 0, 0.6),
+                                        0 0 12px rgba(255, 120, 0, 0.4),
+                                        0 0 20px rgba(255, 120, 0, 0.2),
+                                        0 0 30px rgba(255, 120, 0, 0.1)
+                                    `
+                                }}>
+                                    Training
+                                </span>
+                                {program && (
+                                    <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#FFF3E0', opacity: 0.8, textTransform: 'none', letterSpacing: '0' }}>
+                                        {program.name}
+                                    </span>
+                                )}
+                            </div>
+                        </button>
+
+                        {/* ═══ SECTION 4 – SECONDARY NAVIGATION ═══ */}
+                        <div style={{ display: 'flex', gap: '16px' }}>
+                            <button
+                                className="csv-card-3d"
+                                style={{
+                                    flex: 1,
+                                    padding: '24px 16px',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                                    cursor: 'default',
+                                    opacity: 0.45,
+                                    position: 'relative',
+                                }}
+                                disabled
+                            >
+                                <div style={{
+                                    position: 'absolute', top: '-12px', right: '-12px',
+                                    background: 'linear-gradient(135deg, rgba(50,50,60,0.95), rgba(20,20,30,1))',
+                                    backdropFilter: 'blur(8px)',
+                                    WebkitBackdropFilter: 'blur(8px)',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.62rem', fontWeight: 800, padding: '4px 10px', borderRadius: '6px',
+                                    zIndex: 10, textTransform: 'uppercase', letterSpacing: '0.08em',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2)',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    transform: 'rotate(6deg)'
+                                }}>
+                                    Prossimamente
+                                </div>
+                                <div style={{ color: '#fff' }}><Gamepad2 size={24} strokeWidth={1.5} /></div>
+                                <span style={{
+                                    fontFamily: 'Outfit', fontWeight: 600, fontSize: '0.9rem',
+                                    color: '#fff', letterSpacing: '0.03em',
+                                }}>
+                                    CSV Games
+                                </span>
+                            </button>
+                            <button
+                                className="csv-btn-academy-glow"
+                                style={{
+                                    flex: 1,
+                                    padding: '24px 16px',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => navigate('/academy')}
+                            >
+                                <PlaySquare size={24} strokeWidth={1.5} color="#e6f0ff" style={{ filter: 'drop-shadow(0 0 6px rgba(179,212,255,0.6))' }} />
+                                <span style={{
+                                    fontFamily: 'Outfit', fontWeight: 600, fontSize: '0.9rem',
+                                    color: '#e6f0ff', letterSpacing: '0.03em',
+                                    /* Luce Neon Icy Blue (Academy) con Nucleo Bianco Ghiaccio */
+                                    textShadow: `
+                                        0 0 6px rgba(179, 212, 255, 0.6),
+                                        0 0 12px rgba(179, 212, 255, 0.4),
+                                        0 0 20px rgba(179, 212, 255, 0.2)
+                                    `
+                                }}>
+                                    Academy
+                                </span>
+                            </button>
                         </div>
-                        <div style={{ color: '#fff' }}><Gamepad2 size={24} strokeWidth={1.5} /></div>
-                        <span style={{
-                            fontFamily: 'Outfit', fontWeight: 600, fontSize: '0.9rem',
-                            color: '#fff', letterSpacing: '0.03em',
-                        }}>
-                            CSV Games
-                        </span>
-                    </button>
-                    <button
-                        className="csv-btn-academy-glow"
-                        style={{
-                            flex: 1,
-                            padding: '24px 16px',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => navigate('/academy')}
-                    >
-                        <PlaySquare size={24} strokeWidth={1.5} color="#e6f0ff" style={{ filter: 'drop-shadow(0 0 6px rgba(179,212,255,0.6))' }} />
-                        <span style={{
-                            fontFamily: 'Outfit', fontWeight: 600, fontSize: '0.9rem',
-                            color: '#e6f0ff', letterSpacing: '0.03em',
-                            /* Luce Neon Icy Blue (Academy) con Nucleo Bianco Ghiaccio */
-                            textShadow: `
-                                0 0 6px rgba(179, 212, 255, 0.6),
-                                0 0 12px rgba(179, 212, 255, 0.4),
-                                0 0 20px rgba(179, 212, 255, 0.2)
-                            `
-                        }}>
-                            Academy
-                        </span>
-                    </button>
+                    </div>
                 </div>
-
-                {/* ═══ SECTION 5 – DAILY PROGRESS (solo se DAILY_TASKS attivo) ═══ */}
-                {FEATURE_FLAGS.DAILY_TASKS && (
-                    <div className="glass-card" style={{
-                        padding: '24px',
-                        borderColor: d.claimed ? 'rgba(212,175,55,0.4)' : 'var(--glass-border)',
-                        boxShadow: d.claimed ? '0 8px 32px rgba(212,175,55,0.1)' : 'var(--glass-shadow)',
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                            <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '1.05rem', color: '#fff' }}>I Tuoi Progressi Quotidiani</h3>
-                            {d.claimed && (
-                                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-gold)', background: 'rgba(212,175,55,0.1)', padding: '4px 8px', borderRadius: '12px' }}>
-                                    +20 XP Bonus
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Progress Visualizer */}
-                        <div style={{ marginBottom: '24px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                                <span>Progresso</span>
-                                <span style={{ fontWeight: 700, color: '#fff' }}>
-                                    {[d.steps, d.workout, d.photo].filter(Boolean).length} / 3 task completate
-                                </span>
-                            </div>
-                            <div className="progress-bar-premium" style={{ height: '6px' }}>
-                                <div className="progress-fill" style={{ width: `${([d.steps, d.workout, d.photo].filter(Boolean).length / 3) * 100}%` }} />
-                            </div>
-                        </div>
-
-                        {/* Task Checklist */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                {d.steps ? <CheckCircle2 size={20} color="var(--accent-gold)" /> : <Circle size={20} color="var(--text-muted)" />}
-                                <span style={{ fontSize: '0.9rem', color: d.steps ? '#fff' : 'var(--text-secondary)', textDecoration: d.steps ? 'line-through' : 'none' }}>
-                                    Raggiungi 8000 passi
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                {d.workout ? <CheckCircle2 size={20} color="var(--accent-gold)" /> : <Circle size={20} color="var(--text-muted)" />}
-                                <span style={{ fontSize: '0.9rem', color: d.workout ? '#fff' : 'var(--text-secondary)', textDecoration: d.workout ? 'line-through' : 'none' }}>
-                                    Completa la sessione di allenamento
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                {d.photo ? <CheckCircle2 size={20} color="var(--accent-gold)" /> : <Circle size={20} color="var(--text-muted)" />}
-                                <span style={{ fontSize: '0.9rem', color: d.photo ? '#fff' : 'var(--text-secondary)', textDecoration: d.photo ? 'line-through' : 'none' }}>
-                                    Carica una foto pump
-                                </span>
-                            </div>
-                        </div>
-
-                        {d.claimed && (
-                            <div className="animate-fade-in" style={{ marginTop: '24px', textAlign: 'center', padding: '16px', background: 'rgba(212,175,55,0.05)', borderRadius: '16px', border: '1px solid rgba(212,175,55,0.1)' }}>
-                                <h4 style={{ color: 'var(--accent-gold)', fontSize: '1rem', fontFamily: 'Outfit', fontWeight: 800 }}>Daily Completed 🎉</h4>
-                                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '4px' }}>Ritorna domani per sbloccare di nuovo il bonus giornaliero.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
             </div>
         </div>
     );
@@ -15889,10 +16356,11 @@ const Progress = () => {
 
     return (
         <div className="global-container stagger-children" style={{ paddingBottom: '120px' }}>
-            <div className="animate-fade-in">
-                <p className="text-label" style={{ marginBottom: '8px' }}>I Tuoi Progressi</p>
-                <h1 className="text-h1">Analisi</h1>
-            </div>
+            <div className="w-full flex-col gap-4" style={{ maxWidth: '800px', margin: '0 auto' }}>
+                <div className="animate-fade-in" style={{ marginBottom: '8px' }}>
+                    <p className="text-label" style={{ marginBottom: '8px' }}>I Tuoi Progressi</p>
+                    <h1 className="text-h1">Analisi</h1>
+                </div>
 
             {/* Tabs */}
             <div
@@ -16014,6 +16482,7 @@ const Progress = () => {
                     </Card>
                 </div>
             )}
+            </div>
         </div>
     );
 };
@@ -17106,7 +17575,7 @@ const Shop = () => {
             */}
 
             {/* SECTION 2: NEGOZIO (PACCHETTI E ABBONAMENTI) */}
-            <div className="animate-fade-in">
+            <div className="animate-fade-in w-full" style={{ maxWidth: '1000px', margin: '0 auto' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <div style={{ width: '4px', height: '18px', borderRadius: '2px', background: '#FFF5E6' }} />
                     <h2 style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Negozio</h2>
