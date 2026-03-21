@@ -33,6 +33,7 @@ import VideoUpload from './pages/admin/VideoUpload';
 import AdminLessons from './pages/admin/AdminLessons';
 import AdminAcademy from './pages/admin/AdminAcademy';
 import AdminAthleteDetail from './pages/admin/AdminAthleteDetail';
+import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 
 // Auth & Guards
 import AuthPage from './pages/user/AuthPage';
@@ -108,6 +109,7 @@ function App() {
                   <Route path="/admin/chat" element={<AdminChat />} />
                   <Route path="/admin/academy" element={<AdminAcademy />} />
                   <Route path="/admin/athlete/:athleteId" element={<AdminAthleteDetail />} />
+                  <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
                   {/* Fallback & Redirects */}
                   <Route path="/admin/settings" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
