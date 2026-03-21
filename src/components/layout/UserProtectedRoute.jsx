@@ -34,10 +34,10 @@ const UserProtectedRoute = () => {
         return <Navigate to="/auth" replace />;
     }
 
-    // 2. Coaches and superadmins → redirect to admin dashboard
+    // 2. Coaches can also view as athlete — skip approval & subscription checks
     const isPrivileged = ['coach', 'superadmin'].includes(role);
     if (isPrivileged) {
-        return <Navigate to="/admin/dashboard" replace />;
+        return <Outlet />;
     }
 
     // 3. Account not yet approved by admin
