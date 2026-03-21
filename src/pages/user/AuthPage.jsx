@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, MapPin, CreditCard, Apple, ChevronRight } from 'lucide-react';
+import { Apple, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
 import CsvLogo from '../../components/ui/CsvLogo';
 
 const PROVINCES = [
-    'Agrigento', 'Alessandria', 'Ancona', 'Aosta', 'Arezzo', 'Ascoli Piceno', 'Asti', 'Avellino', 'Bari', 'Barletta-Andria-Trani', 'Belluno', 'Benevento', 'Bergamo', 'Biella', 'Bologna', 'Bolzano', 'Brescia', 'Brindisi', 'Cagliari', 'Caltanissetta', 'Campobasso', 'Caserta', 'Catania', 'Catanzaro', 'Chieti', 'Como', 'Cosenza', 'Cremona', 'Crotone', 'Cuneo', 'Enna', 'Fermo', 'Ferrara', 'Firenze', 'Foggia', 'Forlì-Cesena', 'Frosinone', 'Genova', 'Gorizia', 'Grosseto', 'Imperia', 'Isernia', 'La Spezia', 'L\'Aquila', 'Latina', 'Lecce', 'Lecco', 'Livorno', 'Lodi', 'Lucca', 'Macerata', 'Mantova', 'Massa-Carrara', 'Matera', 'Messina', 'Milano', 'Modena', 'Monza e della Brianza', 'Napoli', 'Novara', 'Nuoro', 'Oristano', 'Padova', 'Palermo', 'Parma', 'Pavia', 'Perugia', 'Pesaro e Urbino', 'Pescara', 'Piacenza', 'Pisa', 'Pistoia', 'Pordenone', 'Potenza', 'Prato', 'Ragusa', 'Ravenna', 'Reggio Calabria', 'Reggio Emilia', 'Rieti', 'Rimini', 'Roma', 'Rovigo', 'Salerno', 'Sassari', 'Savona', 'Siena', 'Siracusa', 'Sondrio', 'Taranto', 'Teramo', 'Terni', 'Torino', 'Trapani', 'Trento', 'Treviso', 'Trieste', 'Udine', 'Varese', 'Venezia', 'Verbano-Cusio-Ossola', 'Vercelli', 'Verona', 'Vibo Valentia', 'Vicenza', 'Viterbo'
+    'Agrigento','Alessandria','Ancona','Aosta','Arezzo','Ascoli Piceno','Asti','Avellino','Bari','Barletta-Andria-Trani','Belluno','Benevento','Bergamo','Biella','Bologna','Bolzano','Brescia','Brindisi','Cagliari','Caltanissetta','Campobasso','Caserta','Catania','Catanzaro','Chieti','Como','Cosenza','Cremona','Crotone','Cuneo','Enna','Fermo','Ferrara','Firenze','Foggia','Forlì-Cesena','Frosinone','Genova','Gorizia','Grosseto','Imperia','Isernia','La Spezia','L\'Aquila','Latina','Lecce','Lecco','Livorno','Lodi','Lucca','Macerata','Mantova','Massa-Carrara','Matera','Messina','Milano','Modena','Monza e della Brianza','Napoli','Novara','Nuoro','Oristano','Padova','Palermo','Parma','Pavia','Perugia','Pesaro e Urbino','Pescara','Piacenza','Pisa','Pistoia','Pordenone','Potenza','Prato','Ragusa','Ravenna','Reggio Calabria','Reggio Emilia','Rieti','Rimini','Roma','Rovigo','Salerno','Sassari','Savona','Siena','Siracusa','Sondrio','Taranto','Teramo','Terni','Torino','Trapani','Trento','Treviso','Trieste','Udine','Varese','Venezia','Verbano-Cusio-Ossola','Vercelli','Verona','Vibo Valentia','Vicenza','Viterbo'
 ];
 
 const AuthPage = () => {
@@ -39,9 +38,7 @@ const AuthPage = () => {
         try {
             const { error: oauthError } = await supabase.auth.signInWithOAuth({
                 provider,
-                options: {
-                    redirectTo: `${window.location.origin}/dashboard`,
-                },
+                options: { redirectTo: `${window.location.origin}/dashboard` },
             });
             if (oauthError) setError(oauthError.message);
         } catch {
@@ -138,6 +135,7 @@ const AuthPage = () => {
                 {/* ── OAuth Buttons ── */}
                 <div style={styles.oauthRow}>
                     <button
+                        type="button"
                         style={styles.oauthBtn}
                         onClick={() => handleOAuth('google')}
                         disabled={!!oauthLoading}
@@ -151,6 +149,7 @@ const AuthPage = () => {
                         {oauthLoading === 'google' ? 'Connessione...' : 'Google'}
                     </button>
                     <button
+                        type="button"
                         style={styles.oauthBtn}
                         onClick={() => handleOAuth('apple')}
                         disabled={!!oauthLoading}
@@ -169,41 +168,57 @@ const AuthPage = () => {
 
                 {/* ── Login / Register Card ── */}
                 <Card glass style={{ padding: '28px', width: '100%' }}>
-                    <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                         {!isLogin && (
-                            <Input
-                                label="Nome e Cognome" name="name" placeholder="Mario Rossi"
-                                icon={<User size={18} />} value={formData.name}
-                                onChange={handleChange} required
-                            />
+                            <div style={styles.fieldGroup}>
+                                <label style={styles.fieldLabel}>Nome e Cognome</label>
+                                <input
+                                    name="name" type="text" placeholder="Mario Rossi"
+                                    value={formData.name} onChange={handleChange}
+                                    required style={styles.input}
+                                />
+                            </div>
                         )}
 
-                        <Input
-                            label="Email" name="email" type="email" placeholder="atleta@csvteam.com"
-                            icon={<Mail size={18} />} value={formData.email}
-                            onChange={handleChange} required
-                        />
+                        <div style={styles.fieldGroup}>
+                            <label style={styles.fieldLabel}>Email</label>
+                            <input
+                                name="email" type="email" placeholder="atleta@csvteam.com"
+                                value={formData.email} onChange={handleChange}
+                                required autoComplete="email" style={styles.input}
+                            />
+                        </div>
 
-                        <Input
-                            label="Password" name="password" type="password" placeholder="••••••••"
-                            icon={<Lock size={18} />} value={formData.password}
-                            onChange={handleChange} required
-                        />
+                        <div style={styles.fieldGroup}>
+                            <label style={styles.fieldLabel}>Password</label>
+                            <input
+                                name="password" type="password" placeholder="••••••••"
+                                value={formData.password} onChange={handleChange}
+                                required autoComplete={isLogin ? 'current-password' : 'new-password'}
+                                style={styles.input}
+                            />
+                        </div>
 
                         {!isLogin && (
                             <>
-                                <Input
-                                    label="Codice Fiscale" name="taxCode" placeholder="RSSMRA80A01H501Z"
-                                    icon={<CreditCard size={18} />} value={formData.taxCode}
-                                    onChange={handleChange} required
-                                />
-                                <Input
-                                    label="Indirizzo di Residenza" name="address" placeholder="Via delle Vittorie, 12"
-                                    icon={<MapPin size={18} />} value={formData.address}
-                                    onChange={handleChange} required
-                                />
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                    <label style={styles.selectLabel}>Provincia</label>
+                                <div style={styles.fieldGroup}>
+                                    <label style={styles.fieldLabel}>Codice Fiscale</label>
+                                    <input
+                                        name="taxCode" type="text" placeholder="RSSMRA80A01H501Z"
+                                        value={formData.taxCode} onChange={handleChange}
+                                        required style={styles.input}
+                                    />
+                                </div>
+                                <div style={styles.fieldGroup}>
+                                    <label style={styles.fieldLabel}>Indirizzo di Residenza</label>
+                                    <input
+                                        name="address" type="text" placeholder="Via delle Vittorie, 12"
+                                        value={formData.address} onChange={handleChange}
+                                        required style={styles.input}
+                                    />
+                                </div>
+                                <div style={styles.fieldGroup}>
+                                    <label style={styles.fieldLabel}>Provincia</label>
                                     <select
                                         name="province" value={formData.province}
                                         onChange={handleChange} style={styles.select} required
@@ -218,9 +233,21 @@ const AuthPage = () => {
                         {error && <p style={styles.errorMsg}>{error}</p>}
                         {success && <p style={styles.successMsg}>{success}</p>}
 
-                        <Button size="lg" fullWidth loading={loading} type="submit" style={{ marginTop: '4px' }}>
-                            {isLogin ? 'Accedi' : 'Crea Account'}
-                        </Button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                ...styles.submitBtn,
+                                opacity: loading ? 0.7 : 1,
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                            }}
+                        >
+                            {loading ? (
+                                <span style={styles.spinner} />
+                            ) : (
+                                isLogin ? 'Accedi' : 'Crea Account'
+                            )}
+                        </button>
                     </form>
                 </Card>
 
@@ -238,19 +265,15 @@ const AuthPage = () => {
                     </button>
                 </div>
 
-                {/* ── Shop CTA (below everything) ── */}
+                {/* ── Shop CTA ── */}
                 <div style={styles.shopSection}>
                     <div style={styles.shopDivider} />
                     <p style={styles.shopLabel}>Non sei ancora abbonato?</p>
-                    <button
-                        onClick={() => navigate('/shop')}
-                        style={styles.shopBtn}
-                    >
+                    <button type="button" onClick={() => navigate('/shop')} style={styles.shopBtn}>
                         Entra e fai parte di CSV
                         <ChevronRight size={18} />
                     </button>
                 </div>
-
             </div>
         </div>
     );
@@ -260,13 +283,9 @@ const AuthPage = () => {
 const styles = {
     page: {
         minHeight: '100dvh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: 'var(--bg-color, #050508)',
-        padding: '24px 16px',
-        position: 'relative',
-        overflow: 'hidden',
+        padding: '24px 16px', position: 'relative', overflow: 'hidden',
     },
     glowTop: {
         position: 'absolute', top: '-120px', right: '-80px',
@@ -292,15 +311,12 @@ const styles = {
         gap: '4px', marginBottom: '4px',
     },
     logoGlow: {
-        position: 'relative',
-        padding: '16px',
-        borderRadius: '50%',
+        position: 'relative', padding: '16px', borderRadius: '50%',
         background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)',
     },
     brandTitle: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 800,
-        fontSize: '1.6rem', letterSpacing: '0.08em', color: '#fff',
-        marginTop: '8px',
+        fontSize: '1.6rem', letterSpacing: '0.08em', color: '#fff', marginTop: '8px',
     },
     brandSub: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 600,
@@ -313,41 +329,66 @@ const styles = {
     },
 
     /* OAuth */
-    oauthRow: {
-        display: 'flex', gap: '12px', width: '100%',
-    },
+    oauthRow: { display: 'flex', gap: '12px', width: '100%' },
     oauthBtn: {
         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: '10px', padding: '13px 16px', borderRadius: '14px',
         background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
         color: '#fff', fontFamily: "'Inter', sans-serif", fontWeight: 600,
-        fontSize: '0.88rem', cursor: 'pointer',
-        transition: 'all 0.2s ease',
+        fontSize: '0.88rem', cursor: 'pointer', transition: 'all 0.2s ease',
     },
 
     /* Divider */
-    divider: {
-        display: 'flex', alignItems: 'center', gap: '16px', width: '100%',
-    },
-    dividerLine: {
-        flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)',
-    },
+    divider: { display: 'flex', alignItems: 'center', gap: '16px', width: '100%' },
+    dividerLine: { flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' },
     dividerText: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 600,
-        fontSize: '0.6rem', letterSpacing: '0.12em',
-        color: 'var(--text-muted, #666)',
+        fontSize: '0.6rem', letterSpacing: '0.12em', color: 'var(--text-muted, #666)',
     },
 
-    /* Select */
-    selectLabel: {
+    /* Form fields */
+    fieldGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
+    fieldLabel: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 600,
-        fontSize: '0.75rem', letterSpacing: '0.05em',
+        fontSize: '0.72rem', letterSpacing: '0.06em',
         color: 'var(--text-muted, #888)', textTransform: 'uppercase',
     },
+    input: {
+        width: '100%', padding: '14px 16px',
+        background: 'var(--surface-color-2, #111)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '12px', color: '#fff',
+        fontSize: '0.92rem', fontFamily: "'Inter', sans-serif",
+        outline: 'none', transition: 'border-color 0.2s',
+        boxSizing: 'border-box',
+    },
     select: {
-        background: 'var(--surface-color-2, #111)', border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '12px', padding: '12px 14px', color: '#fff',
+        width: '100%', padding: '14px 16px',
+        background: 'var(--surface-color-2, #111)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '12px', color: '#fff',
         fontSize: '0.92rem', appearance: 'none', outline: 'none',
+        boxSizing: 'border-box',
+    },
+
+    /* Submit */
+    submitBtn: {
+        width: '100%', padding: '16px',
+        background: 'var(--gradient-primary, linear-gradient(135deg, #D4AF37, #F0A500))',
+        border: 'none', borderRadius: '14px',
+        color: '#050508', fontFamily: "'Outfit', sans-serif",
+        fontWeight: 700, fontSize: '1rem',
+        letterSpacing: '0.02em',
+        transition: 'all 0.2s ease',
+        boxShadow: '0 4px 20px rgba(212,175,55,0.2)',
+        marginTop: '4px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '52px',
+    },
+    spinner: {
+        width: '20px', height: '20px', borderRadius: '50%',
+        border: '2px solid transparent', borderTopColor: '#050508',
+        animation: 'spin 0.6s linear infinite', display: 'inline-block',
     },
 
     /* Messages */
@@ -363,9 +404,7 @@ const styles = {
     },
 
     /* Toggle */
-    toggleRow: {
-        display: 'flex', alignItems: 'center', gap: '8px',
-    },
+    toggleRow: { display: 'flex', alignItems: 'center', gap: '8px' },
     toggleLabel: {
         fontFamily: "'Inter', sans-serif", fontSize: '0.82rem',
         color: 'var(--text-muted, #888)',
