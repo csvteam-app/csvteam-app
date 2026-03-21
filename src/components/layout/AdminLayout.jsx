@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Users, FileText, LogOut, Database, CalendarDays, MessageSquare, Eye, CreditCard } from 'lucide-react';
+import { Users, FileText, LogOut, Database, CalendarDays, MessageSquare, Eye } from 'lucide-react';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { useAuth } from '../../context/AuthContext';
 import CsvLogo from '../ui/CsvLogo';
@@ -56,7 +56,7 @@ const AdminLayout = () => {
                         { name: 'Gestione Lezioni', path: '/admin/lessons', icon: <CalendarDays size={18} strokeWidth={1.5} /> },
                         { name: 'Programmi', path: '/admin/programs', icon: <FileText size={18} strokeWidth={1.5} /> },
                         { name: 'Libreria Esercizi', path: '/admin/exercises', icon: <Database size={18} strokeWidth={1.5} /> },
-                        { name: 'Abbonamenti', path: '/admin/subscriptions', icon: <CreditCard size={18} strokeWidth={1.5} /> },
+
                     ].map(item => (
                         <NavLink
                             key={item.name}

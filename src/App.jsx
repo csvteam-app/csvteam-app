@@ -35,7 +35,7 @@ const ExerciseLibrary = lazy(() => import('./pages/admin/ExerciseLibrary'));
 const AdminLessons = lazy(() => import('./pages/admin/AdminLessons'));
 const AdminAcademy = lazy(() => import('./pages/admin/AdminAcademy'));
 const AdminAthleteDetail = lazy(() => import('./pages/admin/AdminAthleteDetail'));
-const AdminSubscriptions = lazy(() => import('./pages/admin/AdminSubscriptions'));
+
 
 // Gamification Overlays (lazy — not needed on first paint)
 const RewardAnimation = lazy(() => import('./components/gamification/RewardAnimation'));
@@ -118,7 +118,7 @@ function App() {
                     <Route path="/admin/chat" element={<AdminChat />} />
                     <Route path="/admin/academy" element={<AdminAcademy />} />
                     <Route path="/admin/athlete/:athleteId" element={<AdminAthleteDetail />} />
-                    <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+
                     <Route path="/admin/settings" element={<Navigate to="/admin/dashboard" replace />} />
                     <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
                   </Route>
