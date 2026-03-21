@@ -92,19 +92,34 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) return { error };
 
-        // Directly fetch profile — don't rely on onAuthStateChange race
-        const { data: profileData, error: profileError } = await supabase
+        // Try direct query first
+        let profileData = null;
+        const { data: directProfile, error: directError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', data.user.id)
             .single();
 
-        if (profileError) {
-            console.error('[Auth] signIn profile fetch error:', profileError.message);
+        if (directError) {
+            console.warn('[Auth] Direct profile query failed:', directError.message);
+            // Fallback: use SECURITY DEFINER RPC (bypasses RLS)
+            const { data: rpcProfile, error: rpcError } = await supabase
+                .rpc('get_my_profile')
+                .single();
+            if (rpcError) {
+                console.error('[Auth] RPC fallback also failed:', rpcError.message);
+            } else {
+                profileData = rpcProfile;
+            }
         } else {
-            console.log('[Auth] signIn profile:', { id: profileData?.id, role: profileData?.role, email: profileData?.email });
-            // Update React state immediately so route guards have it
+            profileData = directProfile;
+        }
+
+        if (profileData) {
+            console.log('[Auth] signIn profile:', { id: profileData.id, role: profileData.role, email: profileData.email });
             setProfile(profileData);
+        } else {
+            console.error('[Auth] Could not load profile for user:', data.user.id);
         }
 
         return { data, profile: profileData || null };
