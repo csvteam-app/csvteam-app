@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useCoachData } from '../../hooks/useCoachData';
 import Button from '../../components/ui/Button';
@@ -7,7 +8,7 @@ import TrafficLightMetric from '../../components/ui/TrafficLightMetric';
 import {
     AlertCircle, Save, Utensils, CreditCard, Dumbbell, BookOpen,
     ChevronDown, ChevronUp, UserCheck, UserX, Calendar, Clock,
-    Weight, Repeat,
+    Weight, Repeat, History, Edit3,
 } from 'lucide-react';
 
 // ── constants ──
@@ -53,10 +54,12 @@ const TABS = [
 ];
 
 const AdminDashboard = () => {
+    const navigate = useNavigate();
     const {
         isLoading, error, athletes, programs, pendingUsers,
         updateNutritionTargets, approveUser, rejectUser,
         assignSubscription, revokeSubscription, assignProgram,
+        fetchNutritionHistory, fetchProgramHistory,
     } = useCoachData();
 
     const [search, setSearch] = useState('');
@@ -89,6 +92,11 @@ const AdminDashboard = () => {
     const [expandedDay, setExpandedDay] = useState(null);
     const [dayMeals, setDayMeals] = useState({});
     const [logLoading, setLogLoading] = useState(false);
+
+    // History
+    const [macroHistory, setMacroHistory] = useState([]);
+    const [programHistory, setProgramHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     const filtered = athletes.filter(a => {
         if (!search) return true;
@@ -253,7 +261,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="flex-row gap-2 items-center" style={{ width: '100%', maxWidth: '480px', minWidth: '200px' }}>
                     <Input placeholder="Cerca atleta..." value={search} onChange={e => setSearch(e.target.value)} style={{ flex: 1 }} />
-                    <Button variant="primary" onClick={() => setShowInvite(true)} style={{ whiteSpace: 'nowrap', background: 'var(--accent-gold)', color: '#000' }}>
+                    <Button variant="primary" onClick={() => setShowInvite(true)} style={{ whiteSpace: 'nowrap', background: 'var(--accent-gold)', color: '#fff' }}>
                         + Invita
                     </Button>
                     <Button variant="outline" onClick={handleSyncWc} disabled={syncingWc} style={{ whiteSpace: 'nowrap', borderColor: 'rgba(212,175,55,0.3)', color: 'var(--accent-gold)' }}>
@@ -278,7 +286,7 @@ const AdminDashboard = () => {
                         </label>
                         <div className="flex-row justify-end gap-2">
                             <Button variant="ghost" onClick={() => setShowInvite(false)}>Annulla</Button>
-                            <Button variant="primary" onClick={handleInvite} disabled={inviting || !inviteEmail} style={{ background: 'var(--accent-gold)', color: '#000' }}>
+                            <Button variant="primary" onClick={handleInvite} disabled={inviting || !inviteEmail} style={{ background: 'var(--accent-gold)', color: '#fff' }}>
                                 {inviting ? 'Invio...' : 'Invia Magic Link'}
                             </Button>
                         </div>
@@ -442,7 +450,7 @@ const AdminDashboard = () => {
                                                                 style={{ padding: '8px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', fontSize: '0.82rem', flex: 1 }}
                                                             />
                                                             <Button size="sm" onClick={() => handleAssignSub(t.id)} disabled={actionLoading === t.id}
-                                                                style={{ background: 'var(--accent-gold)', color: '#000', whiteSpace: 'nowrap' }}>
+                                                                style={{ background: 'var(--accent-gold)', color: '#fff', whiteSpace: 'nowrap' }}>
                                                                 <CreditCard size={13} /> Assegna
                                                             </Button>
                                                         </div>
@@ -489,9 +497,46 @@ const AdminDashboard = () => {
                                                 </div>
 
                                                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                                    <Button variant="primary" size="sm" onClick={() => handleSaveTargets(t.id)} style={{ background: 'var(--accent-gold)', color: '#000' }}>
+                                                    <Button variant="primary" size="sm" onClick={() => handleSaveTargets(t.id)} style={{ background: 'var(--accent-gold)', color: '#fff' }}>
                                                         <Save size={14} /> Salva Macro
                                                     </Button>
+                                                </div>
+
+                                                {/* ═══ STORICO MACRO ═══ */}
+                                                <div style={{ marginTop: '12px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                                                        <History size={14} color="var(--accent-gold)" />
+                                                        <span style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '0.72rem', color: 'var(--accent-gold)', textTransform: 'uppercase' }}>Storico Macro</span>
+                                                        <button onClick={async () => { setHistoryLoading(true); const h = await fetchNutritionHistory(t.id); setMacroHistory(h); setHistoryLoading(false); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.65rem', cursor: 'pointer', textDecoration: 'underline' }}>Carica</button>
+                                                    </div>
+                                                    {historyLoading && <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Caricamento...</p>}
+                                                    {macroHistory.length > 0 && (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '200px', overflowY: 'auto' }}>
+                                                            {macroHistory.map((h, idx) => (
+                                                                <div key={h.id || idx} style={{
+                                                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                                                    padding: '8px 10px', borderRadius: '8px',
+                                                                    background: h.is_active ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.03)',
+                                                                    border: `1px solid ${h.is_active ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                                                                }}>
+                                                                    <div>
+                                                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fff' }}>
+                                                                            P {h.protein}g · C {h.carbs}g · F {h.fats}g
+                                                                        </span>
+                                                                        <span style={{ fontSize: '0.65rem', color: 'var(--accent-gold)', marginLeft: '8px', fontWeight: 600 }}>
+                                                                            {h.calories} kcal
+                                                                        </span>
+                                                                    </div>
+                                                                    <div style={{ textAlign: 'right' }}>
+                                                                        <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+                                                                            {fmtDate(h.start_date || h.created_at)}
+                                                                        </span>
+                                                                        {h.is_active && <span style={{ fontSize: '0.55rem', color: '#4ade80', marginLeft: '6px', fontWeight: 700 }}>ATTIVO</span>}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
@@ -505,20 +550,63 @@ const AdminDashboard = () => {
                                                     <p style={{ fontWeight: 700, fontSize: '0.92rem', color: '#fff', marginBottom: '10px' }}>
                                                         {t.assignedProgramName || 'Nessun programma'}
                                                     </p>
-                                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                                        <select
-                                                            value={selectedProgramId}
-                                                            onChange={e => setSelectedProgramId(e.target.value)}
-                                                            style={{ flex: 1, padding: '8px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', fontSize: '0.82rem' }}
-                                                        >
-                                                            <option value="">Seleziona programma</option>
-                                                            {programs.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                                        </select>
-                                                        <Button size="sm" onClick={() => handleAssignProgram(t.id)} disabled={!selectedProgramId || actionLoading === t.id}
-                                                            style={{ background: 'var(--accent-gold)', color: '#000', whiteSpace: 'nowrap' }}>
-                                                            Assegna
+                                                    {t.assignedProgramId && (
+                                                        <Button size="sm" onClick={() => navigate(`/admin/programs/${t.assignedProgramId}`)}
+                                                            style={{ background: 'var(--accent-gold)', color: '#fff', whiteSpace: 'nowrap' }}>
+                                                            <Edit3 size={13} /> Modifica Programma
                                                         </Button>
+                                                    )}
+                                                    {!t.assignedProgramId && (
+                                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                            <select
+                                                                value={selectedProgramId}
+                                                                onChange={e => setSelectedProgramId(e.target.value)}
+                                                                style={{ flex: 1, padding: '8px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', fontSize: '0.82rem' }}
+                                                            >
+                                                                <option value="">Seleziona programma</option>
+                                                                {programs.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                                            </select>
+                                                            <Button size="sm" onClick={() => handleAssignProgram(t.id)} disabled={!selectedProgramId || actionLoading === t.id}
+                                                                style={{ background: 'var(--accent-gold)', color: '#fff', whiteSpace: 'nowrap' }}>
+                                                                Assegna
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* ═══ STORICO ALLENAMENTI ═══ */}
+                                                <div style={{ marginTop: '4px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                                                        <History size={14} color="var(--accent-gold)" />
+                                                        <span style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '0.72rem', color: 'var(--accent-gold)', textTransform: 'uppercase' }}>Storico Programmi</span>
+                                                        <button onClick={async () => { setHistoryLoading(true); const h = await fetchProgramHistory(t.id); setProgramHistory(h); setHistoryLoading(false); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.65rem', cursor: 'pointer', textDecoration: 'underline' }}>Carica</button>
                                                     </div>
+                                                    {historyLoading && <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Caricamento...</p>}
+                                                    {programHistory.length > 0 && (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '200px', overflowY: 'auto' }}>
+                                                            {programHistory.map((h, idx) => (
+                                                                <div key={h.id || idx} style={{
+                                                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                                                    padding: '8px 10px', borderRadius: '8px',
+                                                                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                                                                }}>
+                                                                    <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fff' }}>
+                                                                        {h.programs?.name || 'Programma rimosso'}
+                                                                    </span>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                        <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+                                                                            {fmtDate(h.assigned_at)}
+                                                                        </span>
+                                                                        {h.program_id && (
+                                                                            <button onClick={() => navigate(`/admin/programs/${h.program_id}`)} style={{ background: 'none', border: 'none', color: 'var(--accent-gold)', cursor: 'pointer', padding: '2px' }}>
+                                                                                <Edit3 size={12} />
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 {/* Logbook */}

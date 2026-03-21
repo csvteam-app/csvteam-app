@@ -219,6 +219,28 @@ export function useCoachData() {
         await fetchData();
     };
 
+    // ── Nutrition History (all targets, not just active) ──
+    const fetchNutritionHistory = async (athleteId) => {
+        const { data, error: err } = await supabase
+            .from('nutrition_targets')
+            .select('*')
+            .eq('athlete_id', athleteId)
+            .order('created_at', { ascending: false });
+        if (err) { console.error('[CoachData] NutritionHistory error:', err); return []; }
+        return data || [];
+    };
+
+    // ── Program Assignment History ──
+    const fetchProgramHistory = async (athleteId) => {
+        const { data, error: err } = await supabase
+            .from('athlete_programs')
+            .select('*, programs(id, name)')
+            .eq('athlete_id', athleteId)
+            .order('assigned_at', { ascending: false });
+        if (err) { console.error('[CoachData] ProgramHistory error:', err); return []; }
+        return data || [];
+    };
+
     // ── Derived ──
     const pendingUsers = athletes.filter(u => u.approval_status === 'pending');
 
@@ -226,6 +248,7 @@ export function useCoachData() {
         isLoading, error, athletes, programs, subscriptions, pendingUsers,
         updateNutritionTargets, approveUser, rejectUser,
         assignSubscription, revokeSubscription, assignProgram,
+        fetchNutritionHistory, fetchProgramHistory,
         refresh: fetchData,
     };
 }
