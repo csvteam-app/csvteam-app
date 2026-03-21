@@ -301,6 +301,23 @@ const AdminLayout = () => {
                         </span>
                     </button>
                 ))}
+                {canViewAsAthlete && (
+                    <button
+                        onClick={() => navigate('/dashboard')}
+                        style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            padding: '8px 12px', minWidth: '48px',
+                            color: 'var(--accent-teal, #2dd4bf)',
+                            transition: 'color 0.2s',
+                        }}
+                    >
+                        <Eye size={18} strokeWidth={1.5} />
+                        <span style={{ fontSize: '0.6rem', fontFamily: 'Outfit', fontWeight: 500, color: 'var(--accent-teal, #2dd4bf)' }}>
+                            Atleta
+                        </span>
+                    </button>
+                )}
             </div>
         </div>
     );
