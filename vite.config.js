@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'apple-touch-icon-180x180.png'],
+      includeAssets: ['favicon.png', 'apple-touch-icon-180x180.png', 'images/**/*.png', 'images/**/*.svg'],
       manifest: {
         name: 'CSV Team',
         short_name: 'CSV Team',

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-// Import via Vite so the asset gets a hashed URL in production builds
-import csvLogoSrc from '/images/csv-logo.png';
+// Import via Vite from src/assets — gets content-hashed and precached by SW
+import csvLogoSrc from '../../assets/csv-logo.png';
 
 const CsvLogo = ({ size = 48, showText = true, className = '' }) => {
     const [imgError, setImgError] = useState(false);
