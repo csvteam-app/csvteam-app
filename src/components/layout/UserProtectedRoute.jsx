@@ -8,10 +8,9 @@ import ExpiredSubscriptionPage from '../../pages/user/ExpiredSubscriptionPage';
  *
  * Checks (in order):
  *   1. Authenticated?          → redirect to /auth
- *   2. Account approved?       → show PendingApprovalPage
- *   3. Subscription active?    → show ExpiredSubscriptionPage
- *
- * Coach / superadmin users bypass steps 2–3 (they use the admin panel).
+ *   2. Coach/superadmin?       → redirect to /admin/dashboard
+ *   3. Account approved?       → show PendingApprovalPage
+ *   4. Subscription active?    → show ExpiredSubscriptionPage
  */
 const UserProtectedRoute = () => {
     const {
@@ -35,16 +34,19 @@ const UserProtectedRoute = () => {
         return <Navigate to="/auth" replace />;
     }
 
-    // Coaches and superadmins skip approval/subscription gates
+    // 2. Coaches and superadmins → redirect to admin dashboard
     const isPrivileged = ['coach', 'superadmin'].includes(role);
+    if (isPrivileged) {
+        return <Navigate to="/admin/dashboard" replace />;
+    }
 
-    // 2. Account not yet approved by admin
-    if (!isPrivileged && !isApproved) {
+    // 3. Account not yet approved by admin
+    if (!isApproved) {
         return <PendingApprovalPage />;
     }
 
-    // 3. Subscription expired or inactive
-    if (!isPrivileged && !hasActiveSubscription) {
+    // 4. Subscription expired or inactive
+    if (!hasActiveSubscription) {
         return <ExpiredSubscriptionPage />;
     }
 
