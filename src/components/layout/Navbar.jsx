@@ -93,6 +93,7 @@ const Navbar = ({ activeTab }) => {
                         onClick={handleNavClick}
                         style={{
                             background: 'none',
+                            border: 'none',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -103,6 +104,7 @@ const Navbar = ({ activeTab }) => {
                             transition: 'all 0.25s ease',
                             transform: tappedIdx === idx ? 'scale(0.85)' : 'scale(1)',
                             WebkitTapHighlightColor: 'transparent',
+                            touchAction: 'manipulation',
                             position: 'relative',
                         }}
                     >

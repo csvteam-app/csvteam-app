@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, Component } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import PremiumHeader from './PremiumHeader';
 import Navbar from './Navbar';
@@ -14,6 +14,48 @@ import Nutrition from '../../pages/user/Nutrition';
 import Profile from '../../pages/user/Profile';
 
 const TAB_COMPONENTS = [Shop, Chat, Dashboard, Nutrition, Profile];
+
+/* ═══ Per-page Error Boundary — prevents one crash from killing the app ═══ */
+class PageErrorBoundary extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+    componentDidCatch(error, info) {
+        console.error('[PageError]', this.props.pageName || 'unknown', error, info);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', height: '100%', gap: '16px',
+                    padding: '40px 20px', textAlign: 'center',
+                }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        Errore nel caricamento della pagina
+                    </p>
+                    <button
+                        onClick={() => this.setState({ hasError: false })}
+                        style={{
+                            padding: '12px 24px', borderRadius: '12px',
+                            background: 'var(--gradient-primary, linear-gradient(135deg, #D4AF37, #F0A500))',
+                            color: '#050508', border: 'none', fontWeight: 700,
+                            fontFamily: "'Outfit', sans-serif", fontSize: '0.85rem',
+                            cursor: 'pointer', touchAction: 'manipulation',
+                        }}
+                    >
+                        Riprova
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 function getTabIndex(pathname) {
     const exact = TAB_ROUTES.indexOf(pathname);
@@ -143,7 +185,9 @@ const UserLayout = () => {
                     paddingTop: !hideNav && !isMobile ? '60px' : '0', // Offset for PremiumHeader on desktop
                     paddingBottom: hideNav || !isMobile ? '0' : 'calc(20px + env(safe-area-inset-bottom))',
                 }}>
-                    <Outlet />
+                    <PageErrorBoundary pageName="outlet">
+                        <Outlet />
+                    </PageErrorBoundary>
                 </div>
                 {(!hideNav && isMobile) && <Navbar />}
             </div>
@@ -151,9 +195,6 @@ const UserLayout = () => {
     }
 
     // ── Tab routes: render carousel ──
-    // IMPORTANT: PremiumHeader and Navbar must ALWAYS be rendered in carousel
-    // to keep container height stable. Changing height desynchronizes scroll-snap.
-
     return (
         <div style={{
             height: '100dvh', maxHeight: '100dvh',
@@ -176,13 +217,14 @@ const UserLayout = () => {
                     overscrollBehaviorX: 'contain',
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
+                    touchAction: 'pan-x',
                     /* GPU layer promotion */
                     transform: 'translateZ(0)',
                     backfaceVisibility: 'hidden',
                 }}
             >
                 {TAB_ROUTES.map((route, idx) => {
-                    const Component = TAB_COMPONENTS[idx];
+                    const PageComponent = TAB_COMPONENTS[idx];
 
                     return (
                         <div
@@ -201,7 +243,9 @@ const UserLayout = () => {
                                 contain: 'layout style',
                             }}
                         >
-                            <Component />
+                            <PageErrorBoundary pageName={route}>
+                                <PageComponent />
+                            </PageErrorBoundary>
                         </div>
                     );
                 })}

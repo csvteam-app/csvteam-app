@@ -167,6 +167,12 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+  touch-action: manipulation;
+}
+
+/* Eliminate 300ms tap delay on all interactive elements */
+a, input, select, textarea {
+  touch-action: manipulation;
 }
 
 /* ═══════════════════════════════════════

@@ -1,6 +1,11 @@
-import React from 'react';
+import { useState } from 'react';
+
+// Import via Vite so the asset gets a hashed URL in production builds
+import csvLogoSrc from '/images/csv-logo.png';
 
 const CsvLogo = ({ size = 48, showText = true, className = '' }) => {
+    const [imgError, setImgError] = useState(false);
+
     return (
         <div className={`csv-logo ${className}`} style={{
             display: 'inline-flex',
@@ -8,17 +13,26 @@ const CsvLogo = ({ size = 48, showText = true, className = '' }) => {
             alignItems: 'center',
             gap: showText ? '2px' : '0',
         }}>
-            <img
-                src="/images/csv-logo.png"
-                alt="CSV Team"
-                width={size}
-                height={size}
-                style={{
-                    display: 'block',
-                    objectFit: 'contain',
-                    /* The invert(1) and sepia filters are now handled globally in Button.css for the night-shift glow */
-                }}
-            />
+            {!imgError ? (
+                <img
+                    src={csvLogoSrc}
+                    alt="CSV Team"
+                    width={size}
+                    height={size}
+                    style={{ display: 'block', objectFit: 'contain' }}
+                    onError={() => setImgError(true)}
+                />
+            ) : (
+                /* Fallback: gold circle with "CSV" text */
+                <div style={{
+                    width: size, height: size, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #D4AF37, #F0A500)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#050508', fontFamily: "'Outfit', sans-serif",
+                    fontWeight: 900, fontSize: `${size * 0.3}px`,
+                    letterSpacing: '1px',
+                }}>CSV</div>
+            )}
             {showText && (
                 <span
                     style={{
