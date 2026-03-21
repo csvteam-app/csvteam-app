@@ -627,49 +627,66 @@ a, input, select, textarea {
     flex-direction: column;
   }
 
-  /* Mobile top bar */
-  .admin-mobile-bar {
-    display: flex !important;
-  }
-
-  /* Sidebar: slide-in from left */
   .admin-sidebar {
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
     bottom: 0 !important;
-    width: 280px !important;
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    border-right: 1px solid rgba(255,255,255,0.08) !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(60px + env(safe-area-inset-bottom)) !important;
+    flex-direction: row !important;
+    background: rgba(5, 5, 8, 0.92) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(24px) !important;
+    border-top: 1px solid var(--glass-border) !important;
+    border-right: none !important;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom) !important;
   }
 
-  .admin-sidebar.admin-sidebar-open {
-    transform: translateX(0);
+  .admin-sidebar nav {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    padding: 6px 4px !important;
+    gap: 2px !important;
+    justify-content: space-around;
   }
 
-  /* Show close button on mobile */
-  .admin-sidebar-close {
-    display: flex !important;
+  .admin-sidebar nav::-webkit-scrollbar {
+    display: none;
   }
 
-  /* Show backdrop on mobile */
-  .admin-sidebar-backdrop {
-    display: block !important;
+  .admin-sidebar span {
+    display: none !important;
+  }
+
+  .admin-sidebar a {
+    padding: 10px !important;
+    justify-content: center;
+    border-radius: 50% !important;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .admin-sidebar .sidebar-header,
+  .admin-sidebar .sidebar-footer {
+    display: none !important;
   }
 
   .admin-main {
-    padding-top: 72px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
-    padding-bottom: 24px !important;
+    padding-top: 20px !important;
   }
 
   /* Reset padding per la Chat Coach su mobile */
   .admin-main:has(.admin-chat-container) {
     padding-left: 0 !important;
     padding-right: 0 !important;
-    padding-top: 56px !important;
+    padding-top: 0 !important;
   }
 }
 
@@ -688,8 +705,8 @@ a, input, select, textarea {
   color: #fff;
   background: rgba(20,20,24,0.95);
   border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
