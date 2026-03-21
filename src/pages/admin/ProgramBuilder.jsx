@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Card from '../../components/ui/Card';
@@ -8,7 +8,7 @@ import Badge from '../../components/ui/Badge';
 import {
     Plus, Trash2, ArrowUp, ArrowDown, Zap, Copy,
     UserPlus, Save, ChevronRight, Video, Link2,
-    MoreHorizontal, Check, Trash, X, Loader
+    Check, Trash, X, Loader
 } from 'lucide-react';
 import ExercisePicker from '../../components/admin/ExercisePicker';
 import TechNotePopup from '../../components/admin/TechNotePopup';
@@ -379,10 +379,10 @@ const ProgramBuilder = () => {
                             <div key={ex.id} className="animate-fade-in" style={{ padding: '12px 16px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px' }}>
                                 <div className="flex-row gap-3 items-center" style={{ flexWrap: 'wrap' }}>
                                     {/* Order & Title */}
-                                    <div className="flex-col items-center gap-1" style={{ width: '24px' }}>
-                                        <button onClick={() => moveEx(exIdx, -1)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowUp size={14} /></button>
+                                    <div className="flex-col items-center gap-1" style={{ width: '32px' }}>
+                                        <button onClick={() => moveEx(exIdx, -1)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', minWidth: '32px', minHeight: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ArrowUp size={16} /></button>
                                         <span className="text-small" style={{ fontWeight: 800, color: 'var(--accent-warm)' }}>{exIdx + 1}</span>
-                                        <button onClick={() => moveEx(exIdx, 1)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowDown size={14} /></button>
+                                        <button onClick={() => moveEx(exIdx, 1)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', minWidth: '32px', minHeight: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ArrowDown size={16} /></button>
                                     </div>
 
                                     <div style={{ flex: '2 1 200px' }} className="flex-row gap-2 items-center">
@@ -397,17 +397,17 @@ const ProgramBuilder = () => {
 
                                     {/* Config Inputs */}
                                     <div className="flex-row gap-3" style={{ flex: '1 1 300px', flexWrap: 'wrap' }}>
-                                        <div style={{ width: '50px' }}>
-                                            <label className="text-label" style={{ fontSize: '0.6rem' }}>Serie</label>
-                                            <Input variant="compact" type="number" value={ex.sets} onChange={e => updateEx(exIdx, { sets: parseInt(e.target.value) })} />
+                                        <div style={{ flex: '1 1 60px', minWidth: '50px' }}>
+                                            <label className="text-label" style={{ fontSize: '0.65rem' }}>Serie</label>
+                                            <Input variant="compact" type="number" value={ex.sets} onChange={e => updateEx(exIdx, { sets: parseInt(e.target.value) })} style={{ minHeight: '44px' }} />
                                         </div>
-                                        <div style={{ width: '70px' }}>
-                                            <label className="text-label" style={{ fontSize: '0.6rem' }}>Rip</label>
-                                            <Input variant="compact" value={ex.reps} onChange={e => updateEx(exIdx, { reps: e.target.value })} />
+                                        <div style={{ flex: '1 1 70px', minWidth: '60px' }}>
+                                            <label className="text-label" style={{ fontSize: '0.65rem' }}>Rip</label>
+                                            <Input variant="compact" value={ex.reps} onChange={e => updateEx(exIdx, { reps: e.target.value })} style={{ minHeight: '44px' }} />
                                         </div>
-                                        <div style={{ width: '60px' }}>
-                                            <label className="text-label" style={{ fontSize: '0.6rem' }}>Rest</label>
-                                            <Input variant="compact" type="number" value={ex.rest} onChange={e => updateEx(exIdx, { rest: parseInt(e.target.value) })} />
+                                        <div style={{ flex: '1 1 60px', minWidth: '50px' }}>
+                                            <label className="text-label" style={{ fontSize: '0.65rem' }}>Rest</label>
+                                            <Input variant="compact" type="number" value={ex.rest} onChange={e => updateEx(exIdx, { rest: parseInt(e.target.value) })} style={{ minHeight: '44px' }} />
                                         </div>
 
                                         {/* Tech Note Trigger */}
@@ -417,7 +417,7 @@ const ProgramBuilder = () => {
                                                 size="sm"
                                                 fullWidth
                                                 onClick={() => setTechNoteModal({ dayIdx: activeDayIdx, exIdx })}
-                                                style={{ height: '38px', whiteSpace: 'nowrap', padding: '0 8px' }}
+                                                style={{ height: '44px', whiteSpace: 'nowrap', padding: '0 12px' }}
                                             >
                                                 {ex.noteType ? <><Zap size={14} /> {ex.noteText}</> : <><Plus size={14} /> Nota Tecn.</>}
                                             </Button>

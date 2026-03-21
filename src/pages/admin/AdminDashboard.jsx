@@ -35,8 +35,8 @@ const StatusBadge = ({ status }) => {
     return (
         <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '4px',
-            fontSize: '0.68rem', fontWeight: 600, padding: '3px 8px',
-            borderRadius: '6px', background: s.bg, color: s.color,
+            fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px',
+            borderRadius: '8px', background: s.bg, color: s.color,
             textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'Outfit', sans-serif",
         }}>
             {s.label}
@@ -46,10 +46,10 @@ const StatusBadge = ({ status }) => {
 
 // ── Tab pills ──
 const TABS = [
-    { key: 'abbonamento', label: 'Abbonamento', icon: <CreditCard size={13} /> },
-    { key: 'nutrizione', label: 'Nutrizione', icon: <Utensils size={13} /> },
-    { key: 'allenamento', label: 'Allenamento', icon: <Dumbbell size={13} /> },
-    { key: 'diario', label: 'Diario', icon: <BookOpen size={13} /> },
+    { key: 'abbonamento', label: 'Abbonamento', icon: <CreditCard size={15} /> },
+    { key: 'nutrizione', label: 'Nutrizione', icon: <Utensils size={15} /> },
+    { key: 'allenamento', label: 'Allenamento', icon: <Dumbbell size={15} /> },
+    { key: 'diario', label: 'Diario', icon: <BookOpen size={15} /> },
 ];
 
 const AdminDashboard = () => {
@@ -299,7 +299,7 @@ const AdminDashboard = () => {
                         background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px',
                         borderLeft: `3px solid ${kpi.accent}`,
                     }}>
-                        <p className="text-label" style={{ marginBottom: '4px', fontSize: '0.6rem' }}>{kpi.label}</p>
+                        <p className="text-label" style={{ marginBottom: '4px', fontSize: '0.72rem' }}>{kpi.label}</p>
                         <p style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem', color: '#fff' }}>{kpi.value}</p>
                     </div>
                 ))}
@@ -362,10 +362,11 @@ const AdminDashboard = () => {
                                                 key={tab.key}
                                                 onClick={() => setActiveTab(tab.key)}
                                                 style={{
-                                                    display: 'flex', alignItems: 'center', gap: '4px',
-                                                    padding: '7px 12px', borderRadius: '8px', border: 'none',
-                                                    fontSize: '0.72rem', fontWeight: 600, fontFamily: "'Outfit'",
+                                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                                    padding: '10px 16px', borderRadius: '10px', border: 'none',
+                                                    fontSize: '0.8rem', fontWeight: 600, fontFamily: "'Outfit'",
                                                     whiteSpace: 'nowrap', cursor: 'pointer', flexShrink: 0,
+                                                    minHeight: '44px',
                                                     background: activeTab === tab.key ? 'var(--accent-gold)' : 'rgba(255,255,255,0.05)',
                                                     color: activeTab === tab.key ? '#000' : 'var(--text-muted)',
                                                     transition: 'all 0.15s',

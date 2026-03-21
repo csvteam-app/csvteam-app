@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { List, Users, PlusCircle, Settings, CreditCard, Bot, Clock } from 'lucide-react';
+import { List, Users, PlusCircle, CreditCard, Bot, Clock } from 'lucide-react';
 
 // Sotto-componenti
 import AdminLessonsRegistro from './lessons/AdminLessonsRegistro';
@@ -35,25 +35,26 @@ const AdminLessons = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className="flex-row gap-1 items-center"
+                            className="flex-row gap-2 items-center"
                             style={{
-                                padding: '8px 14px',
+                                padding: '10px 16px',
                                 borderRadius: '12px',
                                 background: activeTab === tab.id
-                                    ? tab.id === 'ai' ? 'rgba(147,112,219,0.12)' : 'rgba(212,175,55,0.1)'
+                                    ? 'rgba(212,175,55,0.1)'
                                     : 'transparent',
                                 color: activeTab === tab.id
-                                    ? tab.id === 'ai' ? '#9370DB' : 'var(--accent-gold)'
+                                    ? 'var(--accent-gold)'
                                     : 'var(--text-muted)',
                                 border: `1px solid ${activeTab === tab.id
-                                    ? tab.id === 'ai' ? 'rgba(147,112,219,0.25)' : 'rgba(212,175,55,0.2)'
+                                    ? 'rgba(212,175,55,0.2)'
                                     : 'transparent'}`,
                                 fontWeight: activeTab === tab.id ? 600 : 500,
-                                fontSize: '0.85rem',
+                                fontSize: '0.88rem',
                                 transition: 'all 0.2s',
                                 cursor: 'pointer',
                                 fontFamily: 'Outfit, sans-serif',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                minHeight: '44px',
                             }}
                         >
                             {tab.icon}
