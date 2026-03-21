@@ -29,7 +29,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminChat from './pages/admin/AdminChat';
 import ProgramBuilder from './pages/admin/ProgramBuilder';
 import ExerciseLibrary from './pages/admin/ExerciseLibrary';
-import VideoUpload from './pages/admin/VideoUpload';
+
 import AdminLessons from './pages/admin/AdminLessons';
 import AdminAcademy from './pages/admin/AdminAcademy';
 import AdminAthleteDetail from './pages/admin/AdminAthleteDetail';
@@ -104,7 +104,7 @@ function App() {
                   <Route path="/admin/programs" element={<ProgramBuilder />} />
                   <Route path="/admin/programs/:id" element={<ProgramBuilder />} />
                   <Route path="/admin/exercises" element={<ExerciseLibrary />} />
-                  <Route path="/admin/videos" element={<VideoUpload />} />
+
                   <Route path="/admin/lessons" element={<AdminLessons />} />
                   <Route path="/admin/chat" element={<AdminChat />} />
                   <Route path="/admin/academy" element={<AdminAcademy />} />

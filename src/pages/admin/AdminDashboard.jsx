@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Card from '../../components/ui/Card';
-import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { supabase } from '../../lib/supabase';
 import { useCoachData } from '../../hooks/useCoachData';
-import { Eye, BookOpen, AlertCircle, Activity, ChevronDown, ChevronUp, Utensils, Save, Dumbbell, CalendarRange } from 'lucide-react';
+import { BookOpen, AlertCircle, Utensils, Save } from 'lucide-react';
 import TrafficLightMetric from '../../components/ui/TrafficLightMetric';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const { isLoading, error, athletes, programs, checkins, assignProgram, updateNutritionTargets } = useCoachData();
+    const { isLoading, error, athletes, updateNutritionTargets } = useCoachData();
     const [expandedClient, setExpandedClient] = useState(null);
     const [editingTargets, setEditingTargets] = useState({});
-    const [assigningId, setAssigningId] = useState(null);
     const [syncingWc, setSyncingWc] = useState(false);
 
     const handleSyncWc = async () => {
@@ -38,18 +35,6 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleProgramAssign = async (athleteId, programId) => {
-        if (!programId) return;
-        setAssigningId(athleteId);
-        await assignProgram(athleteId, programId);
-        setAssigningId(null);
-    };
-
-    const getLatestCheckin = (userId) => {
-        const userCheckins = (checkins || []).filter(c => c.athlete_id === userId);
-        if (userCheckins.length === 0) return null;
-        return userCheckins[0];
-    };
 
     const getClientTargets = (clientId) => {
         const client = athletes.find(c => c.id === clientId);
@@ -175,239 +160,109 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
-            {/* Table — Solid High Contrast */}
-            <div style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px', padding: 0, overflow: 'hidden' }}>
-                <div className="responsive-table">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                                {['Nome Atleta', 'Stato Aderenza', 'Azioni'].map(h => (
-                                    <th key={h} style={{
-                                        padding: '16px 16px', fontWeight: 600,
-                                        color: 'var(--text-muted)', fontSize: '0.72rem',
-                                        textTransform: 'uppercase', letterSpacing: '0.08em',
-                                        fontFamily: 'Outfit, sans-serif',
-                                    }}>{h}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {isLoading ? (
-                                <tr><td colSpan={3} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>Caricamento atleti...</td></tr>
-                            ) : error ? (
-                                <tr><td colSpan={3} style={{ padding: '24px', textAlign: 'center', color: '#ff6b6b' }}>Errore: {error}</td></tr>
-                            ) : athletes.length === 0 ? (
-                                <tr><td colSpan={3} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>Nessun atleta registrato.</td></tr>
-                            ) : athletes.map((t, idx) => {
-                                const latestCheckin = getLatestCheckin(t.id);
-                                const isExpanded = expandedClient === t.id;
-                                const targets = getClientTargets(t.id);
-                                return (
-                                    <React.Fragment key={t.id}>
-                                        <tr
-                                            style={{
-                                                borderBottom: (!isExpanded && idx !== athletes.length - 1) ? '1px solid #333' : 'none',
-                                                transition: 'background 0.25s ease-out',
-                                            }}
-                                            onMouseEnter={e => e.currentTarget.style.background = '#222'}
-                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                                        >
-                                            <td style={{ padding: '16px 16px' }}>
-                                                <div className="flex-row gap-2 items-center">
-                                                    {t.avatar_url ? (
-                                                        <img src={t.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
-                                                    ) : (
-                                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }} />
-                                                    )}
-                                                    <div className="flex-row gap-1 items-center">
-                                                        <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#fff', whiteSpace: 'nowrap' }}>{t.full_name}</span>
-                                                        {t.alert && <AlertCircle size={14} strokeWidth={1.5} color="#ff6b6b" />}
-                                                    </div>
+            {/* Athletes — Mobile Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {isLoading ? (
+                    <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', background: '#1a1a1a', borderRadius: '12px', border: '1px solid #333' }}>Caricamento atleti...</div>
+                ) : error ? (
+                    <div style={{ padding: '32px', textAlign: 'center', color: '#ff6b6b', background: '#1a1a1a', borderRadius: '12px', border: '1px solid #333' }}>Errore: {error}</div>
+                ) : athletes.length === 0 ? (
+                    <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', background: '#1a1a1a', borderRadius: '12px', border: '1px solid #333' }}>Nessun atleta registrato.</div>
+                ) : athletes.map(t => {
+                    const isExpanded = expandedClient === t.id;
+                    const targets = getClientTargets(t.id);
+                    return (
+                        <div key={t.id} style={{
+                            background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px',
+                            overflow: 'hidden', transition: 'border-color 0.2s',
+                        }}>
+                            {/* Card Header: Avatar + Name + Sub Badge */}
+                            <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {t.avatar_url ? (
+                                    <img src={t.avatar_url} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                                ) : (
+                                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', flexShrink: 0 }} />
+                                )}
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.full_name}</span>
+                                        {t.alert && <AlertCircle size={14} strokeWidth={1.5} color="#ff6b6b" />}
+                                    </div>
+                                    {/* Subscription inline */}
+                                    {t.subscription_status === 'active' ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', flexWrap: 'wrap' }}>
+                                            <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(34,197,94,0.15)', color: '#4ade80', fontWeight: 600, textTransform: 'uppercase' }}>Attivo</span>
+                                            <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+                                                {t.subscription_plan || ''} {t.subscription_expires_at ? `• ${new Date(t.subscription_expires_at).toLocaleDateString('it-IT')}` : ''}
+                                            </span>
+                                        </div>
+                                    ) : t.subscription_status === 'expired' ? (
+                                        <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(239,68,68,0.15)', color: '#f87171', fontWeight: 600, textTransform: 'uppercase', marginTop: '2px', display: 'inline-block' }}>Scaduto</span>
+                                    ) : (
+                                        <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '2px', display: 'block' }}>Nessun Abbonamento</span>
+                                    )}
+                                </div>
 
-                                                    {/* Subscription Badge */}
-                                                    <div style={{ marginTop: '4px' }}>
-                                                        {t.subscription_status === 'active' ? (
-                                                            <div className="flex-row items-center gap-1">
-                                                                <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(34,197,94,0.15)', color: '#4ade80', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                                    Attivo
-                                                                </span>
-                                                                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                                                                    {t.subscription_plan || 'N/A'} {t.subscription_expires_at ? `(Scade: ${new Date(t.subscription_expires_at).toLocaleDateString()})` : ''}
-                                                                </span>
-                                                            </div>
-                                                        ) : t.subscription_status === 'expired' ? (
-                                                            <div className="flex-row items-center gap-1">
-                                                                <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(239,68,68,0.15)', color: '#f87171', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                                    Scaduto
-                                                                </span>
-                                                                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                                                                    {t.subscription_expires_at ? `Scaduto il ${new Date(t.subscription_expires_at).toLocaleDateString()}` : ''}
-                                                                </span>
-                                                            </div>
-                                                        ) : (
-                                                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Nessun Abbonamento</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style={{ padding: '16px 16px' }}>
-                                                {t.trafficLights ? (
-                                                    <div className="flex-row items-center gap-2" title={t.trafficLights.overall_label}>
-                                                        <TrafficLightMetric statusToken={t.trafficLights.overall_dot_token} size={14} pulsate={t.trafficLights.overall_status_code === 'red'} />
+                                {/* Adherence dot + Actions */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                                    {t.trafficLights && <TrafficLightMetric statusToken={t.trafficLights.overall_dot_token} size={12} pulsate={t.trafficLights.overall_status_code === 'red'} />}
+                                    <Button variant="ghost" size="icon" title="Nutrizione" onClick={() => handleExpand(t.id)} style={{ padding: '6px' }}>
+                                        <Utensils size={16} strokeWidth={1.5} color={isExpanded ? 'var(--accent-gold)' : undefined} />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" title="Dettaglio" onClick={() => navigate(`/admin/athlete/${t.id}`)} style={{ padding: '6px' }}>
+                                        <BookOpen size={16} strokeWidth={1.5} color="rgba(255,245,230,0.7)" />
+                                    </Button>
+                                </div>
+                            </div>
 
-                                                        {/* Detailed Mini-Dots */}
-                                                        <div className="flex-row items-center gap-1" style={{ paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-                                                            <div title={`Dieta: ${t.trafficLights.nutrition_label}`}><TrafficLightMetric statusToken={t.trafficLights.nutrition_dot_token} size={8} /></div>
-                                                            <div title={`Training: ${t.trafficLights.training_label}`}><TrafficLightMetric statusToken={t.trafficLights.training_dot_token} size={8} /></div>
-                                                            <div title={`Performance: ${t.trafficLights.performance_label}`}><TrafficLightMetric statusToken={t.trafficLights.performance_dot_token} size={8} /></div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Nessun Dato</span>
-                                                )}
-                                            </td>
-                                            <td style={{ padding: '16px 16px' }}>
-                                                <div className="flex-row gap-1">
-                                                    <Button variant="ghost" size="icon" title="Nutrizione" onClick={() => handleExpand(t.id)}>
-                                                        <Utensils size={16} strokeWidth={1.5} color={isExpanded ? 'var(--accent-gold)' : undefined} />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost" size="icon" title="Vedi Logbook e Diario"
-                                                        onClick={() => navigate(`/admin/athlete/${t.id}`)}
-                                                    >
-                                                        <BookOpen size={16} strokeWidth={1.5} color="rgba(255,245,230,0.7)" />
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" title="Vedi Profilo"><Eye size={16} strokeWidth={1.5} /></Button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                            {/* Expandable Nutrition Panel */}
+                            {isExpanded && (
+                                <div style={{ padding: '16px', background: '#141414', borderTop: '1px solid #333' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                                        <Utensils size={14} color="var(--accent-gold)" />
+                                        <span style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '0.78rem', color: 'var(--accent-gold)', letterSpacing: '0.05em' }}>
+                                            OBIETTIVI — {t.full_name}
+                                        </span>
+                                    </div>
 
-                                        {/* Expandable Nutrition Targets Row */}
-                                        {isExpanded && (
-                                            <tr>
-                                                <td colSpan={4} style={{ padding: 0 }}>
-                                                    <div style={{
-                                                        padding: '20px 24px',
-                                                        background: '#141414',
-                                                        borderBottom: idx !== athletes.length - 1 ? '1px solid #333' : 'none',
-                                                        borderTop: '1px solid #333',
-                                                        animation: 'fadeIn 0.2s ease-out',
-                                                    }}>
-                                                        <div className="flex-row items-center gap-2" style={{ marginBottom: '16px' }}>
-                                                            <Utensils size={16} color="var(--accent-gold)" />
-                                                            <span style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '0.85rem', color: 'var(--accent-gold)', letterSpacing: '0.05em' }}>
-                                                                OBIETTIVI NUTRIZIONALI — {t.full_name}
-                                                            </span>
-                                                        </div>
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                                        {[
+                                            { key: 'p', label: 'P', unit: 'g', color: 'var(--accent-teal)' },
+                                            { key: 'c', label: 'C', unit: 'g', color: 'var(--accent-gold)' },
+                                            { key: 'f', label: 'F', unit: 'g', color: 'var(--accent-coral)' },
+                                        ].map(macro => (
+                                            <div key={macro.key} style={{ flex: '1 1 70px' }}>
+                                                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, color: macro.color, textTransform: 'uppercase', marginBottom: '4px', fontFamily: 'Outfit' }}>
+                                                    {macro.label} ({macro.unit})
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={editingTargets[macro.key] || ''}
+                                                    onChange={e => setEditingTargets(prev => ({ ...prev, [macro.key]: e.target.value }))}
+                                                    style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: '#1f1f1f', border: '1px solid #444', color: '#fff', fontSize: '0.95rem', fontWeight: 600, fontFamily: 'Outfit', outline: 'none' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
 
-                                                        <div className="flex-row gap-3" style={{ flexWrap: 'wrap', marginBottom: '16px' }}>
-                                                            {[
-                                                                { key: 'p', label: 'Proteine', unit: 'g', color: 'var(--accent-teal)' },
-                                                                { key: 'c', label: 'Carboidrati', unit: 'g', color: 'var(--accent-gold)' },
-                                                                { key: 'f', label: 'Grassi', unit: 'g', color: 'var(--accent-coral)' },
-                                                            ].map(macro => (
-                                                                <div key={macro.key} style={{ flex: '1 1 120px', minWidth: '100px' }}>
-                                                                    <label style={{
-                                                                        display: 'block', fontSize: '0.7rem', fontWeight: 600,
-                                                                        color: macro.color, textTransform: 'uppercase',
-                                                                        letterSpacing: '0.08em', marginBottom: '6px', fontFamily: 'Outfit',
-                                                                    }}>
-                                                                        {macro.label} ({macro.unit})
-                                                                    </label>
-                                                                    <input
-                                                                        type="number"
-                                                                        value={editingTargets[macro.key] || ''}
-                                                                        onChange={e => setEditingTargets(prev => ({ ...prev, [macro.key]: e.target.value }))}
-                                                                        style={{
-                                                                            width: '100%', padding: '10px 14px', borderRadius: '8px',
-                                                                            background: '#1f1f1f', border: '1px solid #444',
-                                                                            color: '#fff', fontSize: '1rem', fontWeight: 600, fontFamily: 'Outfit',
-                                                                            outline: 'none', transition: 'border-color 0.2s',
-                                                                        }}
-                                                                        onFocus={e => e.target.style.borderColor = macro.color}
-                                                                        onBlur={e => e.target.style.borderColor = '#444'}
-                                                                    />
-                                                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-                                                                        Attuale: {macro.key === 'p' ? targets.protein_g : macro.key === 'c' ? targets.carbs_g : targets.fat_g} {macro.unit}
-                                                                    </span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
+                                    <div style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '8px', padding: '10px 14px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>Kcal</span>
+                                        <span style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1rem', color: 'var(--accent-gold)' }}>
+                                            {((parseInt(editingTargets.p) || 0) * 4) + ((parseInt(editingTargets.c) || 0) * 4) + ((parseInt(editingTargets.f) || 0) * 9)}
+                                        </span>
+                                    </div>
 
-                                                        {/* Auto-calculated Calories Preview */}
-                                                        <div style={{
-                                                            background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)',
-                                                            borderRadius: '8px', padding: '12px 16px', marginBottom: '16px',
-                                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                                                        }}>
-                                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                                                                Calorie (auto-calcolate)
-                                                            </span>
-                                                            <span style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.1rem', color: 'var(--accent-gold)' }}>
-                                                                {((parseInt(editingTargets.p) || 0) * 4) + ((parseInt(editingTargets.c) || 0) * 4) + ((parseInt(editingTargets.f) || 0) * 9)} kcal
-                                                            </span>
-                                                        </div>
-
-
-                                                        {/* Coach Adherence Report (from SQL View) */}
-                                                        {t.trafficLights && (
-                                                            <div style={{ marginTop: '24px', marginBottom: '24px', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                                                <div className="flex-row items-center gap-2" style={{ marginBottom: '16px' }}>
-                                                                    <Activity size={16} color="var(--text-main)" />
-                                                                    <span style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '0.85rem', color: '#fff', letterSpacing: '0.05em' }}>
-                                                                        DIAGNOSTICA ADERENZA
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex-row gap-3" style={{ flexWrap: 'wrap' }}>
-                                                                    {/* Nutrition Diagnostic */}
-                                                                    <div style={{ flex: '1 1 200px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', borderLeft: `3px solid var(--${t.trafficLights.nutrition_dot_token})` }}>
-                                                                        <div className="flex-row justify-between items-center" style={{ marginBottom: '8px' }}>
-                                                                            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dieta</span>
-                                                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>{t.trafficLights.nutrition_score}/100</span>
-                                                                        </div>
-                                                                        <p style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginBottom: '4px' }}>{t.trafficLights.nutrition_label}</p>
-                                                                        <p style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Azione: {t.trafficLights.nutrition_action}</p>
-                                                                    </div>
-                                                                    {/* Training Diagnostic */}
-                                                                    <div style={{ flex: '1 1 200px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', borderLeft: `3px solid var(--${t.trafficLights.training_dot_token})` }}>
-                                                                        <div className="flex-row justify-between items-center" style={{ marginBottom: '8px' }}>
-                                                                            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Allenamento</span>
-                                                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>{t.trafficLights.training_adherence_pct}%</span>
-                                                                        </div>
-                                                                        <p style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginBottom: '4px' }}>{t.trafficLights.training_label}</p>
-                                                                        <p style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Azione: {t.trafficLights.training_action}</p>
-                                                                    </div>
-                                                                    {/* Performance Diagnostic */}
-                                                                    <div style={{ flex: '1 1 200px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', borderLeft: `3px solid var(--${t.trafficLights.performance_dot_token})` }}>
-                                                                        <div className="flex-row justify-between items-center" style={{ marginBottom: '8px' }}>
-                                                                            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Performance</span>
-                                                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>{t.trafficLights.performance_score}/100</span>
-                                                                        </div>
-                                                                        <p style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginBottom: '4px' }}>{t.trafficLights.performance_label}</p>
-                                                                        <p style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Azione: {t.trafficLights.performance_action}</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        <div className="flex-row gap-2 justify-end">
-                                                            <Button variant="ghost" size="sm" onClick={() => setExpandedClient(null)}>
-                                                                Annulla
-                                                            </Button>
-                                                            <Button variant="primary" size="sm" onClick={() => handleSaveTargets(t.id)} style={{ background: 'var(--accent-gold)', color: '#000' }}>
-                                                                <Save size={14} /> Salva Obiettivi
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </React.Fragment>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                        <Button variant="ghost" size="sm" onClick={() => setExpandedClient(null)}>Annulla</Button>
+                                        <Button variant="primary" size="sm" onClick={() => handleSaveTargets(t.id)} style={{ background: 'var(--accent-gold)', color: '#000' }}>
+                                            <Save size={14} /> Salva
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

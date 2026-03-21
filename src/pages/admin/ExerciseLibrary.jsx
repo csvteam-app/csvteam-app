@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
-import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Badge from '../../components/ui/Badge';
-import { Plus, Search, Edit3, Trash2, Video, X, Check, Loader, Link2 } from 'lucide-react';
+import { Plus, Edit3, Trash2, Video, X, Check, Loader, Link2, Upload, Film } from 'lucide-react';
 
 const MUSCLE_GROUPS = [
     { key: 'all', label: 'Tutti' },
@@ -27,6 +26,9 @@ const ExerciseLibrary = () => {
     const [search, setSearch] = useState('');
     const [filterGroup, setFilterGroup] = useState('all');
     const [modal, setModal] = useState(null);
+    const [videoFile, setVideoFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const videoInputRef = useRef(null);
 
     // ── Fetch exercises from Supabase ──
     const fetchExercises = useCallback(async () => {
@@ -54,12 +56,56 @@ const ExerciseLibrary = () => {
         });
     }, [exercises, search, filterGroup]);
 
+    // ── Upload video file to Supabase Storage ──
+    const handleVideoFile = (e) => {
+        const f = e.target.files?.[0];
+        if (f) setVideoFile(f);
+    };
+
+    const uploadVideoToStorage = async () => {
+        if (!videoFile) return null;
+        setUploading(true);
+        try {
+            const ext = videoFile.name.split('.').pop();
+            const fileName = `exercise_${Date.now()}.${ext}`;
+            const filePath = `tutorials/${fileName}`;
+
+            const { error: uploadErr } = await supabase.storage
+                .from('tutorial-videos')
+                .upload(filePath, videoFile, { cacheControl: '3600', upsert: false });
+
+            if (uploadErr) {
+                console.warn('[VideoUpload] Storage error:', uploadErr.message);
+                return `storage:${filePath}`;
+            }
+
+            const { data: urlData } = supabase.storage
+                .from('tutorial-videos')
+                .getPublicUrl(filePath);
+
+            return urlData.publicUrl;
+        } catch (err) {
+            console.error('[VideoUpload] Error:', err.message);
+            alert('Errore upload video: ' + err.message);
+            return null;
+        } finally {
+            setUploading(false);
+        }
+    };
+
     // ── Save (Add or Update) ──
     const handleSave = async () => {
         if (!modal) return;
         const { name, primary_muscle_group, tags, video_url } = modal.exercise;
         if (!name.trim()) return;
         setSaving(true);
+
+        // If a video file was selected, upload it first
+        let finalVideoUrl = video_url?.trim() || null;
+        if (videoFile) {
+            const uploadedUrl = await uploadVideoToStorage();
+            if (uploadedUrl) finalVideoUrl = uploadedUrl;
+        }
 
         const parsedTags = typeof tags === 'string'
             ? tags.split(',').map(t => t.trim()).filter(Boolean)
@@ -69,7 +115,7 @@ const ExerciseLibrary = () => {
             name: name.trim(),
             primary_muscle_group,
             tags: parsedTags,
-            video_url: video_url?.trim() || null,
+            video_url: finalVideoUrl,
         };
 
         if (modal.mode === 'add') {
@@ -87,6 +133,7 @@ const ExerciseLibrary = () => {
         }
 
         setSaving(false);
+        setVideoFile(null);
         setModal(null);
         fetchExercises();
     };
@@ -103,20 +150,26 @@ const ExerciseLibrary = () => {
         }
     };
 
-    const openAddModal = () => setModal({
-        mode: 'add',
-        exercise: { name: '', primary_muscle_group: 'chest', tags: '', video_url: '' }
-    });
+    const openAddModal = () => {
+        setVideoFile(null);
+        setModal({
+            mode: 'add',
+            exercise: { name: '', primary_muscle_group: 'chest', tags: '', video_url: '' }
+        });
+    };
 
-    const openEditModal = (ex) => setModal({
-        mode: 'edit',
-        exercise: {
-            ...ex,
-            primary_muscle_group: ex.primary_muscle_group,
-            tags: Array.isArray(ex.tags) ? ex.tags.join(', ') : ex.tags || '',
-            video_url: ex.video_url || '',
-        }
-    });
+    const openEditModal = (ex) => {
+        setVideoFile(null);
+        setModal({
+            mode: 'edit',
+            exercise: {
+                ...ex,
+                primary_muscle_group: ex.primary_muscle_group,
+                tags: Array.isArray(ex.tags) ? ex.tags.join(', ') : ex.tags || '',
+                video_url: ex.video_url || '',
+            }
+        });
+    };
 
     if (isLoading) {
         return (
@@ -225,7 +278,7 @@ const ExerciseLibrary = () => {
             {modal && (
                 <div
                     style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
-                    onClick={() => setModal(null)}
+                    onClick={() => { setModal(null); setVideoFile(null); }}
                 >
                     <div
                         className="animate-fade-in"
@@ -244,7 +297,7 @@ const ExerciseLibrary = () => {
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <h2 className="text-h2" style={{ fontSize: '1.1rem' }}>{modal.mode === 'add' ? 'Nuovo Esercizio' : 'Modifica Esercizio'}</h2>
-                            <Button variant="ghost" size="icon" onClick={() => setModal(null)}><X size={20} /></Button>
+                            <Button variant="ghost" size="icon" onClick={() => { setModal(null); setVideoFile(null); }}><X size={20} /></Button>
                         </div>
 
                         <div className="flex-col gap-3">
@@ -273,7 +326,7 @@ const ExerciseLibrary = () => {
 
                             {/* VIDEO URL FIELD */}
                             <Input
-                                label="Link Video Tutorial"
+                                label="Link Video YouTube"
                                 value={modal.exercise.video_url}
                                 onChange={e => setModal({ ...modal, exercise: { ...modal.exercise, video_url: e.target.value } })}
                                 placeholder="https://youtube.com/watch?v=..."
@@ -289,6 +342,59 @@ const ExerciseLibrary = () => {
                                 </a>
                             )}
 
+                            {/* DIRECT VIDEO UPLOAD FROM IPHONE */}
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', marginTop: '4px' }}>
+                                <label className="text-label" style={{ marginBottom: '8px', display: 'block' }}>Oppure carica da iPhone</label>
+                                <input
+                                    ref={videoInputRef}
+                                    type="file"
+                                    accept="video/*"
+                                    capture="environment"
+                                    onChange={handleVideoFile}
+                                    style={{ display: 'none' }}
+                                />
+                                {videoFile ? (
+                                    <div style={{
+                                        border: '2px solid var(--accent-teal)',
+                                        borderRadius: 'var(--border-radius-sm)',
+                                        padding: '12px 14px',
+                                        background: 'rgba(45,212,191,0.05)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px',
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                                            <Film size={18} color="var(--accent-teal)" style={{ flexShrink: 0 }} />
+                                            <div style={{ minWidth: 0 }}>
+                                                <p style={{ fontSize: '0.82rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{videoFile.name}</p>
+                                                <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{(videoFile.size / 1024 / 1024).toFixed(1)} MB</p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => setVideoFile(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => videoInputRef.current?.click()}
+                                        style={{
+                                            width: '100%', padding: '14px',
+                                            border: '2px dashed rgba(255,255,255,0.1)',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            background: 'transparent', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            color: 'var(--text-muted)', fontSize: '0.82rem', fontWeight: 500,
+                                            transition: 'border-color 0.2s',
+                                        }}
+                                    >
+                                        <Upload size={18} /> Tocca per selezionare video
+                                    </button>
+                                )}
+                                {uploading && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', color: 'var(--accent-gold)', fontSize: '0.78rem' }}>
+                                        <Loader size={14} className="animate-pulse" /> Caricamento in corso…
+                                    </div>
+                                )}
+                            </div>
+
                             <Input
                                 label="Tag (separati da virgola)"
                                 value={modal.exercise.tags}
@@ -298,9 +404,9 @@ const ExerciseLibrary = () => {
                         </div>
 
                         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-                            <Button variant="secondary" style={{ flex: 1 }} onClick={() => setModal(null)}>Annulla</Button>
-                            <Button style={{ flex: 1 }} onClick={handleSave} disabled={saving}>
-                                {saving ? <Loader size={16} className="animate-pulse" /> : <Check size={16} />} Salva
+                            <Button variant="secondary" style={{ flex: 1 }} onClick={() => { setModal(null); setVideoFile(null); }}>Annulla</Button>
+                            <Button style={{ flex: 1 }} onClick={handleSave} disabled={saving || uploading}>
+                                {saving || uploading ? <Loader size={16} className="animate-pulse" /> : <Check size={16} />} Salva
                             </Button>
                         </div>
                     </div>
