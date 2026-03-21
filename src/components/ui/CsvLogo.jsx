@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 // Import via Vite from src/assets — gets content-hashed and precached by SW
 import csvLogoSrc from '../../assets/csv-logo.png';
@@ -50,6 +51,12 @@ const CsvLogo = ({ size = 48, showText = true, className = '' }) => {
             )}
         </div>
     );
+};
+
+CsvLogo.propTypes = {
+    size: PropTypes.number,
+    showText: PropTypes.bool,
+    className: PropTypes.string,
 };
 
 export default CsvLogo;

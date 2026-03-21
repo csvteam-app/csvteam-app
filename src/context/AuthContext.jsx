@@ -92,23 +92,22 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) return { error };
 
-        // The onAuthStateChange listener will fetch the profile, but AdminLogin
-        // needs it synchronously in the return value to check the role.
-        // Poll until the profile state is set (max ~3s).
-        let loadedProfile = null;
-        for (let i = 0; i < 30; i++) {
-            await new Promise(r => setTimeout(r, 100));
-            // Read the latest profile from the ref-like closure — we need to
-            // directly fetch it since React state won't be visible here yet.
-            if (i === 0) {
-                // Kick off a direct fetch as well, in case the listener is slow
-                loadedProfile = await fetchProfile(data.user.id);
-                if (loadedProfile) break;
-            }
+        // Directly fetch profile — don't rely on onAuthStateChange race
+        const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+        if (profileError) {
+            console.error('[Auth] signIn profile fetch error:', profileError.message);
+        } else {
+            console.log('[Auth] signIn profile:', { id: profileData?.id, role: profileData?.role, email: profileData?.email });
+            // Update React state immediately so route guards have it
+            setProfile(profileData);
         }
 
-        console.log('[Auth] signIn result:', { userId: data?.user?.id, profileRole: loadedProfile?.role, profileEmail: loadedProfile?.email });
-        return { data, profile: loadedProfile };
+        return { data, profile: profileData || null };
     };
 
     // Sign out

@@ -102,7 +102,6 @@ body {
   overscroll-behavior: none;
   overscroll-behavior-y: none;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -197,16 +196,16 @@ a, input, select, textarea {
 
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
   border-bottom: 1px solid var(--glass-border);
 }
 
 /* Level 1 — Subtle background sections */
 .glass-panel {
   background: var(--glass-bg-l1);
-  backdrop-filter: blur(var(--glass-blur-l1));
   -webkit-backdrop-filter: blur(var(--glass-blur-l1));
+  backdrop-filter: blur(var(--glass-blur-l1));
   border: 1px solid var(--glass-border);
   border-radius: var(--border-radius);
   box-shadow: var(--glass-shadow);
@@ -215,8 +214,8 @@ a, input, select, textarea {
 /* Level 2 — Tempered obsidian glass cards */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--border-radius);
   box-shadow: var(--glass-shadow);
@@ -273,8 +272,8 @@ a, input, select, textarea {
 /* Level 3 — Modal / overlay glass */
 .glass-modal {
   background: var(--glass-bg-l3);
-  backdrop-filter: blur(var(--glass-blur-l3));
   -webkit-backdrop-filter: blur(var(--glass-blur-l3));
+  backdrop-filter: blur(var(--glass-blur-l3));
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--glass-shadow-deep);
@@ -636,8 +635,8 @@ a, input, select, textarea {
     height: calc(60px + env(safe-area-inset-bottom)) !important;
     flex-direction: row !important;
     background: rgba(5, 5, 8, 0.92) !important;
-    backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(24px) !important;
     border-top: 1px solid var(--glass-border) !important;
     border-right: none !important;
     z-index: 1000;
@@ -697,7 +696,6 @@ a, input, select, textarea {
   overflow-x: hidden;
   padding: var(--content-padding);
   padding-bottom: 100px;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scroll-behavior: smooth;
 }
@@ -987,7 +985,6 @@ a, input, select, textarea {
 
 /* ── Keep-Alive wrapper scroll containers ── */
 .keep-alive-wrapper {
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scroll-behavior: smooth;
   will-change: scroll-position;
@@ -997,13 +994,12 @@ a, input, select, textarea {
 .premium-scroll-x {
   overflow-x: auto;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   scroll-snap-type: x proximity;
   scroll-padding: 0 16px;
-  scrollbar-width: none;
   -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .premium-scroll-x::-webkit-scrollbar {
@@ -1018,7 +1014,6 @@ a, input, select, textarea {
 .premium-scroll-y {
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scroll-behavior: smooth;
 }
@@ -1044,14 +1039,13 @@ a, input, select, textarea {
 
 /* ── Swipeable Pages Carousel ── */
 .swipe-carousel {
-  scrollbar-width: none;
   -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   /* GPU compositing layer */
-  transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
+  transform: translateZ(0);
   -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   perspective: 1000px;
 }
 
@@ -1061,8 +1055,8 @@ a, input, select, textarea {
 
 .swipe-page {
   /* GPU layer per page — prevents repaint propagation */
-  transform: translateZ(0);
   -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   backface-visibility: hidden;
   /* Isolate layout recalculations from sibling pages */
   contain: layout style;
@@ -1077,6 +1071,5 @@ a, input, select, textarea {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
   }
 }
