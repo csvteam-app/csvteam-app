@@ -164,109 +164,93 @@ const AdminSubscriptions = () => {
                 </p>
             )}
 
-            {/* Users Table */}
-            <div style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px', marginTop: '16px', overflow: 'hidden' }}>
-                <div className="responsive-table">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                                {['Utente', 'Stato Account', 'Abbonamento', 'Scadenza', 'Azioni'].map(h => (
-                                    <th key={h} style={{
-                                        padding: '14px 14px', fontWeight: 600,
-                                        color: 'var(--text-muted)', fontSize: '0.68rem',
-                                        textTransform: 'uppercase', letterSpacing: '0.08em',
-                                        fontFamily: 'Outfit, sans-serif',
-                                    }}>{h}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {isLoading ? (
-                                <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>Caricamento...</td></tr>
-                            ) : filteredUsers.length === 0 ? (
-                                <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>Nessun utente trovato.</td></tr>
-                            ) : filteredUsers.map(user => {
-                                const userSubs = getUserSubs(user.id);
-                                const activeSub = userSubs.find(s => s.status === 'active');
-                                const isProcessing = actionLoading === user.id;
+            {/* Users List — Mobile-First Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
+                {isLoading ? (
+                    <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', background: '#1a1a1a', borderRadius: '12px', border: '1px solid #333' }}>Caricamento...</div>
+                ) : filteredUsers.length === 0 ? (
+                    <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', background: '#1a1a1a', borderRadius: '12px', border: '1px solid #333' }}>Nessun utente trovato.</div>
+                ) : filteredUsers.map(user => {
+                    const userSubs = getUserSubs(user.id);
+                    const activeSub = userSubs.find(s => s.status === 'active');
+                    const isProcessing = actionLoading === user.id;
 
-                                return (
-                                    <tr key={user.id} style={{ borderBottom: '1px solid #222', transition: 'background 0.2s' }}
-                                        onMouseEnter={e => e.currentTarget.style.background = '#222'}
-                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                        <td style={{ padding: '14px' }}>
-                                            <div>
-                                                <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#fff' }}>{user.full_name || 'N/A'}</span>
-                                                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>{user.email}</p>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding: '14px' }}>
-                                            <Badge status={user.approval_status || 'pending'} />
-                                        </td>
-                                        <td style={{ padding: '14px' }}>
-                                            {activeSub ? (
-                                                <div>
-                                                    <Badge status="active" />
-                                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px' }}>
-                                                        {activeSub.package_type} • {activeSub.source === 'manual_admin' ? 'Manuale' : 'Shop'}
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                <Badge status={user.subscription_status || 'inactive'} />
-                                            )}
-                                        </td>
-                                        <td style={{ padding: '14px' }}>
-                                            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                                                {activeSub ? new Date(activeSub.end_date).toLocaleDateString('it-IT') : '—'}
+                    return (
+                        <div key={user.id} style={{
+                            background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px',
+                            padding: '16px', transition: 'border-color 0.2s',
+                        }}>
+                            {/* Row 1: Name + Account Status */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#fff', display: 'block' }}>{user.full_name || 'N/A'}</span>
+                                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>{user.email}</span>
+                                </div>
+                                <Badge status={user.approval_status || 'pending'} />
+                            </div>
+
+                            {/* Row 2: Subscription info */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '12px', paddingTop: '8px', borderTop: '1px solid #2a2a2a' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    {activeSub ? (
+                                        <>
+                                            <Badge status="active" />
+                                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                                {activeSub.package_type}
                                             </span>
-                                        </td>
-                                        <td style={{ padding: '14px' }}>
-                                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                                {user.approval_status === 'pending' && (
-                                                    <>
-                                                        <button onClick={() => handleAction(approveUser, user.id)}
-                                                            disabled={isProcessing}
-                                                            style={btnStyle('#4ade80')} title="Approva">
-                                                            <UserCheck size={14} /> Approva
-                                                        </button>
-                                                        <button onClick={() => handleAction(rejectUser, user.id)}
-                                                            disabled={isProcessing}
-                                                            style={btnStyle('#f87171')} title="Rifiuta">
-                                                            <UserX size={14} /> Rifiuta
-                                                        </button>
-                                                    </>
-                                                )}
-                                                {user.approval_status === 'approved' && (
-                                                    <button onClick={() => {
-                                                        setAssignModal({ userId: user.id, userName: user.full_name || user.email });
-                                                        setAssignForm({ packageType: 'trimestrale', durationMonths: 3, startDate: new Date().toISOString().split('T')[0], notes: '' });
-                                                    }}
-                                                        style={btnStyle('var(--accent-gold)')} title="Assegna Piano">
-                                                        <CreditCard size={14} /> Assegna Piano
-                                                    </button>
-                                                )}
-                                                {activeSub && (
-                                                    <button onClick={() => handleAction(revokeSubscription, activeSub.id)}
-                                                        disabled={isProcessing}
-                                                        style={btnStyle('#f87171')} title="Revoca">
-                                                        <XCircle size={14} /> Revoca
-                                                    </button>
-                                                )}
-                                                {user.approval_status === 'rejected' && (
-                                                    <button onClick={() => handleAction(approveUser, user.id)}
-                                                        disabled={isProcessing}
-                                                        style={btnStyle('#4ade80')} title="Riapprova">
-                                                        <UserCheck size={14} /> Riapprova
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                        </>
+                                    ) : (
+                                        <Badge status={user.subscription_status || 'inactive'} />
+                                    )}
+                                </div>
+                                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                                    {activeSub ? `Scade: ${new Date(activeSub.end_date).toLocaleDateString('it-IT')}` : '—'}
+                                </span>
+                            </div>
+
+                            {/* Row 3: Action Buttons */}
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                {user.approval_status === 'pending' && (
+                                    <>
+                                        <button onClick={() => handleAction(approveUser, user.id)}
+                                            disabled={isProcessing}
+                                            style={{ ...btnStyle('#4ade80'), flex: '1 1 auto' }} title="Approva">
+                                            <UserCheck size={14} /> Approva
+                                        </button>
+                                        <button onClick={() => handleAction(rejectUser, user.id)}
+                                            disabled={isProcessing}
+                                            style={{ ...btnStyle('#f87171'), flex: '1 1 auto' }} title="Rifiuta">
+                                            <UserX size={14} /> Rifiuta
+                                        </button>
+                                    </>
+                                )}
+                                {user.approval_status === 'approved' && (
+                                    <button onClick={() => {
+                                        setAssignModal({ userId: user.id, userName: user.full_name || user.email });
+                                        setAssignForm({ packageType: 'trimestrale', durationMonths: 3, startDate: new Date().toISOString().split('T')[0], notes: '' });
+                                    }}
+                                        style={{ ...btnStyle('var(--accent-gold)'), flex: '1 1 auto' }} title="Assegna Piano">
+                                        <CreditCard size={14} /> Assegna Piano
+                                    </button>
+                                )}
+                                {activeSub && (
+                                    <button onClick={() => handleAction(revokeSubscription, activeSub.id)}
+                                        disabled={isProcessing}
+                                        style={{ ...btnStyle('#f87171'), flex: '1 1 auto' }} title="Revoca">
+                                        <XCircle size={14} /> Revoca
+                                    </button>
+                                )}
+                                {user.approval_status === 'rejected' && (
+                                    <button onClick={() => handleAction(approveUser, user.id)}
+                                        disabled={isProcessing}
+                                        style={{ ...btnStyle('#4ade80'), flex: '1 1 auto' }} title="Riapprova">
+                                        <UserCheck size={14} /> Riapprova
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Assign Modal */}
