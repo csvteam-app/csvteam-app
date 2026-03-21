@@ -349,7 +349,6 @@ const ExerciseLibrary = () => {
                                     ref={videoInputRef}
                                     type="file"
                                     accept="video/*"
-                                    capture="environment"
                                     onChange={handleVideoFile}
                                     style={{ display: 'none' }}
                                 />
