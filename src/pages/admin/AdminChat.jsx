@@ -689,36 +689,48 @@ const AdminChat = () => {
                         </div>
 
                         {/* Messages List - Layout Full Width */}
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {/* WhatsApp-style messages area */}
+                        <div style={{
+                            flex: 1, overflowY: 'auto', padding: '8px 16px',
+                            display: 'flex', flexDirection: 'column', gap: '2px',
+                            background: '#0b141a',
+                        }}>
+                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                 {messages.length === 0 && (
-                                    <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '40px' }}>
+                                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.45)', marginTop: '40px', fontSize: '14px' }}>
                                         Nessun messaggio con questo atleta.
                                     </div>
                                 )}
                                 {messages.map(msg => {
                                     const isCoach = msg.sender_id === user?.id;
                                     return (
-                                        <div key={msg.id} style={{ alignSelf: isCoach ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
-                                            {isCoach && (
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', marginBottom: '4px', textAlign: 'right', fontWeight: 600, letterSpacing: '0.05em' }}>
-                                                    {msg.sender?.full_name}
-                                                </div>
-                                            )}
+                                        <div key={msg.id} style={{
+                                            alignSelf: isCoach ? 'flex-end' : 'flex-start',
+                                            maxWidth: '75%',
+                                            marginBottom: '1px',
+                                        }}>
                                             <div style={{
-                                                padding: '12px 16px',
-                                                borderRadius: isCoach ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                                                background: isCoach ? 'var(--surface-color-3)' : 'var(--accent-teal)',
-                                                color: isCoach ? '#fff' : '#000',
-                                                boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+                                                padding: '6px 7px 8px 9px',
+                                                borderRadius: isCoach ? '7.5px 7.5px 0 7.5px' : '7.5px 7.5px 7.5px 0',
+                                                background: isCoach ? '#005c4b' : '#202c33',
+                                                color: '#e9edef',
+                                                position: 'relative',
+                                                boxShadow: '0 1px 0.5px rgba(11,20,26,0.13)',
                                             }}>
                                                 {renderMedia(msg)}
                                                 {msg.text && (
-                                                    <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.5, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.text}</p>
+                                                    <p style={{
+                                                        margin: 0, fontSize: '14.2px', lineHeight: '19px',
+                                                        wordBreak: 'break-word', whiteSpace: 'pre-wrap',
+                                                        color: '#e9edef',
+                                                    }}>{msg.text}</p>
                                                 )}
-                                            </div>
-                                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: isCoach ? 'right' : 'left' }}>
-                                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                <span style={{
+                                                    float: 'right', fontSize: '11px', color: 'rgba(255,255,255,0.45)',
+                                                    marginLeft: '8px', marginTop: '2px', lineHeight: '15px',
+                                                }}>
+                                                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
                                             </div>
                                         </div>
                                     );
@@ -728,72 +740,97 @@ const AdminChat = () => {
                         </div>
 
                         {/* Input Area - Full Width - Multi Media WhatsApp Style (Adapted) */}
-                        <div style={{ padding: '24px 32px', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'var(--surface-color)' }}>
-                            <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {/* WhatsApp-style input bar */}
+                        <div style={{
+                            padding: '5px 8px', background: '#1f2c34',
+                            display: 'flex', alignItems: 'flex-end', gap: '8px',
+                        }}>
+                            {/* Attach */}
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isSending || isRecording}
+                                style={{
+                                    background: 'none', border: 'none', padding: '8px',
+                                    color: '#8696a0', cursor: (isSending || isRecording) ? 'not-allowed' : 'pointer',
+                                    display: 'flex', opacity: (isSending || isRecording) ? 0.4 : 1,
+                                }}
+                            >
+                                <ImageIcon size={24} />
+                            </button>
 
-                                {/* Attachement Button */}
-                                <button
-                                    onClick={() => fileInputRef.current?.click()}
-                                    disabled={isSending || isRecording}
-                                    style={{ background: 'var(--surface-color-2)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-muted)', borderRadius: '50%', padding: '14px', cursor: (isSending || isRecording) ? 'not-allowed' : 'pointer', display: 'flex', transition: 'all 0.2s', opacity: (isSending || isRecording) ? 0.4 : 1 }}
-                                >
-                                    <ImageIcon size={22} />
-                                </button>
-
-                                {/* Text Input vs Recording Status */}
-                                <div style={{ flex: 1, background: 'var(--surface-color-2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', padding: '12px 24px', display: 'flex', alignItems: 'center' }}>
-                                    {isRecording ? (
-                                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', color: '#ff4c4c', fontWeight: 500, animation: 'pulse 1.5s infinite' }}>
-                                            <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff4c4c', marginRight: '10px' }} />
-                                            Registrazione in corso... {formatTime(recordingTime)}
-                                        </div>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={e => {
-                                                setInputValue(e.target.value);
-                                                if (presenceChannel) {
-                                                    presenceChannel.track({ role: 'coach', isTyping: true });
-                                                    clearTimeout(typingTimeoutRef.current);
-                                                    typingTimeoutRef.current = setTimeout(() => {
-                                                        presenceChannel.track({ role: 'coach', isTyping: false });
-                                                    }, 3000);
-                                                }
-                                            }}
-                                            onKeyPress={e => e.key === 'Enter' && handleSend()}
-                                            disabled={isSending}
-                                            placeholder="Scrivi una risposta..."
-                                            style={{
-                                                flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', fontFamily: 'Outfit', outline: 'none'
-                                            }}
-                                        />
-                                    )}
-                                </div>
-
-                                {/* Send vs Mic/Stop Button */}
-                                {inputValue.trim() || isSending ? (
-                                    <button
-                                        onClick={() => handleSend()}
-                                        disabled={isSending}
-                                        style={{ background: inputValue.trim() ? 'var(--accent-gold)' : 'var(--surface-color-3)', border: 'none', color: '#000', cursor: isSending ? 'not-allowed' : 'pointer', padding: '16px', borderRadius: '50%', display: 'flex', transition: 'background 0.2s', opacity: isSending ? 0.5 : 1 }}>
-                                        <Send size={24} />
-                                    </button>
-                                ) : isRecording ? (
-                                    <button
-                                        onClick={stopRecording}
-                                        style={{ background: '#ff4c4c', border: 'none', color: '#fff', cursor: 'pointer', padding: '16px', borderRadius: '50%', display: 'flex', transition: 'all 0.2s', animation: 'pulseGlow 2s infinite' }}>
-                                        <Square size={20} fill="currentColor" />
-                                    </button>
+                            {/* Input pill */}
+                            <div style={{
+                                flex: 1, background: '#2a3942', borderRadius: '21px',
+                                padding: '9px 12px', display: 'flex', alignItems: 'center',
+                                minHeight: '42px',
+                            }}>
+                                {isRecording ? (
+                                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', color: '#ff4c4c', fontWeight: 500, fontSize: '14px' }}>
+                                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff4c4c', marginRight: '8px', animation: 'pulse 1.5s infinite' }} />
+                                        Registrazione... {formatTime(recordingTime)}
+                                    </div>
                                 ) : (
-                                    <button
-                                        onClick={startRecording}
-                                        style={{ background: 'var(--accent-gold)', border: 'none', color: '#000', cursor: 'pointer', padding: '16px', borderRadius: '50%', display: 'flex', transition: 'background 0.2s' }}>
-                                        <Mic size={24} />
-                                    </button>
+                                    <input
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={e => {
+                                            setInputValue(e.target.value);
+                                            if (presenceChannel) {
+                                                presenceChannel.track({ role: 'coach', isTyping: true });
+                                                clearTimeout(typingTimeoutRef.current);
+                                                typingTimeoutRef.current = setTimeout(() => {
+                                                    presenceChannel.track({ role: 'coach', isTyping: false });
+                                                }, 3000);
+                                            }
+                                        }}
+                                        onKeyPress={e => e.key === 'Enter' && handleSend()}
+                                        disabled={isSending}
+                                        placeholder="Messaggio"
+                                        style={{
+                                            flex: 1, background: 'transparent', border: 'none',
+                                            color: '#e9edef', fontSize: '16px', outline: 'none',
+                                            fontFamily: 'system-ui, -apple-system, sans-serif',
+                                        }}
+                                    />
                                 )}
-
                             </div>
+
+                            {/* Send / Mic / Stop */}
+                            {inputValue.trim() || isSending ? (
+                                <button
+                                    onClick={() => handleSend()}
+                                    disabled={isSending}
+                                    style={{
+                                        background: '#00a884', border: 'none', color: '#111b21',
+                                        cursor: isSending ? 'not-allowed' : 'pointer',
+                                        padding: '8px', borderRadius: '50%', display: 'flex',
+                                        width: '40px', height: '40px', alignItems: 'center', justifyContent: 'center',
+                                        opacity: isSending ? 0.5 : 1,
+                                    }}>
+                                    <Send size={20} />
+                                </button>
+                            ) : isRecording ? (
+                                <button
+                                    onClick={stopRecording}
+                                    style={{
+                                        background: '#ff4c4c', border: 'none', color: '#fff',
+                                        cursor: 'pointer', padding: '8px', borderRadius: '50%',
+                                        display: 'flex', width: '40px', height: '40px',
+                                        alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                    <Square size={16} fill="currentColor" />
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={startRecording}
+                                    style={{
+                                        background: 'none', border: 'none', color: '#8696a0',
+                                        cursor: 'pointer', padding: '8px', display: 'flex',
+                                        width: '40px', height: '40px', alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                    <Mic size={24} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}

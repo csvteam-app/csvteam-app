@@ -622,71 +622,22 @@ a, input, select, textarea {
   background-color: var(--bg-color);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   .admin-container {
     flex-direction: column;
   }
 
   .admin-sidebar {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: calc(60px + env(safe-area-inset-bottom)) !important;
-    flex-direction: row !important;
-    background: rgba(5, 5, 8, 0.92) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
-    backdrop-filter: blur(24px) !important;
-    border-top: 1px solid var(--glass-border) !important;
-    border-right: none !important;
-    z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom) !important;
-  }
-
-  .admin-sidebar nav {
-    flex-direction: row !important;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    width: 100%;
-    padding: 6px 4px !important;
-    gap: 2px !important;
-    justify-content: space-around;
-  }
-
-  .admin-sidebar nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .admin-sidebar span {
-    display: none !important;
-  }
-
-  .admin-sidebar a {
-    padding: 10px !important;
-    justify-content: center;
-    border-radius: 50% !important;
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-  }
-
-  .admin-sidebar .sidebar-header,
-  .admin-sidebar .sidebar-footer {
     display: none !important;
   }
 
   .admin-main {
+    padding: 16px !important;
     padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    padding-top: 20px !important;
   }
 
-  /* Reset padding per la Chat Coach su mobile */
   .admin-main:has(.admin-chat-container) {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 0 !important;
+    padding: 0 !important;
   }
 }
 
