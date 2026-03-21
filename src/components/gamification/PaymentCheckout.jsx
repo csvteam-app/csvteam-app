@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { CheckCircle, Lock, X, RefreshCw } from 'lucide-react';
 
 const PaymentCheckout = ({ isOpen, onClose, selectedPackage }) => {
-    const { state } = useAppContext();
+    const { user } = useAuth();
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
 
@@ -35,7 +35,7 @@ const PaymentCheckout = ({ isOpen, onClose, selectedPackage }) => {
                     successUrl: `${window.location.origin}/shop?success=true&session_id={CHECKOUT_SESSION_ID}`,
                     cancelUrl: `${window.location.origin}/shop`,
                     metadata: {
-                        user_id: state.userAuth?.id || 'guest',
+                        user_id: user?.id || 'guest',
                         type: selectedPackage.type,
                         amount_credits: selectedPackage.amount
                     }

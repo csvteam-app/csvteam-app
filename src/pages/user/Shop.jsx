@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { useGamification } from '../../hooks/useGamification';
 import { useShop } from '../../hooks/useShop';
 import Button from '../../components/ui/Button';
@@ -28,12 +28,9 @@ const DAILY_DEALS = [
 
 const Shop = () => {
     const navigate = useNavigate();
-    const { state, purchaseShopItem, purchasePackage } = useAppContext();
+    const { user } = useAuth();
     const { gamification, addXpAndPoints, dailyTasks, completeDailyTask } = useGamification();
     const { products, isLoading } = useShop();
-    const items = state.shopItems || [];
-    const purchases = state.purchases || [];
-    const user = state.userAuth || state.clients?.[0] || { id: 'u1' };
 
     const [toast, setToast] = useState(null);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -41,15 +38,12 @@ const Shop = () => {
     const [claimedDeals, setClaimedDeals] = useState([]);
     const [infoModalOpen, setInfoModalOpen] = useState(false);
 
-    const isPurchased = (itemId) => purchases.some(p => p.itemId === itemId);
 
     const handlePurchase = async (itemId, price, name) => {
-        // Gestione Regalo Giornaliero (Gratis)
+        // Daily free gift
         if (itemId === 'deal_free') {
-            if (dailyTasks.daily_gift) {
-                return; // Already claimed today
-            }
-            await addXpAndPoints(25, 10); // +25 XP e +10 Gemme
+            if (dailyTasks.daily_gift) return;
+            await addXpAndPoints(25, 10);
             await completeDailyTask('daily_gift');
             showToast('Regalo riscosso! +25 XP, +10 CSV Points', 'success');
             return;
@@ -61,17 +55,10 @@ const Shop = () => {
             return;
         }
 
-        // Acquisti dal negozio standard
-        const item = items.find(i => i.id === itemId);
-        if (item) {
-            const success = purchaseShopItem(itemId);
-            if (success) showToast(`${item.name} acquistato! 🎉`, 'success');
-        } else {
-            // Offerte giornaliere a pagamento
-            addXpAndPoints(0, -price); // Deduct points
-            setClaimedDeals(prev => [...prev, itemId]);
-            showToast(`${name} acquistato con successo! 🎉`, 'success');
-        }
+        // Deduct points for daily deal purchases
+        addXpAndPoints(0, -price);
+        setClaimedDeals(prev => [...prev, itemId]);
+        showToast(`${name} acquistato con successo! 🎉`, 'success');
     };
 
     const showToast = (msg, type) => {
@@ -85,14 +72,10 @@ const Shop = () => {
     };
 
     const handleCheckoutComplete = (orderId) => {
-        if (selectedPackage && user?.id) {
-            purchasePackage(user.id, selectedPackage.type, selectedPackage.amount, selectedPackage.price);
-        }
         showToast('Pagamento confermato! Lezioni aggiunte al tuo account.', 'success');
         setCheckoutOpen(false);
     };
 
-    const categories = [...new Set(items.map(i => i.category))];
 
     return (
         <div className="global-container" style={{

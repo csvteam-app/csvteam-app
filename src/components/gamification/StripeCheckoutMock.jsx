@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { CreditCard, CheckCircle, Smartphone, Lock, X, RefreshCw } from 'lucide-react';
 
 const StripeCheckoutMock = ({ isOpen, onClose, selectedPackage, onComplete }) => {
-    const { state, purchasePackage } = useAppContext();
+    const { user } = useAuth();
     const [step, setStep] = useState(1); // 1: Loading, 2: Form, 3: Processing, 4: Success
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [autoRenew, setAutoRenew] = useState(false);
@@ -29,9 +29,7 @@ const StripeCheckoutMock = ({ isOpen, onClose, selectedPackage, onComplete }) =>
 
         // Simula chiamata ad API Stripe/Klarna
         setTimeout(() => {
-            const clientId = state.userAuth?.id || 'u1';
-            // type could be 'singola', 'coppia', 'coaching'. Let shop pass it.
-            const orderId = purchasePackage ? purchasePackage(clientId, selectedPackage.type, selectedPackage.amount || 1, finalPrice) : 'or_' + Date.now();
+            const orderId = 'or_' + Date.now();
 
             setStep(4);
             setTimeout(() => {

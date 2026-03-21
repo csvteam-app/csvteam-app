@@ -1,13 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useGamification } from '../../hooks/useGamification';
 import { useAuth } from '../../context/AuthContext';
-import { useAppContext } from '../../context/AppContext';
 import FEATURE_FLAGS from '../../config/featureFlags';
 import { Trophy, Flame, Dumbbell, Target, CheckCircle2, History, Camera, User, Calendar, Crown } from 'lucide-react';
 
 const Profile = () => {
     const navigate = useNavigate();
-    const { state } = useAppContext();
     const { user, profile: authProfile } = useAuth();
     const { gamification, LEAGUES } = useGamification();
 

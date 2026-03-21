@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../context/AppContext';
 import { useAthleteData } from '../../hooks/useAthleteData';
 import { useGamification } from '../../hooks/useGamification';
 import FEATURE_FLAGS from '../../config/featureFlags';
@@ -9,23 +8,21 @@ import { Gamepad2, PlaySquare, Dumbbell, Zap, Trophy, Flame, CheckCircle2, Circl
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const { state } = useAppContext();
     const { program, nutritionTargets } = useAthleteData();
     const { gamification, dailyTasks: d, LEAGUES } = useGamification();
 
     const xp = gamification?.xp || 0;
-    const streak = gamification?.streak_days || state.user?.streak || 0;
+    const streak = gamification?.streak_days || 0;
 
     const currentLeagueObj = LEAGUES.find(l => l.id === gamification?.current_league) || LEAGUES[0];
     const nextLeague = LEAGUES.find(l => xp < l.threshold) || LEAGUES[LEAGUES.length - 1];
     const xpForNext = nextLeague ? nextLeague.threshold : xp;
     const progressPct = nextLeague ? Math.min((xp / nextLeague.threshold) * 100, 100) : 100;
 
-    // Real nutrition goals from Supabase if available, otherwise from AppContext
-    // (nutritionTargets uses protein_g / carbs_g / fat_g from the DB schema)
+    // Nutrition goals from Supabase (coach-set targets)
     const nutritionGoals = nutritionTargets
         ? { kcal: nutritionTargets.kcal, p: nutritionTargets.protein_g, c: nutritionTargets.carbs_g, f: nutritionTargets.fat_g }
-        : state.nutritionGoals;
+        : { kcal: 2000, p: 150, c: 200, f: 60 };
 
     return (
         <div className="global-container" style={{

@@ -4,14 +4,12 @@ import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import { useAppContext } from '../../context/AppContext';
 import { supabase } from '../../lib/supabase';
 import { useCoachData } from '../../hooks/useCoachData';
 import { Eye, BookOpen, AlertCircle, Activity, ChevronDown, ChevronUp, Utensils, Save, Dumbbell, CalendarRange } from 'lucide-react';
 import TrafficLightMetric from '../../components/ui/TrafficLightMetric';
 
 const AdminDashboard = () => {
-    const { state } = useAppContext();
     const navigate = useNavigate();
     const { isLoading, error, athletes, programs, checkins, assignProgram, updateNutritionTargets } = useCoachData();
     const [expandedClient, setExpandedClient] = useState(null);

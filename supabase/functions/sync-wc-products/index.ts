@@ -1,20 +1,60 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0"
+import { getCorsHeaders } from "../_shared/cors.ts"
 
 // Edge Function per sincronizzare i prodotti da WooCommerce
 // verso la tabella `shop_products` di Supabase.
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+//
+// 🔒 SICUREZZA: richiede header X-Sync-Secret per prevenire chiamate non autorizzate.
+// Solo admin o cron job dovrebbero invocare questa funzione.
 
 serve(async (req) => {
+  const cors = getCorsHeaders(req.headers.get('Origin'));
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: cors })
   }
 
   try {
+    // ──────────────────────────────────────────────────────────────────
+    // 🔒 AUTENTICAZIONE: controlla Authorization header (JWT) oppure secret
+    // ──────────────────────────────────────────────────────────────────
+    const syncSecret = Deno.env.get('SYNC_SECRET');
+    const authHeader = req.headers.get('Authorization');
+    const syncHeader = req.headers.get('X-Sync-Secret');
+
+    // Verifica: o JWT admin valido o X-Sync-Secret per cron
+    if (syncSecret && syncHeader !== syncSecret) {
+      // Fallback a JWT auth
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          headers: { ...cors, 'Content-Type': 'application/json' }, status: 401,
+        });
+      }
+
+      const jwt = authHeader.replace('Bearer ', '');
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: `Bearer ${jwt}` } }
+      });
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
+          headers: { ...cors, 'Content-Type': 'application/json' }, status: 401,
+        });
+      }
+
+      // Verifica che sia admin
+      const role = user.user_metadata?.role;
+      if (role !== 'admin' && role !== 'coach') {
+        return new Response(JSON.stringify({ error: "Forbidden: admin or coach only" }), {
+          headers: { ...cors, 'Content-Type': 'application/json' }, status: 403,
+        });
+      }
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     const wcUrl = Deno.env.get('WOOCOMMERCE_URL') || 'https://csvteam.it'
@@ -99,14 +139,15 @@ serve(async (req) => {
       count: successCount,
       message: "Sync completata con successo" 
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...cors, 'Content-Type': 'application/json' },
       status: 200,
     })
 
   } catch (error: any) {
+    const cors = getCorsHeaders();
     console.error("❌ Errore in sync-wc-products:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...cors, 'Content-Type': 'application/json' },
       status: 500,
     })
   }

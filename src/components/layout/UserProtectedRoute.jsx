@@ -1,13 +1,26 @@
-import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import PendingApprovalPage from '../../pages/user/PendingApprovalPage';
+import ExpiredSubscriptionPage from '../../pages/user/ExpiredSubscriptionPage';
 
 /**
  * Guard for user-facing features.
- * Redirects to /auth (login/register) if user is not authenticated.
+ *
+ * Checks (in order):
+ *   1. Authenticated?          → redirect to /auth
+ *   2. Account approved?       → show PendingApprovalPage
+ *   3. Subscription active?    → show ExpiredSubscriptionPage
+ *
+ * Coach / superadmin users bypass steps 2–3 (they use the admin panel).
  */
 const UserProtectedRoute = () => {
-    const { isAuthenticated, isLoading } = useAuth();
+    const {
+        isAuthenticated,
+        isLoading,
+        role,
+        isApproved,
+        hasActiveSubscription,
+    } = useAuth();
 
     if (isLoading) {
         return (
@@ -17,8 +30,22 @@ const UserProtectedRoute = () => {
         );
     }
 
+    // 1. Not logged in → login page
     if (!isAuthenticated) {
         return <Navigate to="/auth" replace />;
+    }
+
+    // Coaches and superadmins skip approval/subscription gates
+    const isPrivileged = ['coach', 'superadmin'].includes(role);
+
+    // 2. Account not yet approved by admin
+    if (!isPrivileged && !isApproved) {
+        return <PendingApprovalPage />;
+    }
+
+    // 3. Subscription expired or inactive
+    if (!isPrivileged && !hasActiveSubscription) {
+        return <ExpiredSubscriptionPage />;
     }
 
     return <Outlet />;

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { useAthleteData } from '../../hooks/useAthleteData';
-import { useAppContext } from '../../context/AppContext';
+import { useGamification } from '../../hooks/useGamification';
 import { generateRecommendation, parseRepRange } from '../../engine/progressionEngine';
 import Timer from '../../components/ui/Timer';
 import PostWorkoutCheckin from '../../components/user/PostWorkoutCheckin';
@@ -25,7 +25,7 @@ const ActiveWorkout = () => {
     const id = params.id || preservedId;
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { state, completeDailyTask, submitWorkoutCheckin, setConfirmedIncrement } = useAppContext();
+    const { completeDailyTask } = useGamification();
     const { isLoading: programLoading, program } = useAthleteData();
 
     const day = program?.days?.find(d => d.id === id) ?? null;
@@ -139,14 +139,16 @@ const ActiveWorkout = () => {
     /* ── Progression Engine ── */
     const recommendation = (() => {
         const historyForEngine = exerciseHistory.map(h => ({ date: h.date, weight: h.weight, reps: h.reps }));
+        // Read confirmed increments from localStorage
+        const confirmedIncrements = JSON.parse(localStorage.getItem('csv_confirmed_increments') || '{}');
         return generateRecommendation({
             exerciseHistory: historyForEngine,
             repRangeStr: exercise.reps,
             programmedSets: exercise.sets,
             exerciseCategory: 'barbell',
-            confirmedIncrement: state.confirmedIncrements?.[exercise.exerciseId] ?? null,
-            stepsToday: state.gamification?.stepsToday || 0,
-            stepsHistory: state.gamification?.stepsHistory || [],
+            confirmedIncrement: confirmedIncrements[exercise.exerciseId] ?? null,
+            stepsToday: 0,
+            stepsHistory: [],
             nutritionAdherence: 1,
         });
     })();
@@ -181,12 +183,14 @@ const ActiveWorkout = () => {
                 difficulty: checkinData.difficulty
             });
         }
-        if (submitWorkoutCheckin) submitWorkoutCheckin(day.id, checkinData);
         setShowCheckin(false); navigate('/dashboard');
     };
 
     const handleEquipmentConfirm = (increment) => {
-        setConfirmedIncrement(exercise.exerciseId, increment);
+        // Store confirmed increment in localStorage
+        const existing = JSON.parse(localStorage.getItem('csv_confirmed_increments') || '{}');
+        existing[exercise.exerciseId] = increment;
+        localStorage.setItem('csv_confirmed_increments', JSON.stringify(existing));
         setShowClarification(false);
     };
 

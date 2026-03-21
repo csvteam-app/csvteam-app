@@ -3,12 +3,13 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import CsvLogo from '../ui/CsvLogo';
 import Button from '../ui/Button';
-import { User, LogIn, LogOut, Menu, X, ChevronDown, Bell, Settings } from 'lucide-react';
+import { User, LogIn, LogOut, Menu, X, ChevronDown, Bell, Settings, Shield } from 'lucide-react';
 
 const PremiumHeader = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { profile, isAuthenticated, signOut } = useAuth();
+    const { profile, isAuthenticated, signOut, role } = useAuth();
+    const isCoach = ['coach', 'superadmin'].includes(role);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -118,6 +119,11 @@ const PremiumHeader = () => {
                                         <button onClick={() => navigate('/profile')} className="flex-row items-center gap-3 p-3 w-full text-left rounded-lg hover-bg-surface transition-all">
                                             <Settings size={16} /> <span className="text-small">Impostazioni</span>
                                         </button>
+                                        {isCoach && (
+                                            <button onClick={() => navigate('/admin/dashboard')} className="flex-row items-center gap-3 p-3 w-full text-left rounded-lg hover-bg-surface transition-all" style={{ color: 'var(--accent-gold)' }}>
+                                                <Shield size={16} /> <span className="text-small">Pannello Coach</span>
+                                            </button>
+                                        )}
                                         <button onClick={() => { signOut(); navigate('/auth'); }} className="flex-row items-center gap-3 p-3 w-full text-left rounded-lg text-coral hover-bg-surface transition-all">
                                             <LogOut size={16} /> <span className="text-small">Disconnetti</span>
                                         </button>

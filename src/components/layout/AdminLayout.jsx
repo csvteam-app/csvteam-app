@@ -1,12 +1,17 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Users, FileText, Settings, LogOut, Database, UploadCloud, CalendarDays, MessageSquare } from 'lucide-react';
+import { Users, FileText, Settings, LogOut, Database, UploadCloud, CalendarDays, MessageSquare, Eye } from 'lucide-react';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
+import { useAuth } from '../../context/AuthContext';
 import CsvLogo from '../ui/CsvLogo';
 
 const AdminLayout = () => {
     const { logout, admin } = useAdminAuth();
+    const { isAuthenticated: hasSupabaseSession, role } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Show "Vista Atleta" only for coaches logged in via Supabase auth
+    const canViewAsAthlete = hasSupabaseSession && ['coach', 'superadmin'].includes(role);
 
     const isChat = location.pathname.includes('/admin/chat');
 
@@ -76,7 +81,29 @@ const AdminLayout = () => {
                     ))}
                 </nav>
 
-                <div className="sidebar-footer" style={{ padding: '16px 12px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                <div className="sidebar-footer" style={{ padding: '16px 12px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {canViewAsAthlete && (
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="flex-row gap-2 items-center"
+                            style={{
+                                color: 'var(--accent-teal, #2dd4bf)',
+                                width: '100%',
+                                padding: '12px 14px',
+                                fontSize: '0.82rem',
+                                background: 'rgba(45,212,191,0.04)',
+                                border: '1px solid rgba(45,212,191,0.12)',
+                                borderRadius: '12px',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                                fontFamily: 'Outfit, sans-serif',
+                                transition: 'all 0.25s ease-out',
+                            }}
+                        >
+                            <Eye size={16} strokeWidth={1.5} />
+                            <span>Vista Atleta</span>
+                        </button>
+                    )}
                     <button
                         onClick={handleLogout}
                         className="flex-row gap-2 items-center"

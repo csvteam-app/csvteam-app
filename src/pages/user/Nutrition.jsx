@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { useAppContext } from '../../context/AppContext';
 import { useAthleteData } from '../../hooks/useAthleteData';
 import { useNutrition } from '../../hooks/useNutrition';
 import Card from '../../components/ui/Card';
@@ -12,7 +11,6 @@ import DateStrip from '../../components/user/DateStrip';
 import FEATURE_FLAGS from '../../config/featureFlags';
 
 const Nutrition = () => {
-    const { state } = useAppContext();
     const { nutritionTargets } = useAthleteData();
 
     // ── Date state (default: today) ──
@@ -27,7 +25,7 @@ const Nutrition = () => {
     const [activeMeal, setActiveMeal] = useState(null);
     const [activeVoiceMeal, setActiveVoiceMeal] = useState(null);
 
-    // Source goals: Supabase (coach-set) targets take priority, then AppContext fallback
+    // Nutrition goals from Supabase (coach-set targets)
     const userGoals = useMemo(() => {
         if (nutritionTargets) {
             return {
@@ -37,10 +35,8 @@ const Nutrition = () => {
                 f: nutritionTargets.fat_g ?? 60,
             };
         }
-        const userId = state.userAuth?.id || 'u1';
-        const client = state.clients?.find(c => c.id === userId);
-        return client?.nutritionTargets || state.nutritionGoals || { kcal: 2000, p: 150, c: 200, f: 60 };
-    }, [nutritionTargets, state.clients, state.userAuth, state.nutritionGoals]);
+        return { kcal: 2000, p: 150, c: 200, f: 60 };
+    }, [nutritionTargets]);
 
     // Safely get the log for the selected date
     const log = useMemo(() => {

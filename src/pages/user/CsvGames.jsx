@@ -1,6 +1,5 @@
 
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../context/AppContext';
 import { useGamification } from '../../hooks/useGamification';
 import ChallengeCard from '../../components/gamification/ChallengeCard';
 import StepCounter from '../../components/gamification/StepCounter';
@@ -24,7 +23,6 @@ LeagueIcon.propTypes = {
 
 const CsvGames = () => {
     const navigate = useNavigate();
-    const { state } = useAppContext();
     const { gamification, dailyTasks, addXpAndPoints, LEAGUES } = useGamification();
     const xp = gamification?.xp || 0;
 
@@ -55,7 +53,7 @@ const CsvGames = () => {
         }
     ];
 
-    const weeklyChallenges = state.challenges?.filter(c => c.type === 'weekly') || [];
+    const weeklyChallenges = []; // TODO: Fetch from Supabase when weekly challenges are implemented
 
     const handleClaim = async (challengeId) => {
         const ch = dailyChallenges.find(c => c.id === challengeId);

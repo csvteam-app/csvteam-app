@@ -40,11 +40,13 @@ const AuthPage = () => {
         try {
             if (isLogin) {
                 const result = await signIn(formData.email, formData.password);
+                console.log('[AuthPage] signIn result:', { error: result.error, role: result.profile?.role, profileExists: !!result.profile });
                 if (result.error) {
                     setError('Credenziali non valide. Riprova.');
                 } else {
                     // Route based on role
                     const role = result.profile?.role;
+                    console.log('[AuthPage] navigating based on role:', role);
                     if (role === 'coach' || role === 'superadmin') {
                         navigate('/admin/dashboard');
                     } else {

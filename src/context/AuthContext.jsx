@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
 
         fetchProfilePromise.current = supabase
             .from('profiles')
-            .select('id, full_name, email, role, avatar_url, bodyweight_kg')
+            .select('*')
             .eq('id', userId)
             .single()
             .then(({ data, error }) => {
@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
                     console.error('[Auth] Profile fetch error:', error.message);
                     return null;
                 }
+                console.log('[Auth] Profile fetched:', { id: data?.id, role: data?.role, email: data?.email, approval_status: data?.approval_status });
                 return data;
             });
 
@@ -106,6 +107,7 @@ export function AuthProvider({ children }) {
             }
         }
 
+        console.log('[Auth] signIn result:', { userId: data?.user?.id, profileRole: loadedProfile?.role, profileEmail: loadedProfile?.email });
         return { data, profile: loadedProfile };
     };
 
@@ -116,6 +118,19 @@ export function AuthProvider({ children }) {
         await supabase.auth.signOut();
     };
 
+    // Derived status helpers — used by route guards
+    const approvalStatus = profile?.approval_status ?? 'pending';
+    const subscriptionStatus = profile?.subscription_status ?? 'inactive';
+    const isApproved = approvalStatus === 'approved';
+
+    const isSubscriptionActive = (() => {
+        if (subscriptionStatus !== 'active') return false;
+        if (profile?.subscription_expires_at) {
+            return new Date(profile.subscription_expires_at) > new Date();
+        }
+        return true; // active with no expiry → lifetime / manual
+    })();
+
     const value = {
         session,
         user: session?.user ?? null,
@@ -125,6 +140,11 @@ export function AuthProvider({ children }) {
         isLoading,
         signIn,
         signOut,
+        logout: signOut,              // alias used by status pages
+        approvalStatus,
+        subscriptionStatus,
+        isApproved,
+        hasActiveSubscription: isSubscriptionActive,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

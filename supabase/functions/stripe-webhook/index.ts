@@ -32,7 +32,9 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Gestione Sessione di Checkout Completata (Primo Acquisto)
+    // ─────────────────────────────────────────────────────────────────
+    // 1. Sessione di Checkout Completata (Primo Acquisto)
+    // ─────────────────────────────────────────────────────────────────
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata;
@@ -44,26 +46,82 @@ serve(async (req) => {
 
       await handleFulfillment(metadata, session.id);
       
-      // Se è un coaching, prepariamo il coupon di sconto per i rinnovi successivi
+      // ─────────────────────────────────────────────────────────────
+      // 🎫 Coupon 10% per rinnovi coaching
+      // ─────────────────────────────────────────────────────────────
       if (metadata.type === 'coaching' && session.subscription) {
-          // TODO: In futuro la funzione potrebbe collegare automaticamente un "10% off"
-          // coupon alla `session.subscription` tramite API Stripe update.
+        try {
+          // Crea (o recupera) un coupon 10% off
+          let couponId = 'coaching_renewal_10';
+          try {
+            await stripe.coupons.retrieve(couponId);
+          } catch {
+            // Il coupon non esiste ancora, crealo
+            await stripe.coupons.create({
+              id: couponId,
+              percent_off: 10,
+              duration: 'forever',
+              name: 'Sconto Rinnovo Coaching 10%',
+            });
+            console.log('🎫 Coupon coaching_renewal_10 creato');
+          }
+
+          // Applica il coupon alla subscription (si attiverà dal prossimo ciclo)
+          await stripe.subscriptions.update(session.subscription as string, {
+            coupon: couponId,
+          });
+          console.log(`🎫 Coupon 10% applicato alla subscription ${session.subscription}`);
+        } catch (couponErr: any) {
+          console.error('⚠️ Errore applicazione coupon:', couponErr.message);
+          // Non bloccare il webhook per un errore di coupon
+        }
       }
     }
 
-    // 2. Pagamento Ricorrente Riuscito (Es. Abbonamento rinnovato il mese dopo)
+    // ─────────────────────────────────────────────────────────────────
+    // 2. Pagamento Ricorrente Riuscito (Rinnovo Subscription)
+    // ─────────────────────────────────────────────────────────────────
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
       
-      // Se era la prima fattura del checkout.session.completed, l'abbiamo già gestita,
-      // ma possiamo rigestirla qui (basandoci sul billing_reason).
       if (invoice.billing_reason === 'subscription_cycle') {
-         // È un vero rinnovo. Cerchiamo la subscription per prendere la metadata originale
          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
          if (subscription.metadata && subscription.metadata.user_id) {
              console.log("🔔 Rinnovo automatico andato a buon fine. Erogazione nuovi crediti...");
              await handleFulfillment(subscription.metadata, invoice.id);
          }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // 3. 🚫 Subscription Cancellata o Scaduta
+    // ─────────────────────────────────────────────────────────────────
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object as Stripe.Subscription;
+      const userId = subscription.metadata?.user_id;
+
+      if (userId) {
+        console.log(`🚫 Subscription ${subscription.id} cancellata per utente ${userId}`);
+
+        // Aggiorna profiles → cancelled
+        const { error: profileErr } = await supabaseAdmin.from('profiles').update({
+          subscription_status: 'cancelled',
+        }).eq('id', userId);
+
+        if (profileErr) {
+          console.error('Errore disattivazione profile:', profileErr.message);
+        }
+
+        // Aggiorna auth user metadata
+        await supabaseAdmin.auth.admin.updateUserById(userId, {
+          user_metadata: {
+            subscription_status: 'cancelled',
+          },
+        });
+
+        console.log(`✅ Abbonamento disattivato per utente ${userId}`);
+      } else {
+        console.warn('⚠️ Subscription cancellata senza user_id nei metadata');
       }
     }
 
@@ -75,7 +133,9 @@ serve(async (req) => {
   }
 });
 
-// Funzione helper per erogare crediti in App
+// ─────────────────────────────────────────────────────────────────
+// Helper: erogazione crediti in App
+// ─────────────────────────────────────────────────────────────────
 async function handleFulfillment(metadata: any, referenceId: string) {
     const { user_id, type, amount_credits, product_id } = metadata;
     const credits = parseInt(amount_credits) || 1;
@@ -83,7 +143,6 @@ async function handleFulfillment(metadata: any, referenceId: string) {
     console.log(`📦 Erogazione: ${credits} crediti di tipo ${type} a ${user_id}`);
 
     if (type === 'singola' || type === 'coppia') {
-        // Inserimento righe pacchetto
         const { error } = await supabaseAdmin.from('lesson_packages').insert({
             athlete_id: user_id,
             package_type: type === 'singola' ? 'single' : 'pair',
@@ -93,15 +152,16 @@ async function handleFulfillment(metadata: any, referenceId: string) {
         });
 
         if (error) throw error;
+        console.log(`✅ Aggiunti ${credits} crediti ${type} a ${user_id}`);
     } 
     else if (type === 'coaching') {
-        // Estensione o Attivazione Abbonamento
         let expirationDate = new Date();
         expirationDate.setMonth(expirationDate.getMonth() + credits);
 
         // Aggiorna tabella profiles
         await supabaseAdmin.from('profiles').update({
             subscription_status: 'active',
+            subscription_plan: 'coaching',
             subscription_expires_at: expirationDate.toISOString()
         }).eq('id', user_id);
 
@@ -111,5 +171,7 @@ async function handleFulfillment(metadata: any, referenceId: string) {
                 subscription_status: 'active',
             }
         });
+
+        console.log(`✅ Abbonamento attivato fino al ${expirationDate.toISOString()}`);
     }
 }
