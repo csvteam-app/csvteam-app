@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext();
@@ -14,10 +14,11 @@ export function AuthProvider({ children }) {
     const [profile, setProfile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // We retain the promise cache just in case StrictMode double-invokes the effect
     const fetchProfilePromise = useRef(null);
+    const mounted = useRef(true);
 
-    const fetchProfile = async (userId) => {
+    // ── Fetch profile with dedup ──
+    const fetchProfile = useCallback(async (userId) => {
         if (fetchProfilePromise.current) return fetchProfilePromise.current;
 
         fetchProfilePromise.current = supabase
@@ -31,68 +32,113 @@ export function AuthProvider({ children }) {
                     console.error('[Auth] Profile fetch error:', error.message);
                     return null;
                 }
-                console.log('[Auth] Profile fetched:', { id: data?.id, role: data?.role, email: data?.email, approval_status: data?.approval_status });
                 return data;
             });
 
         return fetchProfilePromise.current;
-    };
+    }, []);
 
-    useEffect(() => {
-        let mounted = true;
+    // ── Core: sync session + profile from whatever Supabase gives us ──
+    const syncSession = useCallback(async () => {
+        try {
+            const { data: { session: s } } = await supabase.auth.getSession();
 
-        const initializeSession = async () => {
-            const { data: { session: s }, error } = await supabase.auth.getSession();
-            if (!mounted) return;
+            if (!mounted.current) return;
 
-            setSession(s);
             if (s?.user) {
+                setSession(s);
                 const p = await fetchProfile(s.user.id);
-                if (mounted) {
+                if (mounted.current) {
                     setProfile(p);
                     setIsLoading(false);
                 }
             } else {
-                if (mounted) {
-                    setProfile(null);
+                // No valid session — but DON'T clear profile if we had one.
+                // Only clear on explicit SIGNED_OUT event (manual logout).
+                // This prevents the "half logged in" state where profile shows
+                // but session is null due to a transient token refresh failure.
+                
+                // Try to refresh the session before giving up
+                const { data: { session: refreshed } } = await supabase.auth.refreshSession();
+                if (mounted.current) {
+                    if (refreshed?.user) {
+                        setSession(refreshed);
+                        const p = await fetchProfile(refreshed.user.id);
+                        if (mounted.current) setProfile(p);
+                    }
+                    // If refresh also fails, keep whatever state we have.
+                    // Only signOut() clears everything.
                     setIsLoading(false);
                 }
             }
-        };
+        } catch (err) {
+            console.error('[Auth] syncSession error:', err);
+            if (mounted.current) setIsLoading(false);
+        }
+    }, [fetchProfile]);
 
-        initializeSession();
+    useEffect(() => {
+        mounted.current = true;
 
+        // 1. Initial session sync
+        syncSession();
+
+        // 2. Listen for auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, s) => {
-                if (!mounted) return;
+                if (!mounted.current) return;
 
-                // Solo aggiorna se cambia. Evita flickering se il session è lo stesso
-                setSession(s);
+                console.log('[Auth] event:', event);
 
-                if (s?.user) {
-                    // Cache promise evita re-fetch doppi simultanei
-                    const p = await fetchProfile(s.user.id);
-                    if (mounted) setProfile(p);
-                } else {
-                    if (mounted) setProfile(null);
+                if (event === 'SIGNED_OUT') {
+                    // ONLY clear on explicit sign out
+                    setSession(null);
+                    setProfile(null);
+                    setIsLoading(false);
+                    return;
                 }
 
-                if (mounted) setIsLoading(false);
+                if (s?.user) {
+                    setSession(s);
+                    const p = await fetchProfile(s.user.id);
+                    if (mounted.current) setProfile(p);
+                }
+
+                if (mounted.current) setIsLoading(false);
             }
         );
 
-        return () => {
-            mounted = false;
-            subscription.unsubscribe();
+        // 3. Re-validate session when app comes back to foreground (iOS!)
+        //    This handles: tab switch, app resume from background, screen wake
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log('[Auth] App resumed — re-syncing session');
+                syncSession();
+            }
         };
-    }, []);
+
+        // Also handle iOS-specific events
+        const handleAppResume = () => {
+            console.log('[Auth] App focus — re-syncing session');
+            syncSession();
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleAppResume);
+
+        return () => {
+            mounted.current = false;
+            subscription.unsubscribe();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleAppResume);
+        };
+    }, [syncSession, fetchProfile]);
 
     // Sign in with email + password
     const signIn = async (email, password) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) return { error };
 
-        // Try direct query first
         let profileData = null;
         const { data: directProfile, error: directError } = await supabase
             .from('profiles')
@@ -102,7 +148,6 @@ export function AuthProvider({ children }) {
 
         if (directError) {
             console.warn('[Auth] Direct profile query failed:', directError.message);
-            // Fallback: use SECURITY DEFINER RPC (bypasses RLS)
             const { data: rpcProfile, error: rpcError } = await supabase
                 .rpc('get_my_profile')
                 .single();
@@ -116,23 +161,25 @@ export function AuthProvider({ children }) {
         }
 
         if (profileData) {
-            console.log('[Auth] signIn profile:', { id: profileData.id, role: profileData.role, email: profileData.email });
             setProfile(profileData);
-        } else {
-            console.error('[Auth] Could not load profile for user:', data.user.id);
         }
 
         return { data, profile: profileData || null };
     };
 
-    // Sign out
+    // Sign out — the ONLY way to clear the session
     const signOut = async () => {
-        // Supabase signout will trigger the SIGNED_OUT event,
-        // which clears the profile via the listener.
-        await supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut();
+        } catch (err) {
+            // Force clear even if signOut API fails
+            console.error('[Auth] signOut error, force clearing:', err);
+            setSession(null);
+            setProfile(null);
+        }
     };
 
-    // Derived status helpers — used by route guards
+    // Derived status helpers
     const approvalStatus = profile?.approval_status ?? 'pending';
     const subscriptionStatus = profile?.subscription_status ?? 'inactive';
     const isApproved = approvalStatus === 'approved';
@@ -142,7 +189,7 @@ export function AuthProvider({ children }) {
         if (profile?.subscription_expires_at) {
             return new Date(profile.subscription_expires_at) > new Date();
         }
-        return true; // active with no expiry → lifetime / manual
+        return true;
     })();
 
     const value = {
@@ -154,7 +201,7 @@ export function AuthProvider({ children }) {
         isLoading,
         signIn,
         signOut,
-        logout: signOut,              // alias used by status pages
+        logout: signOut,
         approvalStatus,
         subscriptionStatus,
         isApproved,
