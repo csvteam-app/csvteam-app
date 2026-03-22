@@ -22,6 +22,7 @@ const Chat = () => {
 
     const messagesEndRef = useRef(null);
     const chatAreaRef = useRef(null);
+    const textareaRef = useRef(null);
 
     // Calculate next response window
     const getNextResponseWindow = () => {
@@ -152,6 +153,8 @@ const Chat = () => {
             setTimeout(() => setShowFeedback(false), 5000);
         }
         setIsSending(false);
+        // Re-focus textarea to keep keyboard open (like WhatsApp)
+        setTimeout(() => textareaRef.current?.focus(), 50);
     };
 
     // --- Media Upload Logic ---
@@ -698,6 +701,7 @@ const Chat = () => {
                         </div>
                     ) : (
                         <textarea
+                            ref={textareaRef}
                             value={inputValue}
                             onChange={e => setInputValue(e.target.value)}
                             onKeyPress={e => {
