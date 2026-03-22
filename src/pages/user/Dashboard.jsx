@@ -43,7 +43,7 @@ const Dashboard = () => {
             </div>
 
             {/* ═══ Main Content Container ═══ */}
-            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px', paddingTop: '114px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">
