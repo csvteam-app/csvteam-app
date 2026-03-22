@@ -32,7 +32,7 @@ const Dashboard = () => {
             paddingBottom: '0',
         }}>
             {/* ═══ SECTION 1 – LOGO ═══ */}
-            <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '2vh', paddingBottom: '8vh' }}>
+            <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '2vh', paddingBottom: '1vh' }}>
                 <div
                     className="csv-logo-coin-3d"
                     style={{ width: '130px', cursor: 'pointer' }}
@@ -43,7 +43,7 @@ const Dashboard = () => {
             </div>
 
             {/* ═══ Main Content Container ═══ */}
-            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', marginTop: 'auto', flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '16px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">
