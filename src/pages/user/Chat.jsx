@@ -733,6 +733,8 @@ const Chat = () => {
                 {/* Action Button: Send / Stop / Mic */}
                 {inputValue.trim() || isSending ? (
                     <button
+                        onMouseDown={(e) => e.preventDefault()}
+                        onTouchEnd={(e) => { e.preventDefault(); handleSend(); }}
                         onClick={() => handleSend()}
                         disabled={isSending}
                         style={{
@@ -750,6 +752,8 @@ const Chat = () => {
                             opacity: isSending ? 0.5 : 1,
                             cursor: isSending ? 'not-allowed' : 'pointer',
                             flexShrink: 0,
+                            WebkitTapHighlightColor: 'transparent',
+                            touchAction: 'manipulation',
                         }}
                     >
                         <Send size={18} style={{ marginLeft: '2px' }} />
