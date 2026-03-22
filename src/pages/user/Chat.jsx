@@ -407,7 +407,7 @@ const Chat = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '6px',
-                paddingBottom: '90px',
+                paddingBottom: '16px',
                 overscrollBehaviorY: 'contain',
                 WebkitOverflowScrolling: 'touch',
             }}>
@@ -628,23 +628,19 @@ const Chat = () => {
                 onChange={handleFileSelect}
             />
 
-            {/* ═══ PREMIUM INPUT FOOTER (Floating Dock) ═══ */}
+            {/* ═══ PREMIUM INPUT FOOTER (In-flow Dock) ═══ */}
             <div style={{
-                position: 'fixed',
-                bottom: 'max(16px, env(safe-area-inset-bottom))',
-                left: '16px', right: '16px',
+                flexShrink: 0,
+                padding: '8px 12px',
+                paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
                 background: 'linear-gradient(180deg, rgba(30,32,36,0.7) 0%, rgba(10,12,16,0.9) 100%)',
                 backdropFilter: 'blur(30px)',
                 WebkitBackdropFilter: 'blur(30px)',
-                padding: '10px',
-                borderRadius: '32px',
-                zIndex: 900,
+                borderRadius: '24px 24px 0 0',
                 display: 'flex',
                 alignItems: 'flex-end',
                 gap: '10px',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderTop: '1px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 30px 60px rgba(0,0,0,0.9), 0 0 30px rgba(255, 120, 0, 0.08)',
+                borderTop: '1px solid rgba(255,255,255,0.08)',
             }}>
                 {/* Input Container */}
                 <div style={{

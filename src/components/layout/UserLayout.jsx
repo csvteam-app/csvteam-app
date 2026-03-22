@@ -226,6 +226,7 @@ const UserLayout = () => {
                 {TAB_ROUTES.map((route, idx) => {
                     const PageComponent = TAB_COMPONENTS[idx];
 
+                    const isLockedScroll = idx === 1 || idx === 2; // Chat, Dashboard
                     return (
                         <div
                             key={route}
@@ -234,12 +235,11 @@ const UserLayout = () => {
                                 flex: '0 0 100%',
                                 width: '100%',
                                 height: '100%',
-                                overflowY: 'auto',
+                                overflowY: isLockedScroll ? 'hidden' : 'auto',
                                 overscrollBehaviorY: 'contain',
                                 WebkitOverflowScrolling: 'touch',
                                 scrollSnapAlign: 'center',
                                 scrollSnapStop: 'always',
-                                /* Isolate layout recalculations */
                                 contain: 'layout style',
                             }}
                         >

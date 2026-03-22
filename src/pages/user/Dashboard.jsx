@@ -26,12 +26,13 @@ const Dashboard = () => {
 
     return (
         <div className="global-container" style={{
-            minHeight: '100%',
+            height: '100%',
             gap: '0',
-            paddingBottom: '120px'
+            overflow: 'hidden',
+            paddingBottom: '0',
         }}>
             {/* ═══ SECTION 1 – LOGO ═══ */}
-            <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '10vh', paddingBottom: '2vh' }}>
+            <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '2vh', paddingBottom: '1vh' }}>
                 <div
                     className="csv-logo-coin-3d"
                     style={{ width: '130px', cursor: 'pointer' }}
