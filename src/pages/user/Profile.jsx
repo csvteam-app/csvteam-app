@@ -1,17 +1,41 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useGamification } from '../../hooks/useGamification';
 import { useAuth } from '../../context/AuthContext';
 import FEATURE_FLAGS from '../../config/featureFlags';
-import { Trophy, Flame, Dumbbell, Target, CheckCircle2, History, Camera, User, Calendar, Crown } from 'lucide-react';
+import Shop from './Shop';
+import {
+    Trophy, Flame, Dumbbell, Target, CheckCircle2, History, User, Calendar,
+    Crown, LogIn, LogOut, Shield, ArrowLeft, Mail, Lock, Eye, EyeOff
+} from 'lucide-react';
 
 const Profile = () => {
     const navigate = useNavigate();
-    const { user, profile: authProfile } = useAuth();
+    const { user, profile: authProfile, isAuthenticated, signIn, signOut, role } = useAuth();
     const { gamification, LEAGUES } = useGamification();
+    const isCoach = ['coach', 'superadmin'].includes(role);
 
+    // Login form state
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [loginError, setLoginError] = useState('');
+    const [loginLoading, setLoginLoading] = useState(false);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setLoginError('');
+        setLoginLoading(true);
+        const { error } = await signIn(email, password);
+        if (error) {
+            setLoginError(error.message === 'Invalid login credentials' ? 'Email o password non corretti' : error.message);
+        }
+        setLoginLoading(false);
+    };
+
+    // Gamification data
     const xp = gamification?.xp || 0;
     const u = { name: authProfile?.full_name || user?.user_metadata?.name || 'Utente CSV' };
-    const timeline = []; // Mock timeline, should be fetched if needed
 
     const currentLeague = LEAGUES.find(l => l.id === gamification?.current_league) || LEAGUES[0];
     const nextLeague = LEAGUES.find(l => l.threshold > xp) || LEAGUES[LEAGUES.length - 1];
@@ -22,34 +46,115 @@ const Profile = () => {
     const bestStreak = gamification?.best_streak || 0;
     const currentStreak = gamification?.streak_days || 0;
 
-    // Timeline Icon Mapper
-    const getTimelineIcon = (type) => {
-        switch (type) {
-            case 'workout': return <Dumbbell size={16} color="#fff" />;
-            case 'photo': return <Camera size={16} color="#fff" />;
-            case 'challenge': return <Trophy size={16} color="#fff" />;
-            case 'streak': return <Flame size={16} color="#fff" />;
-            default: return <CheckCircle2 size={16} color="#fff" />;
-        }
+    const btnStyle = {
+        display: 'flex', alignItems: 'center', gap: '10px',
+        width: '100%', padding: '14px 16px', borderRadius: '14px',
+        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgba(255,255,255,0.04)',
+        color: '#fff', cursor: 'pointer', fontSize: '0.88rem',
+        fontWeight: 600, fontFamily: 'Outfit', textAlign: 'left',
     };
 
-    // Date formatter
-    const formatDate = (isoString) => {
-        const date = new Date(isoString);
-        const today = new Date();
-        const diffMs = today - date;
-        const diffDays = Math.floor(diffMs / 86400000);
+    // ── NOT LOGGED IN: show login form ──
+    if (!isAuthenticated) {
+        return (
+            <div className="global-container animate-fade-in" style={{ padding: '20px 20px 80px' }}>
+                {/* Back button */}
+                <button onClick={() => navigate('/dashboard')} style={{
+                    ...btnStyle, width: 'auto', padding: '8px 14px',
+                    marginBottom: '24px', background: 'none', border: 'none',
+                    color: 'var(--text-muted)', fontSize: '0.8rem',
+                }}>
+                    <ArrowLeft size={16} /> Torna all'app
+                </button>
 
-        if (diffDays === 0) return 'Oggi';
-        if (diffDays === 1) return 'Ieri';
-        return `${diffDays} giorni fa`;
-    };
+                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                    <div style={{
+                        width: '64px', height: '64px', borderRadius: '50%', margin: '0 auto 16px',
+                        background: 'linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05))',
+                        border: '1px solid rgba(212,175,55,0.3)',
+                        display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    }}>
+                        <LogIn size={28} color="var(--accent-gold)" />
+                    </div>
+                    <h1 style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>
+                        Accedi al tuo account
+                    </h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '8px' }}>
+                        Entra per accedere al tuo profilo e allo shop
+                    </p>
+                </div>
 
+                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxWidth: '400px', margin: '0 auto' }}>
+                    <div style={{ position: 'relative' }}>
+                        <Mail size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                        <input
+                            type="email" value={email} onChange={e => setEmail(e.target.value)}
+                            placeholder="Email" required autoComplete="email"
+                            style={{
+                                width: '100%', padding: '14px 14px 14px 40px', borderRadius: '14px',
+                                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                                color: '#fff', fontSize: '0.9rem', fontFamily: 'Inter, system-ui', outline: 'none',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                        <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                        <input
+                            type={showPassword ? 'text' : 'password'} value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            placeholder="Password" required autoComplete="current-password"
+                            style={{
+                                width: '100%', padding: '14px 44px 14px 40px', borderRadius: '14px',
+                                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                                color: '#fff', fontSize: '0.9rem', fontFamily: 'Inter, system-ui', outline: 'none',
+                                boxSizing: 'border-box',
+                            }}
+                        />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} style={{
+                            position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                            background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer',
+                        }}>
+                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                    </div>
+
+                    {loginError && (
+                        <p style={{ color: '#ef4444', fontSize: '0.8rem', textAlign: 'center', margin: 0 }}>{loginError}</p>
+                    )}
+
+                    <button type="submit" disabled={loginLoading} style={{
+                        padding: '14px', borderRadius: '14px',
+                        background: 'var(--gradient-primary, linear-gradient(135deg, #D4AF37, #F0A500))',
+                        color: '#050508', border: 'none', fontWeight: 700, fontSize: '0.9rem',
+                        fontFamily: 'Outfit', cursor: loginLoading ? 'not-allowed' : 'pointer',
+                        opacity: loginLoading ? 0.7 : 1,
+                    }}>
+                        {loginLoading ? 'Accesso...' : 'Accedi'}
+                    </button>
+                </form>
+            </div>
+        );
+    }
+
+    // ── LOGGED IN: Profile + Auth Controls + Shop ──
     return (
-        <div className="global-container animate-fade-in" style={{ paddingBottom: '120px' }}>
+        <div className="global-container animate-fade-in" style={{ paddingBottom: '80px' }}>
+
+            {/* Back button */}
+            <div style={{ padding: '12px 0' }}>
+                <button onClick={() => navigate('/dashboard')} style={{
+                    ...btnStyle, width: 'auto', padding: '8px 14px',
+                    background: 'none', border: 'none',
+                    color: 'var(--text-muted)', fontSize: '0.8rem',
+                }}>
+                    <ArrowLeft size={16} /> Torna all'app
+                </button>
+            </div>
 
             {/* 1. USER HEADER */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '24px', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
                 <div style={{
                     width: '80px', height: '80px', borderRadius: '40px',
                     background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.05) 100%)',
@@ -69,170 +174,99 @@ const Profile = () => {
                         marginTop: '16px', padding: '12px 24px', borderRadius: '12px',
                         background: 'linear-gradient(90deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.2) 100%)',
                         border: '1px solid rgba(212,175,55,0.4)', display: 'flex', alignItems: 'center', gap: '12px',
-                        boxShadow: '0 4px 12px rgba(212,175,55,0.1)'
                     }}>
                         <Crown size={20} color="var(--accent-gold)" />
                         <div className="flex-col">
                             <span style={{ fontSize: '0.75rem', color: '#fff', opacity: 0.8, fontWeight: 600 }}>Piano Attivo</span>
-                            <span style={{ fontSize: '1rem', color: 'var(--accent-gold)', fontWeight: 800, fontFamily: 'Outfit' }}>{user?.user_metadata?.subscription_plan || 'Coaching Premium'}</span>
+                            <span style={{ fontSize: '1rem', color: 'var(--accent-gold)', fontWeight: 800, fontFamily: 'Outfit' }}>
+                                {user?.user_metadata?.subscription_plan || 'Coaching Premium'}
+                            </span>
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* RESPONSIVE CONTENT GRID */}
-            <div className="responsive-grid-2col w-full" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                
-                {/* ═══ LEFT COLUMN (Stats & Settings) ═══ */}
-                <div className="flex-col gap-6">
-                    {/* 2. PROGRESS SUMMARY (solo se XP attivo) */}
-                    {FEATURE_FLAGS.XP && (
-                        <div className="glass-card" style={{ padding: '24px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                                <div>
-                                    <span className="text-label" style={{ color: 'var(--text-muted)' }}>LEGA ATTUALE</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                                        <span style={{ fontSize: '1.5rem' }}>{currentLeague.icon}</span>
-                                        <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>
-                                            Lega {currentLeague.name}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {FEATURE_FLAGS.STREAK && (
-                                    <div style={{ textAlign: 'right' }}>
-                                        <span className="text-label" style={{ color: 'var(--text-muted)' }}>STREAK</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', justifyContent: 'flex-end' }}>
-                                            <Flame size={16} color="var(--accent-coral)" />
-                                            <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
-                                                {currentStreak} Giorni
-                                            </span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'flex-end' }}>
-                                    <span style={{ fontSize: '0.9rem', color: 'var(--accent-gold)', fontWeight: 700 }}>
-                                        {xp} XP
-                                    </span>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                        / {xpForNext} XP
-                                    </span>
-                                </div>
-                                <div className="progress-bar-premium" style={{ height: '8px' }}>
-                                    <div className="progress-fill" style={{ width: `${progressPerc}%` }} />
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 3. QUICK STATS (solo se gamification attiva) */}
-                    {FEATURE_FLAGS.XP && (
-                        <div>
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff', marginBottom: '16px' }}>
-                                Statistiche rapide
-                            </h3>
-                            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '8px', msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="no-scrollbar">
-                                {/* Stat 1 */}
-                                <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
-                                    <Dumbbell size={20} color="var(--accent-teal)" style={{ marginBottom: '8px' }} />
-                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>{workoutsCompleted}</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Workout Totali</span>
-                                </div>
-
-                                {/* Stat 2 */}
-                                <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
-                                    <Target size={20} color="var(--accent-warm)" style={{ marginBottom: '8px' }} />
-                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>34</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Sfide Vinte</span>
-                                </div>
-
-                                {/* Stat 3 */}
-                                <div className="glass-card flex-col items-center justify-center p-4" style={{ minWidth: '110px', flex: 1 }}>
-                                    <Flame size={20} color="var(--accent-coral)" style={{ marginBottom: '8px' }} />
-                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff', lineHeight: 1 }}>{bestStreak}</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'center' }}>Best Streak</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* NAVIGAZIONE AGGIUNTIVA */}
-                    <div>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff', marginBottom: '16px' }}>
-                            Impostazioni Lezioni
-                        </h3>
-                        <div
-                            onClick={() => navigate('/profile/availability')}
-                            className="glass-card flex-row items-center justify-between"
-                            style={{ padding: '20px 16px', cursor: 'pointer', borderLeft: '3px solid var(--accent-gold)' }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(212,175,55,0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                    <Calendar size={22} color="var(--accent-gold)" />
-                                </div>
-                                <div>
-                                    <div style={{ fontWeight: 600, color: '#fff', fontSize: '1rem' }}>La mia Disponibilità</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>Gestisci i tuoi orari per le lezioni</div>
-                                </div>
-                            </div>
-                            <div style={{ color: 'var(--text-muted)' }}>→</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ═══ RIGHT COLUMN (Timeline) ═══ */}
-                <div className="glass-card" style={{ padding: '24px', height: 'fit-content' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-                        <History size={18} color="var(--accent-gold)" />
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
-                            Cronologia Progressi
-                        </h3>
-                    </div>
-
-                    <div style={{ position: 'relative', paddingLeft: '16px' }}>
-                        {/* Vertical Line */}
-                        <div style={{ position: 'absolute', top: 0, bottom: 0, left: '32px', width: '2px', background: 'var(--glass-border)' }} />
-
-                        {timeline.length === 0 ? (
-                            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '32px 0' }}>Nessuna attività registrata.</p>
-                        ) : (
-                            timeline.map((event, index) => (
-                                <div key={event.id} className="animate-fade-in" style={{ display: 'flex', gap: '24px', marginBottom: '32px', position: 'relative', animationDelay: `${index * 50}ms` }}>
-                                    {/* Icon Bubble */}
-                                    <div style={{
-                                        width: '34px', height: '34px', borderRadius: '17px',
-                                        background: 'linear-gradient(135deg, #1A1A24 0%, #0F0F16 100%)',
-                                        border: '1px solid var(--glass-border)', zIndex: 2,
-                                        display: 'flex', justifyContent: 'center', alignItems: 'center',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-                                    }}>
-                                        {getTimelineIcon(event.type)}
-                                    </div>
-
-                                    {/* Content */}
-                                    <div style={{ flex: 1, paddingTop: '4px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                                            <h4 style={{ color: '#fff', fontSize: '1rem', fontWeight: 600 }}>{event.title}</h4>
-                                            {event.xpGained && (
-                                                <span style={{ color: 'var(--accent-gold)', fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
-                                                    +{event.xpGained} XP
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                                            {formatDate(event.date)}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
+            {/* 2. AUTH CONTROLS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '32px', maxWidth: '500px', margin: '0 auto 32px' }}>
+                {isCoach && (
+                    <button onClick={() => navigate('/admin/dashboard')} style={{ ...btnStyle, borderColor: 'rgba(212,175,55,0.3)', color: 'var(--accent-gold)' }}>
+                        <Shield size={18} /> Pannello Coach
+                    </button>
+                )}
+                <button onClick={() => navigate('/profile/availability')} style={btnStyle}>
+                    <Calendar size={18} /> La mia Disponibilità
+                </button>
+                <button onClick={() => { signOut(); navigate('/dashboard'); }} style={{ ...btnStyle, color: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' }}>
+                    <LogOut size={18} /> Disconnetti
+                </button>
             </div>
 
+            {/* 3. PROGRESS (se XP attivo) */}
+            {FEATURE_FLAGS.XP && (
+                <div style={{ maxWidth: '500px', margin: '0 auto 24px' }}>
+                    <div className="glass-card" style={{ padding: '24px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                            <div>
+                                <span className="text-label" style={{ color: 'var(--text-muted)' }}>LEGA ATTUALE</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                                    <span style={{ fontSize: '1.5rem' }}>{currentLeague.icon}</span>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>
+                                        Lega {currentLeague.name}
+                                    </span>
+                                </div>
+                            </div>
+                            {FEATURE_FLAGS.STREAK && (
+                                <div style={{ textAlign: 'right' }}>
+                                    <span className="text-label" style={{ color: 'var(--text-muted)' }}>STREAK</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', justifyContent: 'flex-end' }}>
+                                        <Flame size={16} color="var(--accent-coral)" />
+                                        <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Outfit', color: '#fff' }}>
+                                            {currentStreak} Giorni
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'flex-end' }}>
+                                <span style={{ fontSize: '0.9rem', color: 'var(--accent-gold)', fontWeight: 700 }}>{xp} XP</span>
+                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ {xpForNext} XP</span>
+                            </div>
+                            <div className="progress-bar-premium" style={{ height: '8px' }}>
+                                <div className="progress-fill" style={{ width: `${progressPerc}%` }} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quick Stats */}
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                        <div className="glass-card flex-col items-center justify-center p-4" style={{ flex: 1 }}>
+                            <Dumbbell size={18} color="var(--accent-teal)" style={{ marginBottom: '6px' }} />
+                            <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>{workoutsCompleted}</span>
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '2px', textAlign: 'center' }}>Workout</span>
+                        </div>
+                        <div className="glass-card flex-col items-center justify-center p-4" style={{ flex: 1 }}>
+                            <Target size={18} color="var(--accent-warm)" style={{ marginBottom: '6px' }} />
+                            <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>34</span>
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '2px', textAlign: 'center' }}>Sfide</span>
+                        </div>
+                        <div className="glass-card flex-col items-center justify-center p-4" style={{ flex: 1 }}>
+                            <Flame size={18} color="var(--accent-coral)" style={{ marginBottom: '6px' }} />
+                            <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit', color: '#fff' }}>{bestStreak}</span>
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '2px', textAlign: 'center' }}>Best Streak</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ═══ 4. SHOP (embedded) ═══ */}
+            <div style={{
+                marginTop: '16px',
+                borderTop: '1px solid rgba(255,255,255,0.06)',
+                paddingTop: '24px',
+            }}>
+                <Shop />
+            </div>
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingBag, MessageCircle, Dumbbell, Utensils, User } from 'lucide-react';
+import { Dumbbell, MessageCircle, Utensils } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 
 const Navbar = ({ activeTab }) => {
@@ -7,7 +7,6 @@ const Navbar = ({ activeTab }) => {
     const navigate = useNavigate();
     const navRef = useRef(null);
 
-    // Store the last active path for the "Allenamento" ecosystem
     const [lastTrainingPath, setLastTrainingPath] = useState('/dashboard');
     const [tappedIdx, setTappedIdx] = useState(null);
 
@@ -18,14 +17,11 @@ const Navbar = ({ activeTab }) => {
     }, [location.pathname]);
 
     const navItems = [
-        { name: 'Shop', path: '/shop', icon: ShoppingBag, isTrainingEcosystem: false },
-        { name: 'Chat', path: '/chat', icon: MessageCircle, isTrainingEcosystem: false },
         { name: 'Allenamento', path: '/dashboard', icon: Dumbbell, isTrainingEcosystem: true },
+        { name: 'Chat', path: '/chat', icon: MessageCircle, isTrainingEcosystem: false },
         { name: 'Dieta', path: '/nutrition', icon: Utensils, isTrainingEcosystem: false },
-        { name: 'Profilo', path: '/profile', icon: User, isTrainingEcosystem: false },
     ];
 
-    // Use activeTab prop if provided (real-time from carousel), else use pathname
     const getActiveIndex = () => {
         if (typeof activeTab === 'number') return activeTab;
         for (let i = 0; i < navItems.length; i++) {
@@ -36,7 +32,7 @@ const Navbar = ({ activeTab }) => {
                 return i;
             }
         }
-        return 2;
+        return 0;
     };
 
     const activeIndex = getActiveIndex();
