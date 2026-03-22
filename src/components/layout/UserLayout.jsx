@@ -3,15 +3,15 @@ import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import PremiumHeader from './PremiumHeader';
 import Navbar from './Navbar';
 
-/* ═══ TAB PAGES — order matches navbar: Allenamento, Chat, Dieta ═══ */
-const TAB_ROUTES = ['/dashboard', '/chat', '/nutrition'];
+/* ═══ TAB PAGES — order: Dieta, Allenamento, Chat ═══ */
+const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
 
 /* Direct imports for carousel rendering */
+import Nutrition from '../../pages/user/Nutrition';
 import Dashboard from '../../pages/user/Dashboard';
 import Chat from '../../pages/user/Chat';
-import Nutrition from '../../pages/user/Nutrition';
 
-const TAB_COMPONENTS = [Dashboard, Chat, Nutrition];
+const TAB_COMPONENTS = [Nutrition, Dashboard, Chat];
 
 /* ═══ Per-page Error Boundary — prevents one crash from killing the app ═══ */
 class PageErrorBoundary extends Component {
@@ -58,8 +58,8 @@ class PageErrorBoundary extends Component {
 function getTabIndex(pathname) {
     const exact = TAB_ROUTES.indexOf(pathname);
     if (exact !== -1) return exact;
-    if (pathname.startsWith('/chat')) return 1;
-    if (pathname.startsWith('/workout') || pathname.startsWith('/training')) return 0;
+    if (pathname.startsWith('/chat')) return 2;
+    if (pathname.startsWith('/workout') || pathname.startsWith('/training')) return 1;
     return -1;
 }
 
@@ -225,7 +225,7 @@ const UserLayout = () => {
                 {TAB_ROUTES.map((route, idx) => {
                     const PageComponent = TAB_COMPONENTS[idx];
 
-                    const isLockedScroll = idx === 1; // Chat only
+                    const isLockedScroll = idx === 2; // Chat
                     return (
                         <div
                             key={route}

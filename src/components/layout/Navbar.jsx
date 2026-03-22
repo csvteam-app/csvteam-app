@@ -17,9 +17,9 @@ const Navbar = ({ activeTab }) => {
     }, [location.pathname]);
 
     const navItems = [
+        { name: 'Dieta', path: '/nutrition', icon: Utensils, isTrainingEcosystem: false },
         { name: 'Allenamento', path: '/dashboard', icon: Dumbbell, isTrainingEcosystem: true },
         { name: 'Chat', path: '/chat', icon: MessageCircle, isTrainingEcosystem: false },
-        { name: 'Dieta', path: '/nutrition', icon: Utensils, isTrainingEcosystem: false },
     ];
 
     const getActiveIndex = () => {
@@ -32,11 +32,11 @@ const Navbar = ({ activeTab }) => {
                 return i;
             }
         }
-        return 0;
+        return 1;
     };
 
     const activeIndex = getActiveIndex();
-    const isChatActive = activeIndex === 1;
+    const isChatActive = activeIndex === 2;
 
     return (
         <nav
