@@ -80,7 +80,7 @@ const Shop = () => {
     return (
         <div className="global-container" style={{
             paddingBottom: '120px',
-            paddingTop: 'env(safe-area-inset-top)',
+            paddingTop: '16px',
             backgroundColor: '#000000',
             backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255, 215, 170, 0.15) 0%, rgba(255, 215, 170, 0.05) 40%, transparent 70%)',
             minHeight: '100vh',

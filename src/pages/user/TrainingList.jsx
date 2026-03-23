@@ -67,7 +67,7 @@ const TrainingList = () => {
             backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255, 120, 0, 0.06) 0%, transparent 60%)',
             minHeight: '100vh',
             paddingLeft: '16px', paddingRight: '16px',
-            paddingTop: 'env(safe-area-inset-top)'
+            paddingTop: '16px'
         }}>
             {/* Section Header */}
             <div className="animate-fade-in" style={{ marginBottom: '28px' }}>

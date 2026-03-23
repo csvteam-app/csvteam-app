@@ -20,7 +20,7 @@ const PremiumHeader = () => {
             top: 0,
             right: 0,
             zIndex: 100,
-            paddingTop: 'calc(4px + env(safe-area-inset-top))',
+            paddingTop: '4px',
             paddingRight: '12px',
         }}>
             {isAuthenticated ? (

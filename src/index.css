@@ -125,8 +125,7 @@ body {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
-  /* DEBUG — remove after test */
-  border: 4px solid red;
+
 }
 
 /* Global Ambient Breathing Aura */

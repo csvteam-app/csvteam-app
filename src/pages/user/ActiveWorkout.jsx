@@ -223,7 +223,7 @@ const ActiveWorkout = () => {
             backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255, 120, 0, 0.06) 0%, transparent 55%)',
             minHeight: '100vh',
             paddingLeft: '16px', paddingRight: '16px',
-            paddingTop: 'env(safe-area-inset-top)'
+            paddingTop: '16px'
         }}>
             {/* ── HEADER ── */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }} className="animate-fade-in">

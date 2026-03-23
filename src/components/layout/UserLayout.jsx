@@ -174,15 +174,14 @@ const UserLayout = () => {
     if (!isTabRoute || !isMobile) {
         const hideNav = pathname.startsWith('/chat');
         return (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
                 {!hideNav && <PremiumHeader />}
                 <div style={{
                     flex: 1, 
                     overflowY: 'hidden',
                     overscrollBehaviorY: 'contain',
                     WebkitOverflowScrolling: 'touch',
-                    paddingTop: !hideNav && !isMobile ? '60px' : '0', // Offset for PremiumHeader on desktop
-                    paddingBottom: hideNav || !isMobile ? '0' : 'calc(20px + env(safe-area-inset-bottom))',
+                    paddingTop: !hideNav && !isMobile ? '60px' : '0',
                 }}>
                     <PageErrorBoundary pageName="outlet">
                         <Outlet />
@@ -198,8 +197,7 @@ const UserLayout = () => {
         <div style={{
             height: '100%', maxHeight: '100%',
             display: 'flex', flexDirection: 'column', overflow: 'hidden',
-            /* DEBUG — remove after test */
-            border: '4px solid lime',
+            position: 'relative',
         }}>
             <PremiumHeader />
 
@@ -251,7 +249,14 @@ const UserLayout = () => {
                 })}
             </div>
 
-            <Navbar activeTab={visualTab} />
+            {/* Navbar wrapper — collapses smoothly when chat is active */}
+            <div style={{
+                overflow: 'hidden',
+                maxHeight: visualTab === 2 ? '0px' : '80px',
+                transition: 'max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}>
+                <Navbar activeTab={visualTab} />
+            </div>
         </div>
     );
 };

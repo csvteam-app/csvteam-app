@@ -117,7 +117,7 @@ const FoodSearch = ({ meal, onSelect, onClose }) => {
                 background: 'linear-gradient(145deg, rgba(20,20,25,0.98), rgba(10,10,15,1))',
                 backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
                 display: 'flex', flexDirection: 'column',
-                padding: 'env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0',
+                padding: '0',
                 overscrollBehavior: 'none' /* Prevents bouncy scrolling on iOS */
             }}
         >
@@ -303,7 +303,7 @@ const FoodSearch = ({ meal, onSelect, onClose }) => {
                             ))}
                         </div>
 
-                        <div style={{ marginTop: 'auto', paddingTop: '24px', paddingBottom: 'calc(72px + env(safe-area-inset-bottom))' }}>
+                        <div style={{ marginTop: 'auto', paddingTop: '24px', paddingBottom: '72px' }}>
                             <button
                                 className="csv-btn-food-glow"
                                 onClick={handleAdd}

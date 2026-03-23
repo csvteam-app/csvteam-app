@@ -25,7 +25,7 @@ const EquipmentClarification = ({ question, onConfirm, onDismiss }) => {
             <div style={{
                 width: '100%', maxWidth: '500px',
                 background: 'var(--surface-color)', borderRadius: '24px 24px 0 0',
-                padding: '28px 24px calc(24px + env(safe-area-inset-bottom))',
+                padding: '28px 24px 24px',
                 animation: 'slideUp 0.3s ease-out',
             }}>
                 <h3 style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '1.1rem', color: 'var(--accent-gold)', marginBottom: '8px' }}>

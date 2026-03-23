@@ -328,7 +328,7 @@ const Chat = () => {
         }}>
             {/* ═══ PREMIUM HEADER ═══ */}
             <div style={{
-                paddingTop: 'env(safe-area-inset-top)',
+                paddingTop: '0',
                 background: 'rgba(20, 20, 20, 0.65)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                 backdropFilter: 'blur(20px)',
@@ -635,7 +635,7 @@ const Chat = () => {
             <div style={{
                 flexShrink: 0,
                 padding: '8px 12px',
-                paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+                paddingBottom: '8px',
                 background: 'linear-gradient(180deg, rgba(30,32,36,0.7) 0%, rgba(10,12,16,0.9) 100%)',
                 backdropFilter: 'blur(30px)',
                 WebkitBackdropFilter: 'blur(30px)',

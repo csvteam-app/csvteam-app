@@ -25,13 +25,7 @@ const Dashboard = () => {
             gap: '0',
             overflow: 'visible',
             paddingBottom: '0',
-            /* DEBUG — remove after test */
-            border: '4px solid cyan',
         }}>
-            {/* DEBUG VERSION STAMP — remove after test */}
-            <div style={{ position: 'fixed', top: '50px', left: '10px', zIndex: 99999, background: 'red', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' }}>
-                BUILD v2023-03-23-14:05
-            </div>
             {/* ═══ SECTION 1 – LOGO ═══ */}
             <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '88px', paddingBottom: '8px' }}>
                 <div
@@ -44,7 +38,7 @@ const Dashboard = () => {
             </div>
 
             {/* ═══ Main Content Container ═══ */}
-            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '24px', paddingBottom: '112px' }}>
+            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '24px', paddingBottom: '20px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">

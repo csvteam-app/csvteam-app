@@ -36,17 +36,13 @@ const Navbar = ({ activeTab }) => {
     };
 
     const activeIndex = getActiveIndex();
-    const isChatActive = activeIndex === 2;
 
     return (
         <nav
             ref={navRef}
             className="lg-hidden"
             style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                width: '100%',
+                flex: '0 0 auto',
                 background: 'rgba(5,5,8,0.92)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -54,13 +50,7 @@ const Navbar = ({ activeTab }) => {
                 display: 'flex',
                 justifyContent: 'space-around',
                 alignItems: 'center',
-                padding: '6px 0 0 0',
-                paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
-                zIndex: 9999,
-                transform: isChatActive ? 'translateY(100%)' : 'translateY(0)',
-                opacity: isChatActive ? 0 : 1,
-                pointerEvents: isChatActive ? 'none' : 'auto',
-                transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                padding: '6px 0 8px 0',
             }}
         >
             {navItems.map((item, idx) => {
