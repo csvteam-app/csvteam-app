@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, Component } from 'react';
+import { useEffect, useState, useRef, useCallback, Suspense, Component } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import PremiumHeader from './PremiumHeader';
 import Navbar from './Navbar';
@@ -18,7 +18,6 @@ class PageErrorBoundary extends Component {
         return { hasError: true };
     }
     static getDerivedStateFromProps(props, state) {
-        // Reset error when page changes
         if (props.pageName !== state.errorKey && state.hasError) {
             return { hasError: false, errorKey: props.pageName };
         }
@@ -61,13 +60,15 @@ class PageErrorBoundary extends Component {
 const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
 const TAB_COMPONENTS = [Nutrition, Dashboard, Chat];
 const TAB_NAMES = ['nutrition', 'dashboard', 'chat'];
+const NUM_TABS = TAB_ROUTES.length;
+const PANEL_PCT = 100 / NUM_TABS;  // 33.333% — each panel's width as % of wrapper
 
-const SNAP_THRESHOLD = 0.3;        // 30% of screen width
-const VELOCITY_THRESHOLD = 0.3;    // px per ms
-const SNAP_DURATION = 280;         // ms
+const SNAP_THRESHOLD = 0.3;
+const VELOCITY_THRESHOLD = 0.3;
+const SNAP_DURATION = 280;
 const SNAP_EASING = 'cubic-bezier(0.25, 1, 0.5, 1)';
-const EDGE_RESISTANCE = 0.3;       // drag multiplier at edges
-const DIRECTION_LOCK_PX = 10;      // px before locking direction
+const EDGE_RESISTANCE = 0.3;
+const DIRECTION_LOCK_PX = 10;
 
 function getTabIndex(pathname) {
     const exact = TAB_ROUTES.indexOf(pathname);
@@ -77,6 +78,9 @@ function getTabIndex(pathname) {
     return -1;
 }
 
+/** Convert tab index to translate3d percentage (relative to wrapper width) */
+const panelOffset = (idx) => -(idx * PANEL_PCT);
+
 const UserLayout = () => {
     const { pathname } = useLocation();
     const navigate = useNavigate();
@@ -84,16 +88,10 @@ const UserLayout = () => {
     const isTabRoute = tabIndex !== -1;
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-    // Refs for swipe (zero re-renders during gesture)
     const wrapperRef = useRef(null);
     const touchState = useRef({
-        startX: 0,
-        startY: 0,
-        startTime: 0,
-        currentX: 0,
-        locked: null,   // null | 'h' | 'v'
-        dragging: false,
-        animating: false,
+        startX: 0, startY: 0, startTime: 0, currentX: 0,
+        locked: null, dragging: false, animating: false,
     });
 
     useEffect(() => {
@@ -102,14 +100,13 @@ const UserLayout = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Sync wrapper position when route changes (e.g., from navbar tap)
+    // Sync wrapper position when route changes (navbar tap)
     useEffect(() => {
         if (!wrapperRef.current || !isTabRoute || !isMobile) return;
         const ts = touchState.current;
         if (ts.dragging || ts.animating) return;
-        // Instant position (no transition)
         wrapperRef.current.style.transition = 'none';
-        wrapperRef.current.style.transform = `translate3d(${-tabIndex * 100}%, 0, 0)`;
+        wrapperRef.current.style.transform = `translate3d(${panelOffset(tabIndex)}%, 0, 0)`;
     }, [tabIndex, isTabRoute, isMobile]);
 
     /* ── Touch handlers ── */
@@ -123,11 +120,7 @@ const UserLayout = () => {
         ts.startTime = Date.now();
         ts.locked = null;
         ts.dragging = true;
-
-        // Remove transition for direct finger tracking
-        if (wrapperRef.current) {
-            wrapperRef.current.style.transition = 'none';
-        }
+        if (wrapperRef.current) wrapperRef.current.style.transition = 'none';
     }, []);
 
     const onTouchMove = useCallback((e) => {
@@ -138,35 +131,27 @@ const UserLayout = () => {
         const dx = touch.clientX - ts.startX;
         const dy = touch.clientY - ts.startY;
 
-        // Direction lock
         if (ts.locked === null) {
             if (Math.abs(dx) > DIRECTION_LOCK_PX || Math.abs(dy) > DIRECTION_LOCK_PX) {
                 ts.locked = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
-            } else {
-                return; // Wait for enough movement
-            }
+            } else return;
         }
-
-        // Vertical scroll — let browser handle
         if (ts.locked === 'v') return;
 
-        // Horizontal swipe — prevent scroll, track finger
         e.preventDefault();
-
         let dragX = dx;
-
-        // Edge resistance
-        if ((tabIndex === 0 && dx > 0) || (tabIndex === TAB_ROUTES.length - 1 && dx < 0)) {
+        if ((tabIndex === 0 && dx > 0) || (tabIndex === NUM_TABS - 1 && dx < 0)) {
             dragX = dx * EDGE_RESISTANCE;
         }
-
         ts.currentX = dragX;
 
-        // Move wrapper — direct DOM manipulation, no React
         if (wrapperRef.current) {
-            const baseOffset = -tabIndex * 100;
-            const dragPercent = (dragX / window.innerWidth) * 100;
-            wrapperRef.current.style.transform = `translate3d(${baseOffset + dragPercent}%, 0, 0)`;
+            // Convert pixel drag to percentage of WRAPPER width
+            // Wrapper = NUM_TABS * viewport, so 1px = (100 / (NUM_TABS * viewport)) %
+            const wrapperWidthPx = wrapperRef.current.offsetWidth;
+            const dragPct = (dragX / wrapperWidthPx) * 100;
+            const base = panelOffset(tabIndex);
+            wrapperRef.current.style.transform = `translate3d(${base + dragPct}%, 0, 0)`;
         }
     }, [tabIndex]);
 
@@ -174,8 +159,6 @@ const UserLayout = () => {
         const ts = touchState.current;
         if (!ts.dragging) return;
         ts.dragging = false;
-
-        // If locked to vertical or no lock established, do nothing
         if (ts.locked !== 'h') return;
 
         const dx = ts.currentX;
@@ -185,22 +168,18 @@ const UserLayout = () => {
         const threshold = screenWidth * SNAP_THRESHOLD;
 
         let targetIndex = tabIndex;
-
-        // Check if should snap to next/prev
         if (dx < -threshold || (dx < 0 && velocity > VELOCITY_THRESHOLD)) {
-            targetIndex = Math.min(tabIndex + 1, TAB_ROUTES.length - 1);
+            targetIndex = Math.min(tabIndex + 1, NUM_TABS - 1);
         } else if (dx > threshold || (dx > 0 && velocity > VELOCITY_THRESHOLD)) {
             targetIndex = Math.max(tabIndex - 1, 0);
         }
 
-        // Animate snap
         ts.animating = true;
         if (wrapperRef.current) {
             wrapperRef.current.style.transition = `transform ${SNAP_DURATION}ms ${SNAP_EASING}`;
-            wrapperRef.current.style.transform = `translate3d(${-targetIndex * 100}%, 0, 0)`;
+            wrapperRef.current.style.transform = `translate3d(${panelOffset(targetIndex)}%, 0, 0)`;
         }
 
-        // After animation, update route
         setTimeout(() => {
             ts.animating = false;
             if (targetIndex !== tabIndex) {
@@ -237,27 +216,27 @@ const UserLayout = () => {
         }}>
             <PremiumHeader />
 
-            {/* ═══ SWIPE CONTAINER — overflow hidden, no scroll ═══ */}
+            {/* ═══ SWIPE CONTAINER ═══ */}
             <div
                 style={{
                     flex: 1,
                     minHeight: 0,
                     overflow: 'hidden',
                     position: 'relative',
-                    touchAction: 'pan-y', // allow vertical scroll, JS handles horizontal
+                    touchAction: 'pan-y',
                 }}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
             >
-                {/* ═══ PANELS WRAPPER — moves via translate3d ═══ */}
+                {/* ═══ PANELS WRAPPER ═══ */}
                 <div
                     ref={wrapperRef}
                     style={{
                         display: 'flex',
-                        width: `${TAB_ROUTES.length * 100}%`,
+                        width: `${NUM_TABS * 100}%`,
                         height: '100%',
-                        transform: `translate3d(${-tabIndex * 100}%, 0, 0)`,
+                        transform: `translate3d(${panelOffset(tabIndex)}%, 0, 0)`,
                         willChange: 'transform',
                         backfaceVisibility: 'hidden',
                     }}
@@ -266,7 +245,7 @@ const UserLayout = () => {
                         <div
                             key={TAB_NAMES[idx]}
                             style={{
-                                width: `${100 / TAB_ROUTES.length}%`,
+                                width: `${PANEL_PCT}%`,
                                 height: '100%',
                                 overflow: 'auto',
                                 WebkitOverflowScrolling: 'touch',
@@ -274,9 +253,15 @@ const UserLayout = () => {
                                 flexShrink: 0,
                             }}
                         >
-                            <PageErrorBoundary pageName={TAB_NAMES[idx]}>
-                                <PageComponent />
-                            </PageErrorBoundary>
+                            <Suspense fallback={
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)' }}>
+                                    Caricamento...
+                                </div>
+                            }>
+                                <PageErrorBoundary pageName={TAB_NAMES[idx]}>
+                                    <PageComponent />
+                                </PageErrorBoundary>
+                            </Suspense>
                         </div>
                     ))}
                 </div>
