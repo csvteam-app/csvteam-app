@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAthleteData } from '../../hooks/useAthleteData';
 import { useGamification } from '../../hooks/useGamification';
@@ -8,7 +7,7 @@ import { Gamepad2, PlaySquare, Dumbbell, Zap, Trophy, Flame, CheckCircle2, Circl
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const { program, nutritionTargets } = useAthleteData();
+    const { program } = useAthleteData();
     const { gamification, dailyTasks: d, LEAGUES } = useGamification();
 
     const xp = gamification?.xp || 0;
@@ -19,10 +18,6 @@ const Dashboard = () => {
     const xpForNext = nextLeague ? nextLeague.threshold : xp;
     const progressPct = nextLeague ? Math.min((xp / nextLeague.threshold) * 100, 100) : 100;
 
-    // Nutrition goals from Supabase (coach-set targets)
-    const nutritionGoals = nutritionTargets
-        ? { kcal: nutritionTargets.kcal, p: nutritionTargets.protein_g, c: nutritionTargets.carbs_g, f: nutritionTargets.fat_g }
-        : { kcal: 2000, p: 150, c: 200, f: 60 };
 
     return (
         <div className="global-container" style={{
@@ -32,10 +27,10 @@ const Dashboard = () => {
             paddingBottom: '0',
         }}>
             {/* ═══ SECTION 1 – LOGO ═══ */}
-            <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '2vh', paddingBottom: '1vh' }}>
+            <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '88px', paddingBottom: '8px' }}>
                 <div
                     className="csv-logo-coin-3d"
-                    style={{ width: '130px', cursor: 'pointer' }}
+                    style={{ width: '195px', cursor: 'pointer' }}
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 >
                     <CsvLogo size="100%" showText={false} />
@@ -43,7 +38,7 @@ const Dashboard = () => {
             </div>
 
             {/* ═══ Main Content Container ═══ */}
-            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', marginTop: 'auto', flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '16px', transform: 'translateY(-8px)' }}>
+            <div className="animate-fade-in w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '24px', paddingBottom: '112px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">
@@ -257,27 +252,4 @@ const Dashboard = () => {
         </div>
     );
 };
-
-/* ─── Glass Home Button ─── */
-const HomeButton = ({ label, icon, onClick }) => (
-    <button
-        onClick={onClick}
-        className="csv-card-3d"
-        style={{
-            flex: 1,
-            padding: '24px 16px',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px',
-            cursor: 'pointer',
-        }}
-    >
-        <div style={{ color: '#fff' }}>{icon}</div>
-        <span style={{
-            fontFamily: 'Outfit', fontWeight: 600, fontSize: '0.9rem',
-            color: '#fff', letterSpacing: '0.03em',
-        }}>
-            {label}
-        </span>
-    </button>
-);
-
 export default Dashboard;
