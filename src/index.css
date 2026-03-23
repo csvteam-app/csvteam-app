@@ -904,11 +904,11 @@ a, input, select, textarea {
 }
 
 .animate-fade-in {
-  animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fadeIn 0.15s ease both;
 }
 
 .animate-fade {
-  animation: fadeIn 0.3s ease both;
+  animation: fadeIn 0.15s ease both;
 }
 
 .glow-warm {
@@ -919,29 +919,29 @@ a, input, select, textarea {
   animation: breathe 3s ease-in-out infinite;
 }
 
-/* Stagger children */
+/* Stagger children — instant (no delays) */
 .stagger-children>*:nth-child(1) {
   animation-delay: 0s;
 }
 
 .stagger-children>*:nth-child(2) {
-  animation-delay: 0.06s;
+  animation-delay: 0s;
 }
 
 .stagger-children>*:nth-child(3) {
-  animation-delay: 0.12s;
+  animation-delay: 0s;
 }
 
 .stagger-children>*:nth-child(4) {
-  animation-delay: 0.18s;
+  animation-delay: 0s;
 }
 
 .stagger-children>*:nth-child(5) {
-  animation-delay: 0.24s;
+  animation-delay: 0s;
 }
 
 .stagger-children>*:nth-child(6) {
-  animation-delay: 0.30s;
+  animation-delay: 0s;
 }
 
 /* ═══════════════════════════════════════

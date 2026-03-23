@@ -55,7 +55,7 @@ export function useNutrition(dateStr) {
         };
 
         fetchLogs();
-    }, [user, activeDate]);
+    }, [user?.id, activeDate]);
 
     const addFoodLog = useCallback(async (mealType, food, grams) => {
         if (!user) return;

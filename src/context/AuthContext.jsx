@@ -38,60 +38,54 @@ export function AuthProvider({ children }) {
         return fetchProfilePromise.current;
     }, []);
 
-    // ── Core: sync session + profile from whatever Supabase gives us ──
-    const syncSession = useCallback(async () => {
+    // ── Core: initial session load (runs ONCE at startup) ──
+    const initSession = useCallback(async () => {
         try {
             const { data: { session: s } } = await supabase.auth.getSession();
-
             if (!mounted.current) return;
 
             if (s?.user) {
                 setSession(s);
                 const p = await fetchProfile(s.user.id);
-                if (mounted.current) {
-                    setProfile(p);
-                    setIsLoading(false);
-                }
-            } else {
-                // No valid session — but DON'T clear profile if we had one.
-                // Only clear on explicit SIGNED_OUT event (manual logout).
-                // This prevents the "half logged in" state where profile shows
-                // but session is null due to a transient token refresh failure.
-                
-                // Try to refresh the session before giving up
-                const { data: { session: refreshed } } = await supabase.auth.refreshSession();
-                if (mounted.current) {
-                    if (refreshed?.user) {
-                        setSession(refreshed);
-                        const p = await fetchProfile(refreshed.user.id);
-                        if (mounted.current) setProfile(p);
-                    }
-                    // If refresh also fails, keep whatever state we have.
-                    // Only signOut() clears everything.
-                    setIsLoading(false);
-                }
+                if (mounted.current) setProfile(p);
             }
+            // No session = not logged in. That's fine. No retry needed.
         } catch (err) {
-            console.error('[Auth] syncSession error:', err);
-            if (mounted.current) setIsLoading(false);
+            console.error('[Auth] initSession error:', err);
+        }
+        if (mounted.current) setIsLoading(false);
+    }, [fetchProfile]);
+
+    // ── Silent refresh: update session WITHOUT flashing loading state ──
+    const silentRefresh = useCallback(async () => {
+        try {
+            const { data: { session: s } } = await supabase.auth.getSession();
+            if (!mounted.current) return;
+            if (s?.user) {
+                setSession(s);
+                // Only refetch profile if user changed
+                const p = await fetchProfile(s.user.id);
+                if (mounted.current) setProfile(p);
+            }
+            // If no session on resume, keep existing state. 
+            // Only explicit SIGNED_OUT clears.
+        } catch (err) {
+            console.error('[Auth] silentRefresh error:', err);
         }
     }, [fetchProfile]);
 
     useEffect(() => {
         mounted.current = true;
 
-        // 1. Initial session sync
-        syncSession();
+        // 1. Initial session — single network call
+        initSession();
 
         // 2. Listen for auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, s) => {
                 if (!mounted.current) return;
 
-                console.log('[Auth] event:', event);
-
                 if (event === 'SIGNED_OUT') {
-                    // ONLY clear on explicit sign out
                     setSession(null);
                     setProfile(null);
                     setIsLoading(false);
@@ -103,36 +97,25 @@ export function AuthProvider({ children }) {
                     const p = await fetchProfile(s.user.id);
                     if (mounted.current) setProfile(p);
                 }
-
                 if (mounted.current) setIsLoading(false);
             }
         );
 
-        // 3. Re-validate session when app comes back to foreground (iOS!)
-        //    This handles: tab switch, app resume from background, screen wake
+        // 3. Silent refresh on resume — NO isLoading flash
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                console.log('[Auth] App resumed — re-syncing session');
-                syncSession();
+                silentRefresh();
             }
         };
 
-        // Also handle iOS-specific events
-        const handleAppResume = () => {
-            console.log('[Auth] App focus — re-syncing session');
-            syncSession();
-        };
-
         document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('focus', handleAppResume);
 
         return () => {
             mounted.current = false;
             subscription.unsubscribe();
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('focus', handleAppResume);
         };
-    }, [syncSession, fetchProfile]);
+    }, [initSession, silentRefresh, fetchProfile]);
 
     // Sign in with email + password
     const signIn = async (email, password) => {

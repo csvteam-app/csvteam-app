@@ -224,6 +224,8 @@ const UserLayout = () => {
             >
                 {TAB_ROUTES.map((route, idx) => {
                     const PageComponent = TAB_COMPONENTS[idx];
+                    // Only mount the visible tab + immediate neighbors
+                    const shouldMount = Math.abs(idx - visualTab) <= 1;
 
                     return (
                         <div
@@ -233,7 +235,7 @@ const UserLayout = () => {
                                 flex: '0 0 100%',
                                 width: '100%',
                                 height: '100%',
-                                overflowY: 'hidden',
+                                overflowY: 'auto',
                                 overscrollBehaviorY: 'contain',
                                 WebkitOverflowScrolling: 'touch',
                                 scrollSnapAlign: 'center',
@@ -241,9 +243,11 @@ const UserLayout = () => {
                                 contain: 'layout style',
                             }}
                         >
-                            <PageErrorBoundary pageName={route}>
-                                <PageComponent />
-                            </PageErrorBoundary>
+                            {shouldMount ? (
+                                <PageErrorBoundary pageName={route}>
+                                    <PageComponent />
+                                </PageErrorBoundary>
+                            ) : null}
                         </div>
                     );
                 })}
