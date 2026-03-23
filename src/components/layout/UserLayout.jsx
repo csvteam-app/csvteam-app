@@ -98,18 +98,15 @@ const UserLayout = () => {
     }
 
     // ── Tab routes on mobile: simple tab rendering (no carousel/swipe) ──
-    // All tabs are kept mounted to preserve state, but only the active one is visible.
-    const hideNav = tabIndex === 2; // hide navbar on Chat
-
+    // All tabs kept mounted (preserves state), only active one is displayed.
     return (
         <div style={{
             height: '100%', maxHeight: '100%',
             display: 'flex', flexDirection: 'column', overflow: 'hidden',
-            position: 'relative',
         }}>
-            {!hideNav && <PremiumHeader />}
+            <PremiumHeader />
 
-            {/* ═══ TAB PAGES — mounted but only active one is visible ═══ */}
+            {/* ═══ TAB PAGES — display: none/flex toggles visibility ═══ */}
             {TAB_ROUTES.map((route, idx) => {
                 const PageComponent = TAB_COMPONENTS[idx];
                 const isActive = idx === tabIndex;
@@ -118,14 +115,13 @@ const UserLayout = () => {
                     <div
                         key={route}
                         style={{
-                            flex: isActive ? 1 : undefined,
-                            height: isActive ? undefined : 0,
-                            overflow: isActive ? 'auto' : 'hidden',
-                            visibility: isActive ? 'visible' : 'hidden',
-                            position: isActive ? 'relative' : 'absolute',
-                            width: '100%',
-                            WebkitOverflowScrolling: isActive ? 'touch' : undefined,
-                            overscrollBehaviorY: isActive ? 'contain' : undefined,
+                            display: isActive ? 'flex' : 'none',
+                            flexDirection: 'column',
+                            flex: 1,
+                            minHeight: 0,
+                            overflow: 'auto',
+                            WebkitOverflowScrolling: 'touch',
+                            overscrollBehaviorY: 'contain',
                         }}
                     >
                         <PageErrorBoundary pageName={route}>
@@ -135,8 +131,8 @@ const UserLayout = () => {
                 );
             })}
 
-            {/* Navbar */}
-            {!hideNav && <Navbar activeTab={tabIndex} />}
+            {/* Navbar — always visible on all tabs */}
+            <Navbar activeTab={tabIndex} />
         </div>
     );
 };
