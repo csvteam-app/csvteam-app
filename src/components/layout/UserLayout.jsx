@@ -1,19 +1,9 @@
 import { useEffect, useState, Component } from 'react';
-import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import PremiumHeader from './PremiumHeader';
 import Navbar from './Navbar';
 
-/* ═══ TAB PAGES — order: Dieta, Allenamento, Chat ═══ */
-const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
-
-/* Direct imports for tab rendering */
-import Nutrition from '../../pages/user/Nutrition';
-import Dashboard from '../../pages/user/Dashboard';
-import Chat from '../../pages/user/Chat';
-
-const TAB_COMPONENTS = [Nutrition, Dashboard, Chat];
-
-/* ═══ Per-page Error Boundary — prevents one crash from killing the app ═══ */
+/* ═══ Per-page Error Boundary ═══ */
 class PageErrorBoundary extends Component {
     constructor(props) {
         super(props);
@@ -55,6 +45,9 @@ class PageErrorBoundary extends Component {
     }
 }
 
+/* ═══ TAB ROUTES for navbar highlighting ═══ */
+const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
+
 function getTabIndex(pathname) {
     const exact = TAB_ROUTES.indexOf(pathname);
     if (exact !== -1) return exact;
@@ -66,7 +59,6 @@ function getTabIndex(pathname) {
 const UserLayout = () => {
     const { pathname } = useLocation();
     const tabIndex = getTabIndex(pathname);
-    const isTabRoute = tabIndex !== -1;
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
     useEffect(() => {
@@ -75,64 +67,30 @@ const UserLayout = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // ── Non-tab routes OR Desktop mode: render with Outlet ──
-    if (!isTabRoute || !isMobile) {
-        const hideNav = pathname.startsWith('/chat');
-        return (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-                {!hideNav && <PremiumHeader />}
-                <div style={{
-                    flex: 1, 
-                    overflowY: 'hidden',
-                    overscrollBehaviorY: 'contain',
-                    WebkitOverflowScrolling: 'touch',
-                    paddingTop: !hideNav && !isMobile ? '60px' : '0',
-                }}>
-                    <PageErrorBoundary pageName="outlet">
-                        <Outlet />
-                    </PageErrorBoundary>
-                </div>
-                {(!hideNav && isMobile) && <Navbar />}
-            </div>
-        );
-    }
-
-    // ── Tab routes on mobile: simple tab rendering (no carousel/swipe) ──
-    // All tabs kept mounted (preserves state), only active one is displayed.
     return (
         <div style={{
-            height: '100%', maxHeight: '100%',
-            display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
         }}>
             <PremiumHeader />
 
-            {/* ═══ TAB PAGES — display: none/flex toggles visibility ═══ */}
-            {TAB_ROUTES.map((route, idx) => {
-                const PageComponent = TAB_COMPONENTS[idx];
-                const isActive = idx === tabIndex;
+            {/* ═══ PAGE CONTENT — React Router Outlet ═══ */}
+            <div style={{
+                flex: 1,
+                minHeight: 0,
+                overflow: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehaviorY: 'contain',
+            }}>
+                <PageErrorBoundary pageName={pathname}>
+                    <Outlet />
+                </PageErrorBoundary>
+            </div>
 
-                return (
-                    <div
-                        key={route}
-                        style={{
-                            display: isActive ? 'flex' : 'none',
-                            flexDirection: 'column',
-                            flex: 1,
-                            minHeight: 0,
-                            overflow: 'auto',
-                            WebkitOverflowScrolling: 'touch',
-                            overscrollBehaviorY: 'contain',
-                        }}
-                    >
-                        <PageErrorBoundary pageName={route}>
-                            <PageComponent />
-                        </PageErrorBoundary>
-                    </div>
-                );
-            })}
-
-            {/* Navbar — always visible on all tabs */}
-            <Navbar activeTab={tabIndex} />
+            {/* ═══ NAVBAR — always visible on mobile ═══ */}
+            {isMobile && <Navbar activeTab={tabIndex} />}
         </div>
     );
 };
