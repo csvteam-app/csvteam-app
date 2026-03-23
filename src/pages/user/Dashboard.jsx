@@ -60,7 +60,7 @@ const Dashboard = () => {
                                         </h2>
                                     </div>
                                     {currentLeagueObj && (
-                                        <span className="drop-shadow-gold" style={{ fontSize: '2.5rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }}>{currentLeagueObj.icon}</span>
+                                        <span style={{ fontSize: '2.5rem' }}>{currentLeagueObj.icon}</span>
                                     )}
                                 </div>
 
@@ -165,19 +165,12 @@ const Dashboard = () => {
                                 flex: 1,
                             }}
                         >
-                            <Dumbbell size={32} strokeWidth={2.5} color="#FFF3E0" style={{ filter: 'drop-shadow(0 0 6px rgba(255,120,0,0.6))' }} />
+                            <Dumbbell size={32} strokeWidth={2.5} color="#FFF3E0" />
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
                                 <span style={{
                                     fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.4rem',
                                     letterSpacing: '0.04em', textTransform: 'uppercase',
                                     color: '#FFF3E0',
-                                    /* Luce Night Shift e Colore Avorio */
-                                    textShadow: `
-                                        0 0 6px rgba(255, 120, 0, 0.6),
-                                        0 0 12px rgba(255, 120, 0, 0.4),
-                                        0 0 20px rgba(255, 120, 0, 0.2),
-                                        0 0 30px rgba(255, 120, 0, 0.1)
-                                    `
                                 }}>
                                     Training
                                 </span>
@@ -205,9 +198,7 @@ const Dashboard = () => {
                             >
                                 <div style={{
                                     position: 'absolute', top: '-12px', right: '-12px',
-                                    background: 'linear-gradient(135deg, rgba(50,50,60,0.95), rgba(20,20,30,1))',
-                                    backdropFilter: 'blur(8px)',
-                                    WebkitBackdropFilter: 'blur(8px)',
+                                    background: 'rgba(30, 30, 40, 0.95)',
                                     color: '#FFFFFF',
                                     fontSize: '0.62rem', fontWeight: 800, padding: '4px 10px', borderRadius: '6px',
                                     zIndex: 10, textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -235,16 +226,10 @@ const Dashboard = () => {
                                 }}
                                 onClick={() => navigate('/academy')}
                             >
-                                <PlaySquare size={24} strokeWidth={1.5} color="#e6f0ff" style={{ filter: 'drop-shadow(0 0 6px rgba(179,212,255,0.6))' }} />
+                                <PlaySquare size={24} strokeWidth={1.5} color="#e6f0ff" />
                                 <span style={{
                                     fontFamily: 'Outfit', fontWeight: 600, fontSize: '0.9rem',
                                     color: '#e6f0ff', letterSpacing: '0.03em',
-                                    /* Luce Neon Icy Blue (Academy) con Nucleo Bianco Ghiaccio */
-                                    textShadow: `
-                                        0 0 6px rgba(179, 212, 255, 0.6),
-                                        0 0 12px rgba(179, 212, 255, 0.4),
-                                        0 0 20px rgba(179, 212, 255, 0.2)
-                                    `
                                 }}>
                                     Academy
                                 </span>

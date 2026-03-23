@@ -128,30 +128,7 @@ body {
 
 }
 
-/* Global Ambient Breathing Aura */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: radial-gradient(circle at 50% -20%, rgba(212, 175, 55, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  animation: ambientBodyBreathe 5s ease-in-out infinite alternate;
-}
 
-@keyframes ambientBodyBreathe {
-  0% {
-    opacity: 0.3;
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
 
 h1,
 h2,
@@ -248,30 +225,7 @@ a, input, select, textarea {
   z-index: 1;
 }
 
-/* Subtle breathing aura for all glass surfaces */
-.glass-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 30px rgba(212, 175, 55, 0.02), 0 0 20px rgba(212, 175, 55, 0.05);
-  pointer-events: none;
-  animation: cardBreathe 4s ease-in-out infinite alternate;
-  z-index: 0;
-}
 
-@keyframes cardBreathe {
-  0% {
-    opacity: 0.2;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
 
 .glass-card:hover {
   border-color: var(--glass-border-hover);
@@ -404,38 +358,17 @@ a, input, select, textarea {
    PREMIUM PROGRESS BAR & DOPAMINE GLOWS
    ═══════════════════════════════════════ */
 
-/* Dopamine Glow Utilities */
+/* Dopamine Utilities — Static only, no animations */
 .dopamine-glow {
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4), 0 0 30px rgba(212, 175, 55, 0.2);
-  animation: pulseGlow 3s ease-in-out infinite alternate;
+  /* no-op: animation removed for GPU performance */
 }
 
 .drop-shadow-gold {
-  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+  /* no-op: filter removed for GPU performance */
 }
 
 .dopamine-text-glow {
-  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
-}
-
-@keyframes pulseGlow {
-  0% {
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), 0 0 30px rgba(212, 175, 55, 0.1);
-  }
-
-  100% {
-    box-shadow: 0 0 25px rgba(212, 175, 55, 0.6), 0 0 50px rgba(212, 175, 55, 0.3);
-  }
-}
-
-@keyframes pulseGlowDropShadow {
-  0% {
-    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4)) drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
-  }
-
-  100% {
-    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.5));
-  }
+  /* no-op: text-shadow removed for GPU performance */
 }
 
 .progress-bar-premium {
@@ -444,8 +377,6 @@ a, input, select, textarea {
   height: 8px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.5);
-  /* Sfondo più scuro per far risaltare la luce */
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
   overflow: hidden;
 }
 
@@ -453,34 +384,8 @@ a, input, select, textarea {
   height: 100%;
   border-radius: 4px;
   background: var(--gradient-gold-bar);
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.8), 0 0 24px rgba(212, 175, 55, 0.4);
-  /* Luce solida della barra */
-  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 0.3s ease-out;
   position: relative;
-  overflow: hidden;
-}
-
-/* Riflesso animato che scorre sopra la barra */
-.progress-bar-premium .progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  right: 0;
-  bottom: 0;
-  width: 200%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
-  animation: progressShine 2.5s ease-in-out infinite;
-}
-
-@keyframes progressShine {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 /* ═══════════════════════════════════════
@@ -664,8 +569,7 @@ a, input, select, textarea {
   color: #fff;
   background: rgba(20,20,24,0.95);
   border: 1px solid rgba(255,255,255,0.1);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -912,11 +816,11 @@ a, input, select, textarea {
 }
 
 .glow-warm {
-  animation: pulseGlow 3s ease-in-out infinite;
+  /* no-op: animation removed */
 }
 
 .animate-breathe {
-  animation: breathe 3s ease-in-out infinite;
+  /* no-op: animation removed */
 }
 
 /* Stagger children — instant (no delays) */

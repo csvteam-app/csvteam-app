@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════
-   OBSIDIAN BUTTONS — Polished Metal Controls
+   OBSIDIAN BUTTONS — Zero GPU at Rest
    ═══════════════════════════════════════ */
 
 .csv-btn {
@@ -8,7 +8,6 @@
     justify-content: center;
     font-weight: 600;
     border-radius: var(--border-radius-sm);
-    transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
     user-select: none;
     font-family: 'Outfit', sans-serif;
     letter-spacing: 0.04em;
@@ -19,7 +18,6 @@
 
 .csv-btn:active {
     transform: scale(0.96);
-    transition-duration: 0.08s;
 }
 
 .csv-btn:disabled {
@@ -28,21 +26,15 @@
     transform: none;
 }
 
-/* ═══ Primary — Dark Obsidian 3D (No Glow) ═══ */
+/* ═══ Primary — Dark Obsidian 3D ═══ */
 .csv-btn-primary {
-    background: linear-gradient(145deg, rgba(30, 30, 35, 0.9), rgba(15, 15, 20, 1));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(15, 15, 20, 1));
     color: #FFFFFF;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     border-bottom: 4px solid rgba(0, 0, 0, 0.6);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 8px 16px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
     font-weight: 700;
-    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .csv-btn-primary:active:not(:disabled) {
@@ -50,54 +42,15 @@
     transform: translateY(3px);
 }
 
-.csv-btn-primary:hover:not(:disabled):not(:active) {
-    background: linear-gradient(145deg, rgba(35, 35, 40, 1), rgba(20, 20, 25, 1));
-    border-color: rgba(255, 255, 255, 0.2);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.8);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 12px 24px rgba(0, 0, 0, 0.8);
-    transform: translateY(-1px);
-}
-
-/* ═══ Primary Glow — Dark Obsidian 3D with Gold Glow ═══ */
-@keyframes buttonGlowBreathe {
-    0% {
-        box-shadow:
-            inset 0 1px 0 rgba(255, 220, 160, 0.1),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-            0 8px 16px rgba(0, 0, 0, 0.6),
-            0 0 6px rgba(255, 120, 0, 0.3),
-            0 0 12px rgba(255, 120, 0, 0.15);
-    }
-
-    100% {
-        box-shadow:
-            inset 0 1px 0 rgba(255, 220, 160, 0.2),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-            0 10px 20px rgba(0, 0, 0, 0.7),
-            0 0 10px rgba(255, 120, 0, 0.4),
-            0 0 20px rgba(255, 120, 0, 0.2);
-    }
-}
-
+/* ═══ Primary Glow — Gold accent ═══ */
 .csv-btn-primary-glow {
-    background: linear-gradient(145deg, rgba(30, 30, 35, 0.9), rgba(15, 15, 20, 1));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(15, 15, 20, 1));
     color: #FFDCA0;
-    border: 1px solid rgba(255, 220, 160, 0.1);
-    border-top: 1px solid rgba(255, 220, 160, 0.2);
+    border: 1px solid rgba(255, 220, 160, 0.15);
+    border-top: 1px solid rgba(255, 220, 160, 0.25);
     border-bottom: 4px solid rgba(0, 0, 0, 0.6);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 220, 160, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 8px 16px rgba(0, 0, 0, 0.6),
-        0 0 8px rgba(255, 120, 0, 0.3),
-        0 0 16px rgba(255, 120, 0, 0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
     font-weight: 700;
-    animation: buttonGlowBreathe 3s ease-in-out infinite alternate;
 }
 
 .csv-btn-primary-glow:active:not(:disabled) {
@@ -105,58 +58,16 @@
     transform: translateY(3px);
 }
 
-.csv-btn-primary-glow:hover:not(:disabled):not(:active) {
-    background: linear-gradient(145deg, rgba(35, 35, 40, 1), rgba(20, 20, 25, 1));
-    border-color: rgba(255, 220, 160, 0.2);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.8);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 220, 160, 0.2),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 12px 24px rgba(0, 0, 0, 0.8),
-        0 0 12px rgba(255, 120, 0, 0.6),
-        0 0 24px rgba(255, 120, 0, 0.3);
-    transform: translateY(-1px);
-}
-
-/* ═══ Academy Glow — Dark Obsidian 3D with Icy White Glow ═══ */
-@keyframes buttonAcademyGlowBreathe {
-    0% {
-        box-shadow:
-            inset 0 1px 0 rgba(230, 240, 255, 0.1),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-            0 8px 16px rgba(0, 0, 0, 0.6),
-            0 0 6px rgba(179, 212, 255, 0.3),
-            0 0 12px rgba(179, 212, 255, 0.15);
-    }
-
-    100% {
-        box-shadow:
-            inset 0 1px 0 rgba(230, 240, 255, 0.2),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-            0 10px 20px rgba(0, 0, 0, 0.7),
-            0 0 10px rgba(179, 212, 255, 0.4),
-            0 0 20px rgba(179, 212, 255, 0.2);
-    }
-}
-
+/* ═══ Academy — Icy blue accent ═══ */
 .csv-btn-academy-glow {
-    background: linear-gradient(145deg, rgba(30, 30, 35, 0.9), rgba(15, 15, 20, 1));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(15, 15, 20, 1));
     color: #e6f0ff;
-    border: 1px solid rgba(230, 240, 255, 0.1);
-    border-top: 1px solid rgba(230, 240, 255, 0.2);
+    border: 1px solid rgba(230, 240, 255, 0.15);
+    border-top: 1px solid rgba(230, 240, 255, 0.25);
     border-bottom: 4px solid rgba(0, 0, 0, 0.6);
-    box-shadow:
-        inset 0 1px 0 rgba(230, 240, 255, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 8px 16px rgba(0, 0, 0, 0.6),
-        0 0 8px rgba(179, 212, 255, 0.3),
-        0 0 16px rgba(179, 212, 255, 0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
     border-radius: var(--border-radius);
     font-weight: 700;
-    transition: all 0.2s cubic-bezier(0.25, 1.2, 0.5, 1);
-    animation: buttonAcademyGlowBreathe 3s ease-in-out infinite alternate;
 }
 
 .csv-btn-academy-glow:active:not(:disabled) {
@@ -164,83 +75,31 @@
     transform: translateY(3px);
 }
 
-.csv-btn-academy-glow:hover:not(:disabled):not(:active) {
-    background: linear-gradient(145deg, rgba(35, 35, 40, 1), rgba(20, 20, 25, 1));
-    border-color: rgba(230, 240, 255, 0.2);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.8);
-    box-shadow:
-        inset 0 1px 0 rgba(230, 240, 255, 0.2),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 12px 24px rgba(0, 0, 0, 0.8),
-        0 0 12px rgba(179, 212, 255, 0.6),
-        0 0 24px rgba(179, 212, 255, 0.3);
-    transform: translateY(-1px);
-}
-
-/* ═══ 3D Coin Logo effect (No Button, SVG 3D) ═══ */
+/* ═══ 3D Coin Logo — Static ═══ */
 .csv-logo-coin-3d {
-    transition: all 0.2s cubic-bezier(0.25, 1.2, 0.5, 1);
-    /*
-       Multiple drop shadows on the SVG create the 3D depth and the glowing aura:
-       Base colors tweaked with sepia to simulate night-shift ivory core
-    */
-    filter:
-        invert(1) brightness(0.95) sepia(0.6) hue-rotate(5deg) saturate(3) drop-shadow(0px 1px 0px rgba(255, 220, 160, 0.4)) drop-shadow(0px 3px 0px rgba(40, 40, 45, 0.9)) drop-shadow(0px 4px 0px rgba(10, 10, 15, 0.9)) drop-shadow(0px 8px 12px rgba(0, 0, 0, 0.6));
-    animation: logoCoinGlow 3s ease-in-out infinite alternate;
+    filter: invert(1) brightness(0.95) sepia(0.6) hue-rotate(5deg) saturate(3);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transform: translateY(0);
-}
-
-@keyframes logoCoinGlow {
-    0% {
-        filter:
-            invert(1) brightness(0.95) sepia(0.6) hue-rotate(5deg) saturate(3) drop-shadow(0 0 6px rgba(255, 120, 0, 0.6)) drop-shadow(0 0 12px rgba(255, 120, 0, 0.4)) drop-shadow(0 0 24px rgba(255, 120, 0, 0.2)) drop-shadow(0 0 40px rgba(255, 120, 0, 0.1));
-    }
-
-    100% {
-        filter:
-            invert(1) brightness(0.95) sepia(0.6) hue-rotate(5deg) saturate(3) drop-shadow(0 0 7px rgba(255, 120, 0, 0.7)) drop-shadow(0 0 14px rgba(255, 120, 0, 0.5)) drop-shadow(0 0 28px rgba(255, 120, 0, 0.3)) drop-shadow(0 0 42px rgba(255, 120, 0, 0.2));
-    }
 }
 
 .csv-logo-coin-3d:active {
-    /* Push down */
     transform: translateY(3px) scale(0.98);
-    filter:
-        invert(1) brightness(0.95) sepia(0.6) hue-rotate(5deg) saturate(3) drop-shadow(0 0 6px rgba(255, 120, 0, 0.6)) drop-shadow(0 0 12px rgba(255, 120, 0, 0.4));
-    animation: none;
-    /* pause breathing on hold */
 }
 
-/* ═══ Secondary — Obsidian glass surface ═══ */
+/* ═══ Secondary — Obsidian surface ═══ */
 .csv-btn-secondary {
     background: var(--glass-bg);
     color: var(--text-main);
     border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.csv-btn-secondary:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--glass-border-hover);
-    box-shadow: var(--glass-shadow-deep);
-}
-
-/* ═══ Outline — Gold border elegance ═══ */
+/* ═══ Outline — Gold border ═══ */
 .csv-btn-outline {
     background-color: transparent;
     border: 1px solid rgba(212, 175, 55, 0.25);
     color: var(--accent-gold);
     box-shadow: none;
-}
-
-.csv-btn-outline:hover:not(:disabled) {
-    background-color: rgba(212, 175, 55, 0.06);
-    border-color: rgba(212, 175, 55, 0.45);
-    box-shadow: 0px 0px 20px rgba(212, 175, 55, 0.1);
 }
 
 /* ═══ Ghost — invisible until hover ═══ */
@@ -251,43 +110,21 @@
     box-shadow: none;
 }
 
-.csv-btn-ghost:hover:not(:disabled) {
-    color: var(--text-main);
-    background-color: rgba(255, 255, 255, 0.04);
-}
-
-/* ═══ Teal / Gold Reward — Luxury CTA (3D No Glow) ═══ */
+/* ═══ Teal / Gold Reward — Luxury CTA ═══ */
 .csv-btn-teal {
-    background: linear-gradient(145deg, rgba(30, 20, 10, 0.9), rgba(15, 10, 5, 1));
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: linear-gradient(145deg, rgba(30, 20, 10, 0.95), rgba(15, 10, 5, 1));
     color: #FFFFFF;
     border: 1px solid rgba(212, 175, 55, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     border-bottom: 4px solid rgba(40, 20, 0, 0.8);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 8px 16px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
     font-weight: 800;
-    text-shadow: 0px 1px 2px rgba(0, 0, 0, 1);
     letter-spacing: 0.06em;
 }
 
 .csv-btn-teal:active:not(:disabled) {
     border-bottom-width: 1px;
     transform: translateY(3px) scale(0.98);
-}
-
-.csv-btn-teal:hover:not(:disabled):not(:active) {
-    background: linear-gradient(145deg, rgba(40, 30, 15, 1), rgba(25, 18, 10, 1));
-    border-color: rgba(255, 215, 0, 0.5);
-    border-bottom: 4px solid rgba(60, 30, 0, 1);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 12px 24px rgba(0, 0, 0, 0.9);
-    transform: translateY(-2px) scale(1.02);
 }
 
 /* ═══ Sizes ═══ */
@@ -320,20 +157,14 @@
     width: 100%;
 }
 
-/* ═══ 3D Interactive Cards (Dashboard Games & Academy) ═══ */
+/* ═══ 3D Interactive Cards ═══ */
 .csv-card-3d {
-    background: linear-gradient(135deg, rgba(40, 40, 55, 0.7) 0%, rgba(20, 20, 30, 0.9) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(135deg, rgba(40, 40, 55, 0.85) 0%, rgba(20, 20, 30, 0.95) 100%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     border-bottom: 4px solid rgba(0, 0, 0, 0.6);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 8px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     border-radius: 16px;
-    transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
     position: relative;
 }
 
@@ -341,61 +172,21 @@
     border-bottom-width: 1px;
     transform: translateY(3px);
 }
-/* ═══ Food Glow — Warm White / Ivory ═══ */
-@keyframes buttonFoodGlowBreathe {
-    0% {
-        box-shadow:
-            inset 0 1px 0 rgba(255, 220, 160, 0.1),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-            0 8px 16px rgba(0, 0, 0, 0.6),
-            0 0 6px rgba(255, 220, 160, 0.3),
-            0 0 12px rgba(255, 220, 160, 0.15);
-    }
 
-    100% {
-        box-shadow:
-            inset 0 1px 0 rgba(255, 220, 160, 0.2),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-            0 10px 20px rgba(0, 0, 0, 0.7),
-            0 0 10px rgba(255, 220, 160, 0.4),
-            0 0 20px rgba(255, 220, 160, 0.2);
-    }
-}
-
+/* ═══ Food Glow — Warm accent ═══ */
 .csv-btn-food-glow {
-    background: linear-gradient(145deg, rgba(30, 30, 35, 0.9), rgba(15, 15, 20, 1));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(15, 15, 20, 1));
     color: #FFDCA0;
-    border: 1px solid rgba(255, 220, 160, 0.1);
-    border-top: 1px solid rgba(255, 220, 160, 0.2);
+    border: 1px solid rgba(255, 220, 160, 0.15);
+    border-top: 1px solid rgba(255, 220, 160, 0.25);
     border-bottom: 4px solid rgba(0, 0, 0, 0.6);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 220, 160, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 8px 16px rgba(0, 0, 0, 0.6),
-        0 0 8px rgba(255, 220, 160, 0.3),
-        0 0 16px rgba(255, 220, 160, 0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
     font-weight: 700;
-    animation: buttonFoodGlowBreathe 3s ease-in-out infinite alternate;
 }
 
 .csv-btn-food-glow:active:not(:disabled) {
     border-bottom-width: 1px;
     transform: translateY(3px);
-}
-
-.csv-btn-food-glow:hover:not(:disabled):not(:active) {
-    background: linear-gradient(145deg, rgba(35, 35, 40, 1), rgba(20, 20, 25, 1));
-    border-color: rgba(255, 220, 160, 0.2);
-    border-bottom: 4px solid rgba(0, 0, 0, 0.8);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 220, 160, 0.2),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
-        0 12px 24px rgba(0, 0, 0, 0.8),
-        0 0 12px rgba(255, 220, 160, 0.6),
-        0 0 24px rgba(255, 220, 160, 0.3);
-    transform: translateY(-1px);
 }
 
 /* ═══ Loading State ═══ */
