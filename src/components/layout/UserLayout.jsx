@@ -174,11 +174,11 @@ const UserLayout = () => {
     if (!isTabRoute || !isMobile) {
         const hideNav = pathname.startsWith('/chat');
         return (
-            <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {!hideNav && <PremiumHeader />}
                 <div style={{
                     flex: 1, 
-                    overflowY: hideNav ? 'hidden' : 'auto',
+                    overflowY: 'hidden',
                     overscrollBehaviorY: 'contain',
                     WebkitOverflowScrolling: 'touch',
                     paddingTop: !hideNav && !isMobile ? '60px' : '0', // Offset for PremiumHeader on desktop
@@ -225,7 +225,6 @@ const UserLayout = () => {
                 {TAB_ROUTES.map((route, idx) => {
                     const PageComponent = TAB_COMPONENTS[idx];
 
-                    const isLockedScroll = idx === 2; // Chat
                     return (
                         <div
                             key={route}
@@ -234,7 +233,7 @@ const UserLayout = () => {
                                 flex: '0 0 100%',
                                 width: '100%',
                                 height: '100%',
-                                overflowY: isLockedScroll ? 'hidden' : 'auto',
+                                overflowY: 'hidden',
                                 overscrollBehaviorY: 'contain',
                                 WebkitOverflowScrolling: 'touch',
                                 scrollSnapAlign: 'center',
