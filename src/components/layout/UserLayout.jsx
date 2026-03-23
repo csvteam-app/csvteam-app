@@ -1,5 +1,5 @@
-import { useEffect, useState, Component } from 'react';
-import { useLocation, Outlet } from 'react-router-dom';
+import { useEffect, useState, useRef, useCallback, Component } from 'react';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import PremiumHeader from './PremiumHeader';
 import Navbar from './Navbar';
 
@@ -45,15 +45,71 @@ class PageErrorBoundary extends Component {
     }
 }
 
+/* ═══ TAB ORDER ═══ */
+const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
+
+function getTabIndex(pathname) {
+    const exact = TAB_ROUTES.indexOf(pathname);
+    if (exact !== -1) return exact;
+    if (pathname.startsWith('/chat')) return 2;
+    if (pathname.startsWith('/workout') || pathname.startsWith('/training')) return 1;
+    return -1;
+}
+
+/* ═══ Swipe gesture config ═══ */
+const SWIPE_THRESHOLD = 50;       // min px horizontal to trigger
+const SWIPE_RATIO = 1.5;          // dx must be > dy * ratio (avoid vertical scroll false triggers)
+
 const UserLayout = () => {
     const { pathname } = useLocation();
+    const navigate = useNavigate();
+    const tabIndex = getTabIndex(pathname);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    // Swipe tracking refs (no re-renders during gesture)
+    const touchRef = useRef({ startX: 0, startY: 0, swiping: false });
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    /* ── Swipe handlers ── */
+    const onTouchStart = useCallback((e) => {
+        const touch = e.touches[0];
+        touchRef.current = {
+            startX: touch.clientX,
+            startY: touch.clientY,
+            swiping: true,
+        };
+    }, []);
+
+    const onTouchEnd = useCallback((e) => {
+        const ref = touchRef.current;
+        if (!ref.swiping) return;
+        ref.swiping = false;
+
+        const touch = e.changedTouches[0];
+        const dx = touch.clientX - ref.startX;
+        const dy = touch.clientY - ref.startY;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+
+        // Must exceed threshold and be primarily horizontal
+        if (absDx < SWIPE_THRESHOLD || absDx < absDy * SWIPE_RATIO) return;
+
+        // Only swipe on tab routes
+        if (tabIndex === -1) return;
+
+        if (dx < 0 && tabIndex < TAB_ROUTES.length - 1) {
+            // Swipe left → next tab
+            navigate(TAB_ROUTES[tabIndex + 1]);
+        } else if (dx > 0 && tabIndex > 0) {
+            // Swipe right → previous tab
+            navigate(TAB_ROUTES[tabIndex - 1]);
+        }
+    }, [tabIndex, navigate]);
 
     return (
         <div style={{
@@ -64,11 +120,11 @@ const UserLayout = () => {
         }}>
             <PremiumHeader />
 
-            {/* ═══ PAGE CONTENT ═══ 
-                 key={pathname} forces React to unmount/remount the content 
-                 when the route changes — guarantees fresh render */}
+            {/* ═══ PAGE CONTENT ═══ */}
             <div
                 key={pathname}
+                onTouchStart={isMobile ? onTouchStart : undefined}
+                onTouchEnd={isMobile ? onTouchEnd : undefined}
                 style={{
                     flex: 1,
                     minHeight: 0,
