@@ -45,20 +45,8 @@ class PageErrorBoundary extends Component {
     }
 }
 
-/* ═══ TAB ROUTES for navbar highlighting ═══ */
-const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
-
-function getTabIndex(pathname) {
-    const exact = TAB_ROUTES.indexOf(pathname);
-    if (exact !== -1) return exact;
-    if (pathname.startsWith('/chat')) return 2;
-    if (pathname.startsWith('/workout') || pathname.startsWith('/training')) return 1;
-    return -1;
-}
-
 const UserLayout = () => {
     const { pathname } = useLocation();
-    const tabIndex = getTabIndex(pathname);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
     useEffect(() => {
@@ -76,21 +64,26 @@ const UserLayout = () => {
         }}>
             <PremiumHeader />
 
-            {/* ═══ PAGE CONTENT — React Router Outlet ═══ */}
-            <div style={{
-                flex: 1,
-                minHeight: 0,
-                overflow: 'auto',
-                WebkitOverflowScrolling: 'touch',
-                overscrollBehaviorY: 'contain',
-            }}>
+            {/* ═══ PAGE CONTENT ═══ 
+                 key={pathname} forces React to unmount/remount the content 
+                 when the route changes — guarantees fresh render */}
+            <div
+                key={pathname}
+                style={{
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehaviorY: 'contain',
+                }}
+            >
                 <PageErrorBoundary pageName={pathname}>
                     <Outlet />
                 </PageErrorBoundary>
             </div>
 
-            {/* ═══ NAVBAR — always visible on mobile ═══ */}
-            {isMobile && <Navbar activeTab={tabIndex} />}
+            {/* ═══ NAVBAR ═══ */}
+            {isMobile && <Navbar />}
         </div>
     );
 };
