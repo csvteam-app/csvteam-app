@@ -90,43 +90,40 @@ const UserLayout = () => {
         }
     }, [isTabRoute]);
 
-    // ── Set initial scroll position on first mount or tab change ──
+    // ── Set initial scroll position on first mount ──
     useEffect(() => {
         if (!isTabRoute || !scrollRef.current || didMount.current) return;
         const container = scrollRef.current;
-        if (container.clientWidth === 0) return; // not yet laid out
+        if (container.clientWidth === 0) return;
+        isProgrammatic.current = true;
         container.scrollLeft = tabIndex * container.clientWidth;
         lastSyncedTab.current = tabIndex;
         setVisualTab(tabIndex);
         didMount.current = true;
+        // Reset flag after layout settles
+        requestAnimationFrame(() => { isProgrammatic.current = false; });
     }, [isTabRoute, tabIndex]);
 
     // ── Scroll to correct page on route change (navbar tap) ──
     useEffect(() => {
         if (!isTabRoute || !scrollRef.current || !didMount.current) return;
+        // Skip if already synced to this tab (prevents cascade)
+        if (lastSyncedTab.current === tabIndex) return;
 
         const container = scrollRef.current;
         const pageWidth = container.clientWidth;
         if (pageWidth === 0) return;
 
-        const targetScroll = tabIndex * pageWidth;
-        const currentPage = Math.round(container.scrollLeft / pageWidth);
+        isProgrammatic.current = true;
+        lastSyncedTab.current = tabIndex;
+        container.scrollTo({ left: tabIndex * pageWidth, behavior: 'smooth' });
 
-        // Sync if tabIndex changed OR if scroll position doesn't match
-        if (currentPage !== tabIndex || lastSyncedTab.current !== tabIndex) {
-            isProgrammatic.current = true;
-            container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-            lastSyncedTab.current = tabIndex;
-
-            // Use the transitionend / scrollend to reset the flag
-            const resetFlag = () => { isProgrammatic.current = false; };
-
-            // Modern browsers support scrollend
-            if ('onscrollend' in window) {
-                container.addEventListener('scrollend', resetFlag, { once: true });
-            } else {
-                setTimeout(resetFlag, 400);
-            }
+        // Reset programmatic flag after animation
+        const resetFlag = () => { isProgrammatic.current = false; };
+        if ('onscrollend' in window) {
+            container.addEventListener('scrollend', resetFlag, { once: true });
+        } else {
+            setTimeout(resetFlag, 400);
         }
     }, [tabIndex, isTabRoute]);
 
@@ -141,7 +138,7 @@ const UserLayout = () => {
         const currentPage = Math.round(container.scrollLeft / pageWidth);
         const clampedPage = Math.max(0, Math.min(currentPage, TAB_ROUTES.length - 1));
 
-        if (clampedPage !== tabIndex) {
+        if (clampedPage !== lastSyncedTab.current) {
             lastSyncedTab.current = clampedPage;
             isProgrammatic.current = true;
             navigate(TAB_ROUTES[clampedPage], { replace: true });
@@ -150,24 +147,24 @@ const UserLayout = () => {
                 isProgrammatic.current = false;
             });
         }
-    }, [tabIndex, navigate]);
+    }, [navigate]);
 
-    // ── Scroll listener: real-time visual tab + debounced route sync ──
+    // ── Scroll listener: visual tab + debounced route sync ──
     const handleScroll = useCallback(() => {
         if (!scrollRef.current) return;
         const container = scrollRef.current;
         const pageWidth = container.clientWidth;
         if (pageWidth === 0) return;
 
-        // Real-time visual update (no debounce)
+        // Real-time visual update — ONLY if changed
         const currentPage = Math.round(container.scrollLeft / pageWidth);
         const clamped = Math.max(0, Math.min(currentPage, TAB_ROUTES.length - 1));
-        setVisualTab(clamped);
+        setVisualTab(prev => prev === clamped ? prev : clamped);
 
-        // Debounced route sync
+        // Debounced route sync (skip if programmatic)
         if (isProgrammatic.current) return;
         clearTimeout(scrollTimeout.current);
-        scrollTimeout.current = setTimeout(handleScrollEnd, 50);
+        scrollTimeout.current = setTimeout(handleScrollEnd, 150);
     }, [handleScrollEnd]);
 
     // ── Non-tab routes OR Desktop mode: render with Outlet ──

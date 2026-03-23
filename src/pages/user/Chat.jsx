@@ -43,7 +43,7 @@ const Chat = () => {
 
     // 1. Fetch historical messages
     useEffect(() => {
-        if (!user) return;
+        if (!user?.id) return;
 
         const fetchMessages = async () => {
             setFetchError(null);
@@ -112,7 +112,7 @@ const Chat = () => {
             supabase.removeChannel(subscription);
             supabase.removeChannel(presenceChannel);
         };
-    }, [user]);
+    }, [user?.id]);
 
     // Scroll to bottom on new messages — use scrollTop instead of scrollIntoView
     // to avoid scrolling parent carousel horizontally

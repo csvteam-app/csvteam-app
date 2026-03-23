@@ -108,7 +108,7 @@ const Nutrition = () => {
     };
 
     return (
-        <div className="global-container animate-fade-in" style={{ paddingBottom: '144px' }}>
+        <div className="global-container" style={{ paddingBottom: '144px' }}>
             <div className="w-full" style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
 
                 {/* ═══ DATE STRIP — FatSecret-style ═══ */}
