@@ -198,6 +198,8 @@ const UserLayout = () => {
         <div style={{
             height: '100%', maxHeight: '100%',
             display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            /* DEBUG — remove after test */
+            border: '4px solid lime',
         }}>
             <PremiumHeader />
 

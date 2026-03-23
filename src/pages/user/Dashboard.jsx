@@ -25,7 +25,13 @@ const Dashboard = () => {
             gap: '0',
             overflow: 'visible',
             paddingBottom: '0',
+            /* DEBUG — remove after test */
+            border: '4px solid cyan',
         }}>
+            {/* DEBUG VERSION STAMP — remove after test */}
+            <div style={{ position: 'fixed', top: '50px', left: '10px', zIndex: 99999, background: 'red', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold' }}>
+                BUILD v2023-03-23-14:05
+            </div>
             {/* ═══ SECTION 1 – LOGO ═══ */}
             <div className="animate-fade-in flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '88px', paddingBottom: '8px' }}>
                 <div
