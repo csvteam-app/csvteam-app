@@ -1,11 +1,15 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAthleteData } from '../../hooks/useAthleteData';
 import { useGamification } from '../../hooks/useGamification';
 import FEATURE_FLAGS from '../../config/featureFlags';
 import CsvLogo from '../../components/ui/CsvLogo';
 import { Gamepad2, PlaySquare, Dumbbell, Zap, Trophy, Flame, CheckCircle2, Circle } from 'lucide-react';
+import { perfTrackMount, perfTrackRender } from '../../components/debug/perfTracker';
 
 const Dashboard = () => {
+    perfTrackRender('Dashboard');
+    useEffect(() => { perfTrackMount('Dashboard'); }, []);
     const navigate = useNavigate();
     const { program } = useAthleteData();
     const { gamification, dailyTasks: d, LEAGUES } = useGamification();

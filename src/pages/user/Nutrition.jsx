@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAthleteData } from '../../hooks/useAthleteData';
 import { useNutrition } from '../../hooks/useNutrition';
 import Card from '../../components/ui/Card';
@@ -9,8 +9,11 @@ import FoodSearch from '../../components/user/FoodSearch';
 import VoiceLoggerModal from '../../components/user/VoiceLoggerModal';
 import DateStrip from '../../components/user/DateStrip';
 import FEATURE_FLAGS from '../../config/featureFlags';
+import { perfTrackMount, perfTrackRender } from '../../components/debug/perfTracker';
 
 const Nutrition = () => {
+    perfTrackRender('Nutrition');
+    useEffect(() => { perfTrackMount('Nutrition'); }, []);
     const { nutritionTargets } = useAthleteData();
 
     // ── Date state (default: today) ──
