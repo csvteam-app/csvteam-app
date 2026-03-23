@@ -23,7 +23,7 @@ const Dashboard = () => {
         <div className="global-container" style={{
             height: '100%',
             gap: '0',
-            overflow: 'hidden',
+            overflow: 'visible',
             paddingBottom: '0',
         }}>
             {/* ═══ SECTION 1 – LOGO ═══ */}
