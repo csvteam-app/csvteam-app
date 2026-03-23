@@ -90,7 +90,7 @@ const UserLayout = () => {
         }
     }, [isTabRoute]);
 
-    // ── Set initial scroll position BEFORE first paint ──
+    // ── Set initial scroll position on first mount or tab change ──
     useEffect(() => {
         if (!isTabRoute || !scrollRef.current || didMount.current) return;
         const container = scrollRef.current;
@@ -99,7 +99,7 @@ const UserLayout = () => {
         lastSyncedTab.current = tabIndex;
         setVisualTab(tabIndex);
         didMount.current = true;
-    });
+    }, [isTabRoute, tabIndex]);
 
     // ── Scroll to correct page on route change (navbar tap) ──
     useEffect(() => {
@@ -224,8 +224,6 @@ const UserLayout = () => {
             >
                 {TAB_ROUTES.map((route, idx) => {
                     const PageComponent = TAB_COMPONENTS[idx];
-                    // Only mount the visible tab + immediate neighbors
-                    const shouldMount = Math.abs(idx - visualTab) <= 1;
 
                     return (
                         <div
@@ -243,11 +241,9 @@ const UserLayout = () => {
                                 contain: 'layout style',
                             }}
                         >
-                            {shouldMount ? (
-                                <PageErrorBoundary pageName={route}>
-                                    <PageComponent />
-                                </PageErrorBoundary>
-                            ) : null}
+                            <PageErrorBoundary pageName={route}>
+                                <PageComponent />
+                            </PageErrorBoundary>
                         </div>
                     );
                 })}
