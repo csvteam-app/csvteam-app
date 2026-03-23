@@ -12,9 +12,7 @@ const BUILD_ID = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'local';
 
 export default function PerfOverlay() {
     const location = useLocation();
-    const [visible, setVisible] = useState(() => {
-        return new URLSearchParams(window.location.search).get('perf') === '1';
-    });
+    const [visible, setVisible] = useState(true);
     const [tick, setTick] = useState(0);
     const tapCount = useRef(0);
     const tapTimer = useRef(null);
