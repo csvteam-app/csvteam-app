@@ -5,10 +5,8 @@ import { useEffect, useState, useRef } from 'react';
 const Navbar = ({ activeTab }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const navRef = useRef(null);
 
     const [lastTrainingPath, setLastTrainingPath] = useState('/dashboard');
-    const [tappedIdx, setTappedIdx] = useState(null);
 
     useEffect(() => {
         if (location.pathname === '/dashboard' || location.pathname.startsWith('/workout') || location.pathname.startsWith('/training')) {
@@ -39,13 +37,10 @@ const Navbar = ({ activeTab }) => {
 
     return (
         <nav
-            ref={navRef}
             className="lg-hidden"
             style={{
                 flex: '0 0 auto',
-                background: 'rgba(5,5,8,0.92)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
+                background: 'rgba(5,5,8,0.97)',
                 borderTop: '1px solid rgba(255,255,255,0.06)',
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -59,10 +54,6 @@ const Navbar = ({ activeTab }) => {
 
                 const handleNavClick = (e) => {
                     e.preventDefault();
-
-                    // Micro-bounce on tap
-                    setTappedIdx(idx);
-                    setTimeout(() => setTappedIdx(null), 200);
 
                     if (item.isTrainingEcosystem && !isActive) {
                         navigate(lastTrainingPath);
@@ -85,10 +76,8 @@ const Navbar = ({ activeTab }) => {
                             alignItems: 'center',
                             gap: '2px',
                             padding: '4px 16px',
-                            color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
+                            color: isActive ? '#FFDCA0' : 'rgba(255,255,255,0.35)',
                             cursor: 'pointer',
-                            transition: 'all 0.25s ease',
-                            transform: tappedIdx === idx ? 'scale(0.85)' : 'scale(1)',
                             WebkitTapHighlightColor: 'transparent',
                             touchAction: 'manipulation',
                             position: 'relative',
@@ -97,10 +86,6 @@ const Navbar = ({ activeTab }) => {
                         <Icon
                             size={22}
                             strokeWidth={isActive ? 2.2 : 1.5}
-                            style={{
-                                filter: isActive ? 'drop-shadow(0px 0px 6px rgba(212,175,55,0.8)) drop-shadow(0px 0px 12px rgba(212,175,55,0.6))' : 'none',
-                                transition: 'filter 0.3s ease'
-                            }}
                         />
                         <span style={{
                             fontSize: '0.58rem',
@@ -108,8 +93,6 @@ const Navbar = ({ activeTab }) => {
                             fontFamily: 'Outfit',
                             letterSpacing: '0.03em',
                             opacity: isActive ? 1 : 0.8,
-                            textShadow: isActive ? '0px 0px 8px rgba(212,175,55,0.9), 0px 0px 16px rgba(212,175,55,0.6)' : 'none',
-                            transition: 'text-shadow 0.3s ease'
                         }}>
                             {item.name}
                         </span>

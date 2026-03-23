@@ -33,7 +33,7 @@ export default function PerfOverlay() {
     // Refresh ticker every 500ms when visible
     useEffect(() => {
         if (!visible) return;
-        const id = setInterval(() => setTick(t => t + 1), 500);
+        const id = setInterval(() => setTick(t => t + 1), 2000);
         return () => clearInterval(id);
     }, [visible]);
 

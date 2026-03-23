@@ -323,19 +323,15 @@ const Chat = () => {
             flexDirection: 'column',
             height: '100%',
             minHeight: '100%',
-            backgroundColor: '#000000',
-            backgroundImage: 'radial-gradient(ellipse at 15% 5%, rgba(255, 120, 0, 0.30) 0%, rgba(255, 90, 0, 0.10) 35%, transparent 70%), radial-gradient(circle at 50% 100%, rgba(255, 120, 0, 0.08) 0%, transparent 40%)',
-            boxShadow: 'inset 0 0 120px rgba(0,0,0,1)',
+            backgroundColor: '#0a0a0c',
             position: 'relative',
             overflow: 'hidden'
         }}>
             {/* ═══ PREMIUM HEADER ═══ */}
             <div style={{
                 paddingTop: '0',
-                background: 'rgba(20, 20, 20, 0.65)',
+                background: 'rgba(15, 15, 18, 0.95)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
             }}>
                 <div style={{
                     display: 'flex',
@@ -540,8 +536,6 @@ const Chat = () => {
                                     color: '#e8e8e8',
                                     position: 'relative',
                                     minWidth: '80px',
-                                    backdropFilter: 'blur(10px)',
-                                    WebkitBackdropFilter: 'blur(10px)',
                                 }}>
                                     {renderMedia(msg)}
                                     {msg.text && (
@@ -639,9 +633,7 @@ const Chat = () => {
                 flexShrink: 0,
                 padding: '8px 12px',
                 paddingBottom: '8px',
-                background: 'linear-gradient(180deg, rgba(30,32,36,0.7) 0%, rgba(10,12,16,0.9) 100%)',
-                backdropFilter: 'blur(30px)',
-                WebkitBackdropFilter: 'blur(30px)',
+                background: 'rgba(15, 15, 18, 0.97)',
                 borderRadius: '24px 24px 0 0',
                 display: 'flex',
                 alignItems: 'flex-end',

@@ -37,14 +37,14 @@
 
   /* ═══ OBSIDIAN GLASS — 3-DEPTH LAYER SYSTEM ═══ */
   /* Level 1 — Background panels / sections */
-  --glass-bg-l1: rgba(12, 12, 14, 0.55);
-  --glass-blur-l1: 12px;
+  --glass-bg-l1: rgba(12, 12, 14, 0.75);
+  --glass-blur-l1: 0px;
   /* Level 2 — Primary cards (default) */
-  --glass-bg: rgba(12, 12, 14, 0.72);
-  --glass-blur: 16px;
+  --glass-bg: rgba(12, 12, 14, 0.85);
+  --glass-blur: 0px;
   /* Level 3 — Modals / overlays */
-  --glass-bg-l3: rgba(12, 12, 14, 0.85);
-  --glass-blur-l3: 24px;
+  --glass-bg-l3: rgba(12, 12, 14, 0.95);
+  --glass-blur-l3: 0px;
 
   --glass-border: rgba(255, 255, 255, 0.07);
   --glass-border-hover: rgba(255, 255, 255, 0.12);
