@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, Component } from 'react';
+import { useEffect, useState, Component } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import PremiumHeader from './PremiumHeader';
 import Navbar from './Navbar';
@@ -6,7 +6,7 @@ import Navbar from './Navbar';
 /* ═══ TAB PAGES — order: Dieta, Allenamento, Chat ═══ */
 const TAB_ROUTES = ['/nutrition', '/dashboard', '/chat'];
 
-/* Direct imports for carousel rendering */
+/* Direct imports for tab rendering */
 import Nutrition from '../../pages/user/Nutrition';
 import Dashboard from '../../pages/user/Dashboard';
 import Chat from '../../pages/user/Chat';
@@ -65,16 +65,8 @@ function getTabIndex(pathname) {
 
 const UserLayout = () => {
     const { pathname } = useLocation();
-    const navigate = useNavigate();
-    const scrollRef = useRef(null);
-    const isProgrammatic = useRef(false);
-    const scrollTimeout = useRef(null);
-    const didMount = useRef(false);
-    const lastSyncedTab = useRef(-1);
-
     const tabIndex = getTabIndex(pathname);
     const isTabRoute = tabIndex !== -1;
-    const [visualTab, setVisualTab] = useState(tabIndex >= 0 ? tabIndex : 2);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
     useEffect(() => {
@@ -82,86 +74,6 @@ const UserLayout = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-    // Reset didMount when leaving carousel so re-entry syncs correctly
-    useEffect(() => {
-        if (!isTabRoute) {
-            didMount.current = false;
-        }
-    }, [isTabRoute]);
-
-    // ── Set initial scroll position on first mount ──
-    useEffect(() => {
-        if (!isTabRoute || !scrollRef.current || didMount.current) return;
-        const container = scrollRef.current;
-        if (container.clientWidth === 0) return;
-        isProgrammatic.current = true;
-        container.scrollLeft = tabIndex * container.clientWidth;
-        lastSyncedTab.current = tabIndex;
-        setVisualTab(tabIndex);
-        didMount.current = true;
-        // Reset flag after layout settles
-        requestAnimationFrame(() => { isProgrammatic.current = false; });
-    }, [isTabRoute, tabIndex]);
-
-    // ── Scroll to correct page on route change (navbar tap) ──
-    useEffect(() => {
-        if (!isTabRoute || !scrollRef.current || !didMount.current) return;
-        // Skip if already synced to this tab (prevents cascade)
-        if (lastSyncedTab.current === tabIndex) return;
-
-        const container = scrollRef.current;
-        const pageWidth = container.clientWidth;
-        if (pageWidth === 0) return;
-
-        isProgrammatic.current = true;
-        lastSyncedTab.current = tabIndex;
-        // INSTANT scroll — no smooth animation (iOS smooth scroll adds ~400ms)
-        container.scrollLeft = tabIndex * pageWidth;
-        setVisualTab(tabIndex);
-        // Reset immediately after paint
-        requestAnimationFrame(() => { isProgrammatic.current = false; });
-    }, [tabIndex, isTabRoute]);
-
-    // ── Detect scroll-snap settle → sync route ──
-    const handleScrollEnd = useCallback(() => {
-        if (isProgrammatic.current || !scrollRef.current) return;
-
-        const container = scrollRef.current;
-        const pageWidth = container.clientWidth;
-        if (pageWidth === 0) return;
-
-        const currentPage = Math.round(container.scrollLeft / pageWidth);
-        const clampedPage = Math.max(0, Math.min(currentPage, TAB_ROUTES.length - 1));
-
-        if (clampedPage !== lastSyncedTab.current) {
-            lastSyncedTab.current = clampedPage;
-            isProgrammatic.current = true;
-            navigate(TAB_ROUTES[clampedPage], { replace: true });
-            // Reset after React processes the navigation
-            requestAnimationFrame(() => {
-                isProgrammatic.current = false;
-            });
-        }
-    }, [navigate]);
-
-    // ── Scroll listener: visual tab + debounced route sync ──
-    const handleScroll = useCallback(() => {
-        if (!scrollRef.current) return;
-        const container = scrollRef.current;
-        const pageWidth = container.clientWidth;
-        if (pageWidth === 0) return;
-
-        // Real-time visual update — ONLY if changed
-        const currentPage = Math.round(container.scrollLeft / pageWidth);
-        const clamped = Math.max(0, Math.min(currentPage, TAB_ROUTES.length - 1));
-        setVisualTab(prev => prev === clamped ? prev : clamped);
-
-        // Debounced route sync (skip if programmatic)
-        if (isProgrammatic.current) return;
-        clearTimeout(scrollTimeout.current);
-        scrollTimeout.current = setTimeout(handleScrollEnd, 150);
-    }, [handleScrollEnd]);
 
     // ── Non-tab routes OR Desktop mode: render with Outlet ──
     if (!isTabRoute || !isMobile) {
@@ -185,69 +97,46 @@ const UserLayout = () => {
         );
     }
 
-    // ── Tab routes: render carousel ──
+    // ── Tab routes on mobile: simple tab rendering (no carousel/swipe) ──
+    // All tabs are kept mounted to preserve state, but only the active one is visible.
+    const hideNav = tabIndex === 2; // hide navbar on Chat
+
     return (
         <div style={{
             height: '100%', maxHeight: '100%',
             display: 'flex', flexDirection: 'column', overflow: 'hidden',
             position: 'relative',
         }}>
-            <PremiumHeader />
+            {!hideNav && <PremiumHeader />}
 
-            {/* ═══ SWIPEABLE PAGES CAROUSEL ═══ */}
-            <div
-                ref={scrollRef}
-                onScroll={handleScroll}
-                className="swipe-carousel"
-                style={{
-                    flex: 1,
-                    display: 'flex',
-                    overflowX: 'scroll',
-                    overflowY: 'hidden',
-                    scrollSnapType: 'x mandatory',
-                    WebkitOverflowScrolling: 'touch',
-                    overscrollBehaviorX: 'contain',
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                    touchAction: 'pan-x',
-                    /* GPU layer promotion */
-                    transform: 'translateZ(0)',
-                    backfaceVisibility: 'hidden',
-                }}
-            >
-                {TAB_ROUTES.map((route, idx) => {
-                    const PageComponent = TAB_COMPONENTS[idx];
+            {/* ═══ TAB PAGES — mounted but only active one is visible ═══ */}
+            {TAB_ROUTES.map((route, idx) => {
+                const PageComponent = TAB_COMPONENTS[idx];
+                const isActive = idx === tabIndex;
 
-                    return (
-                        <div
-                            key={route}
-                            className="swipe-page"
-                            style={{
-                                flex: '0 0 100%',
-                                width: '100%',
-                                height: '100%',
-                                overflowY: 'auto',
-                                overscrollBehaviorY: 'contain',
-                                WebkitOverflowScrolling: 'touch',
-                                scrollSnapAlign: 'center',
-                            }}
-                        >
-                            <PageErrorBoundary pageName={route}>
-                                <PageComponent />
-                            </PageErrorBoundary>
-                        </div>
-                    );
-                })}
-            </div>
+                return (
+                    <div
+                        key={route}
+                        style={{
+                            flex: isActive ? 1 : undefined,
+                            height: isActive ? undefined : 0,
+                            overflow: isActive ? 'auto' : 'hidden',
+                            visibility: isActive ? 'visible' : 'hidden',
+                            position: isActive ? 'relative' : 'absolute',
+                            width: '100%',
+                            WebkitOverflowScrolling: isActive ? 'touch' : undefined,
+                            overscrollBehaviorY: isActive ? 'contain' : undefined,
+                        }}
+                    >
+                        <PageErrorBoundary pageName={route}>
+                            <PageComponent />
+                        </PageErrorBoundary>
+                    </div>
+                );
+            })}
 
-            {/* Navbar wrapper — collapses smoothly when chat is active */}
-            <div style={{
-                overflow: 'hidden',
-                maxHeight: visualTab === 2 ? '0px' : '80px',
-                transition: 'max-height 0.15s ease-out',
-            }}>
-                <Navbar activeTab={visualTab} />
-            </div>
+            {/* Navbar */}
+            {!hideNav && <Navbar activeTab={tabIndex} />}
         </div>
     );
 };
