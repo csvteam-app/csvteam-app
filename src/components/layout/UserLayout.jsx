@@ -174,7 +174,7 @@ const UserLayout = () => {
     if (!isTabRoute || !isMobile) {
         const hideNav = pathname.startsWith('/chat');
         return (
-            <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {!hideNav && <PremiumHeader />}
                 <div style={{
                     flex: 1, 
@@ -196,7 +196,7 @@ const UserLayout = () => {
     // ── Tab routes: render carousel ──
     return (
         <div style={{
-            height: '100dvh', maxHeight: '100dvh',
+            height: '100%', maxHeight: '100%',
             display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
             <PremiumHeader />

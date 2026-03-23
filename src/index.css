@@ -544,8 +544,8 @@ a, input, select, textarea {
   margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
-  padding-top: calc(16px + env(safe-area-inset-top));
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  padding-top: 16px;
+  padding-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;

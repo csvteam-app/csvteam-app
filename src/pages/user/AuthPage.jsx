@@ -321,10 +321,10 @@ const AuthPage = () => {
 const s = {
     /* ── Page ── */
     page: {
-        height: '100dvh',
+        height: '100%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: '#050508',
-        padding: 'env(safe-area-inset-top, 12px) 16px env(safe-area-inset-bottom, 12px)',
+        padding: '12px 16px',
         position: 'relative', overflow: 'hidden',
         boxSizing: 'border-box',
     },
