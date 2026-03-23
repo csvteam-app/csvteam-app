@@ -116,15 +116,11 @@ const UserLayout = () => {
 
         isProgrammatic.current = true;
         lastSyncedTab.current = tabIndex;
-        container.scrollTo({ left: tabIndex * pageWidth, behavior: 'smooth' });
-
-        // Reset programmatic flag after animation
-        const resetFlag = () => { isProgrammatic.current = false; };
-        if ('onscrollend' in window) {
-            container.addEventListener('scrollend', resetFlag, { once: true });
-        } else {
-            setTimeout(resetFlag, 400);
-        }
+        // INSTANT scroll — no smooth animation (iOS smooth scroll adds ~400ms)
+        container.scrollLeft = tabIndex * pageWidth;
+        setVisualTab(tabIndex);
+        // Reset immediately after paint
+        requestAnimationFrame(() => { isProgrammatic.current = false; });
     }, [tabIndex, isTabRoute]);
 
     // ── Detect scroll-snap settle → sync route ──
@@ -234,8 +230,6 @@ const UserLayout = () => {
                                 overscrollBehaviorY: 'contain',
                                 WebkitOverflowScrolling: 'touch',
                                 scrollSnapAlign: 'center',
-                                scrollSnapStop: 'always',
-                                contain: 'layout style',
                             }}
                         >
                             <PageErrorBoundary pageName={route}>
@@ -250,7 +244,7 @@ const UserLayout = () => {
             <div style={{
                 overflow: 'hidden',
                 maxHeight: visualTab === 2 ? '0px' : '80px',
-                transition: 'max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'max-height 0.15s ease-out',
             }}>
                 <Navbar activeTab={visualTab} />
             </div>
