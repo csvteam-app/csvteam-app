@@ -128,7 +128,7 @@ const AuthPage = () => {
                 <div style={s.logoSection}>
                     <div
                         className="csv-logo-coin-3d"
-                        style={{ width: '195px', cursor: 'pointer' }}
+                        style={{ width: '140px', cursor: 'pointer' }}
                     >
                         <CsvLogo size="100%" showText={false} />
                     </div>
@@ -321,11 +321,12 @@ const AuthPage = () => {
 const s = {
     /* ── Page ── */
     page: {
-        minHeight: '100dvh',
+        height: '100dvh',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: '#050508',
-        padding: '32px 16px',
+        padding: 'env(safe-area-inset-top, 12px) 16px env(safe-area-inset-bottom, 12px)',
         position: 'relative', overflow: 'hidden',
+        boxSizing: 'border-box',
     },
     glowOrb1: {
         position: 'absolute', top: '-160px', right: '-120px',
@@ -342,13 +343,12 @@ const s = {
     container: {
         width: '100%', maxWidth: '420px',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        gap: '20px', position: 'relative', zIndex: 1,
+        gap: '10px', position: 'relative', zIndex: 1,
     },
 
     /* ── Logo ── */
     logoSection: {
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-        paddingTop: '0px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0px',
     },
     logoGlow: {
         position: 'relative', padding: '20px', borderRadius: '50%',
@@ -357,8 +357,8 @@ const s = {
     },
     brandTitle: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 800,
-        fontSize: '1.8rem', letterSpacing: '0.1em', color: '#fff',
-        marginTop: '8px',
+        fontSize: '1.4rem', letterSpacing: '0.1em', color: '#fff',
+        marginTop: '4px', marginBottom: '0',
     },
     brandSub: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 600,
@@ -372,12 +372,12 @@ const s = {
     },
     headline: {
         fontFamily: "'Outfit', sans-serif", fontWeight: 700,
-        fontSize: '1.15rem', color: '#fff', lineHeight: 1.4,
-        margin: '0 0 6px',
+        fontSize: '1.05rem', color: '#fff', lineHeight: 1.3,
+        margin: '0 0 2px',
     },
     subheadline: {
-        fontFamily: "'Inter', sans-serif", fontSize: '0.82rem',
-        color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, margin: 0,
+        fontFamily: "'Inter', sans-serif", fontSize: '0.78rem',
+        color: 'rgba(255,255,255,0.45)', lineHeight: 1.4, margin: 0,
     },
 
     /* ── Glass Card ── */
@@ -388,16 +388,16 @@ const s = {
         WebkitBackdropFilter: 'blur(24px)',
         border: '1px solid rgba(255,243,224,0.1)',
         borderRadius: '20px',
-        padding: '28px 24px',
+        padding: '20px 20px',
         boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,243,224,0.04)',
-        display: 'flex', flexDirection: 'column', gap: '18px',
+        display: 'flex', flexDirection: 'column', gap: '14px',
     },
 
     /* ── OAuth ── */
     oauthRow: { display: 'flex', gap: '12px' },
     oauthBtn: {
         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        gap: '10px', padding: '13px 16px', borderRadius: '12px',
+        gap: '10px', padding: '11px 16px', borderRadius: '12px',
         background: 'rgba(255,255,255,0.03)',
         border: '1px solid rgba(255,255,255,0.08)',
         color: 'rgba(255,255,255,0.8)',
@@ -422,7 +422,7 @@ const s = {
 
     /* ── Form ── */
     form: {
-        display: 'flex', flexDirection: 'column', gap: '12px',
+        display: 'flex', flexDirection: 'column', gap: '10px',
     },
     inputWrap: {
         position: 'relative',
@@ -462,7 +462,7 @@ const s = {
 
     /* ── Submit ── */
     submitBtn: {
-        width: '100%', padding: '15px',
+        width: '100%', padding: '13px',
         background: 'linear-gradient(135deg, #FFF3E0, #E8D5B0)',
         border: 'none', borderRadius: '14px',
         color: '#050508', fontFamily: "'Outfit', sans-serif",
@@ -471,7 +471,7 @@ const s = {
         boxShadow: '0 4px 24px rgba(255,120,0,0.15)',
         marginTop: '4px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        minHeight: '52px',
+        minHeight: '46px',
     },
     spinner: {
         width: '20px', height: '20px', borderRadius: '50%',
@@ -511,7 +511,7 @@ const s = {
     /* ── Premium CTA ── */
     ctaSection: {
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        gap: '12px', width: '100%', marginTop: '4px',
+        gap: '8px', width: '100%', marginTop: '0px',
     },
     ctaDivider: {
         width: '60px', height: '1px',
@@ -525,7 +525,7 @@ const s = {
         display: 'flex', alignItems: 'center', gap: '8px',
         background: 'rgba(255,243,224,0.04)',
         border: '1px solid rgba(255,243,224,0.12)',
-        borderRadius: '14px', padding: '14px 28px',
+        borderRadius: '12px', padding: '11px 24px',
         color: '#FFF3E0',
         fontFamily: "'Outfit', sans-serif", fontWeight: 700,
         fontSize: '0.92rem', letterSpacing: '0.02em',
