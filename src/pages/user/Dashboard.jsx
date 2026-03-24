@@ -20,7 +20,7 @@ const Dashboard = () => {
 
 
     return (
-        <div style={{
+        <div data-dbg="dashboard" style={{
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -30,7 +30,7 @@ const Dashboard = () => {
             WebkitOverflowScrolling: 'touch',
         }}>
             {/* ═══ SECTION 1 – LOGO (centered in top portion) ═══ */}
-            <div style={{
+            <div data-dbg="logo" style={{
                 flex: '1 1 auto',
                 display: 'flex',
                 flexDirection: 'column',
@@ -49,7 +49,7 @@ const Dashboard = () => {
             </div>
 
             {/* ═══ Main Content Container (pushed to bottom of available space) ═══ */}
-            <div style={{ flex: '0 0 auto', maxWidth: '1200px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '16px' }}>
+            <div data-dbg="cards" style={{ flex: '0 0 auto', maxWidth: '1200px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '16px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">

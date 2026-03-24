@@ -8,6 +8,54 @@ import Nutrition from '../../pages/user/Nutrition';
 import Dashboard from '../../pages/user/Dashboard';
 import Chat from '../../pages/user/Chat';
 
+/* ═══ DEBUG: Layout measurement overlay ═══ */
+function LayoutDebugOverlay() {
+    const [metrics, setMetrics] = useState('');
+    useEffect(() => {
+        const measure = () => {
+            const ids = [
+                ['#root', '#root'],
+                ['LAYOUT', '[data-dbg="layout"]'],
+                ['SWIPE_CTR', '[data-dbg="swipe-ctr"]'],
+                ['PANEL', '[data-dbg="panel-active"]'],
+                ['DASH', '[data-dbg="dashboard"]'],
+                ['LOGO', '[data-dbg="logo"]'],
+                ['CARDS', '[data-dbg="cards"]'],
+                ['NAVBAR', '[data-dbg="navbar"]'],
+            ];
+            const lines = ids.map(([name, sel]) => {
+                const el = document.querySelector(sel);
+                if (!el) return `${name}: NOT FOUND`;
+                const r = el.getBoundingClientRect();
+                return `${name} t:${Math.round(r.top)} b:${Math.round(r.bottom)} h:${Math.round(r.height)}`;
+            });
+            lines.push(`VP: ${window.innerWidth}x${window.innerHeight}`);
+            lines.push(`SAI-T: ${getComputedStyle(document.documentElement).getPropertyValue('--sat') || '?'}`);
+            setMetrics(lines.join('\n'));
+        };
+        measure();
+        const id = setInterval(measure, 2000);
+        return () => clearInterval(id);
+    }, []);
+    return (
+        <pre style={{
+            position: 'fixed', bottom: '80px', left: '4px', right: '4px',
+            zIndex: 99999, background: 'rgba(0,0,0,0.92)', color: '#0f0',
+            fontFamily: 'monospace', fontSize: '9px', lineHeight: '13px',
+            padding: '6px 8px', borderRadius: '8px', pointerEvents: 'none',
+            whiteSpace: 'pre-wrap',
+        }}>
+            {metrics}
+        </pre>
+    );
+}
+
+const DBG_LABEL = (name, color) => ({
+    position: 'absolute', top: 0, left: 0, zIndex: 99998,
+    background: color, color: '#000', fontSize: '8px', fontWeight: 900,
+    fontFamily: 'monospace', padding: '1px 4px', pointerEvents: 'none',
+});
+
 /* ═══ Per-page Error Boundary ═══ */
 class PageErrorBoundary extends Component {
     constructor(props) {
@@ -218,22 +266,28 @@ const UserLayout = () => {
 
     // ── Mobile tab routes: premium swipe panels ──
     return (
-        <div style={{
+         <div data-dbg="layout" style={{
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
+            border: '2px solid red',
+            position: 'relative',
         }}>
+            <span style={DBG_LABEL('LAYOUT', 'red')}>LAYOUT</span>
+            <LayoutDebugOverlay />
             <PremiumHeader />
 
             {/* ═══ SWIPE CONTAINER ═══ */}
             <div
+                data-dbg="swipe-ctr"
                 style={{
                     flex: 1,
                     minHeight: 0,
                     overflow: 'hidden',
                     position: 'relative',
                     touchAction: 'pan-y',
+                    border: '2px solid blue',
                 }}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
@@ -254,6 +308,7 @@ const UserLayout = () => {
                     {TAB_COMPONENTS.map((PageComponent, idx) => (
                         <div
                             key={TAB_NAMES[idx]}
+                            data-dbg={idx === tabIndex ? 'panel-active' : `panel-${idx}`}
                             style={{
                                 width: `${PANEL_PCT}%`,
                                 height: '100%',
@@ -261,6 +316,8 @@ const UserLayout = () => {
                                 WebkitOverflowScrolling: 'touch',
                                 overscrollBehaviorY: 'contain',
                                 flexShrink: 0,
+                                border: idx === tabIndex ? '2px solid cyan' : 'none',
+                                position: 'relative',
                             }}
                         >
                             <Suspense fallback={
@@ -277,8 +334,10 @@ const UserLayout = () => {
                 </div>
             </div>
 
-            {/* ═══ NAVBAR ═══ */}
-            <Navbar visualTab={visualTab} />
+            <div data-dbg="navbar" style={{ position: 'relative' }}>
+                <span style={DBG_LABEL('NAVBAR', 'orange')}>NAVBAR</span>
+                <Navbar visualTab={visualTab} />
+            </div>
         </div>
     );
 };
