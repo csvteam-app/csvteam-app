@@ -71,10 +71,11 @@ const EDGE_RESISTANCE = 0.3;
 const DIRECTION_LOCK_PX = 10;
 
 function getTabIndex(pathname) {
-    const exact = TAB_ROUTES.indexOf(pathname);
-    if (exact !== -1) return exact;
-    if (pathname.startsWith('/chat')) return 2;
-    if (pathname.startsWith('/workout') || pathname.startsWith('/training')) return 1;
+    // ONLY match exact tab routes — sub-routes like /training, /workout/:id
+    // must NOT be swallowed by the swipe system
+    if (pathname === '/nutrition') return 0;
+    if (pathname === '/dashboard') return 1;
+    if (pathname === '/chat') return 2;
     return -1;
 }
 

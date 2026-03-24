@@ -27,7 +27,7 @@ const Dashboard = () => {
             paddingBottom: '0',
         }}>
             {/* ═══ SECTION 1 – LOGO ═══ */}
-            <div className="flex-col items-center" style={{ flex: '0 0 auto', paddingTop: '88px', paddingBottom: '8px' }}>
+            <div className="flex-col items-center" style={{ flex: '0 0 auto', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)', paddingBottom: '8px' }}>
                 <div
                     className="csv-logo-coin-3d"
                     style={{ width: '195px', cursor: 'pointer' }}
