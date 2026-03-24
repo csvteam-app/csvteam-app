@@ -26,30 +26,29 @@ const Dashboard = () => {
             flexDirection: 'column',
             padding: '0 16px',
             boxSizing: 'border-box',
-            overflow: 'auto',
-            WebkitOverflowScrolling: 'touch',
         }}>
-            {/* ═══ SECTION 1 – LOGO (centered in top portion) ═══ */}
+            {/* ═══ TOP SPACER — absorbs free space above logo ═══ */}
+            <div style={{ flex: '1 1 0' }} />
+
+            {/* ═══ LOGO — fixed natural size, centered by spacers ═══ */}
             <div data-dbg="logo" style={{
-                flex: '1 1 auto',
+                flex: '0 0 auto',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minHeight: '160px',
-                paddingTop: '12px',
+                padding: '8px 0 16px 0',
             }}>
                 <div
                     className="csv-logo-coin-3d"
-                    style={{ width: '195px', cursor: 'pointer' }}
+                    style={{ width: '180px', cursor: 'pointer' }}
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 >
                     <CsvLogo size="100%" showText={false} />
                 </div>
             </div>
 
-            {/* ═══ Main Content Container (pushed to bottom of available space) ═══ */}
-            <div data-dbg="cards" style={{ flex: '0 0 auto', maxWidth: '1200px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '16px' }}>
+            {/* ═══ CARDS/ACTIONS — fixed natural size ═══ */}
+            <div data-dbg="cards" style={{ flex: '0 0 auto', maxWidth: '1200px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">
@@ -245,6 +244,9 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* ═══ BOTTOM SPACER — matches top spacer for centered composition ═══ */}
+            <div style={{ flex: '1 1 0', minHeight: '16px' }} />
         </div>
     );
 };
