@@ -2,11 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Send, Image as ImageIcon, Mic, Square, Shield, Clock } from 'lucide-react';
-import { perfTrackMount, perfTrackRender } from '../../components/debug/perfTracker';
 
 const Chat = () => {
-    perfTrackRender('Chat');
-    useEffect(() => { perfTrackMount('Chat'); }, []);
     const { user } = useAuth();
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');

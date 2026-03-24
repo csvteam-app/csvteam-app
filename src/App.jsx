@@ -5,7 +5,6 @@ import { AuthProvider } from './context/AuthContext';
 import { AppProvider, useAppContext } from './context/AppContext';
 import ErrorBoundary from './ErrorBoundary';
 import FEATURE_FLAGS from './config/featureFlags';
-import PerfOverlay from './components/debug/PerfOverlay';
 
 // Layouts — kept eager (always needed)
 import UserLayout from './components/layout/UserLayout';
@@ -79,7 +78,6 @@ function App() {
         <AppProvider>
           <BrowserRouter>
             <GamificationOverlays />
-            <PerfOverlay />
 
             <Suspense fallback={<PageLoader />}>
               <Routes>
