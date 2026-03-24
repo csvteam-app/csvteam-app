@@ -87,6 +87,12 @@ const UserLayout = () => {
     const tabIndex = getTabIndex(pathname);
     const isTabRoute = tabIndex !== -1;
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+    const [visualTab, setVisualTab] = useState(tabIndex !== -1 ? tabIndex : 1);
+
+    // Sync visualTab when route changes (from navbar tap or after swipe completes)
+    useEffect(() => {
+        if (tabIndex !== -1) setVisualTab(tabIndex);
+    }, [tabIndex]);
 
     const wrapperRef = useRef(null);
     const touchState = useRef({
@@ -174,6 +180,9 @@ const UserLayout = () => {
             targetIndex = Math.max(tabIndex - 1, 0);
         }
 
+        // Update navbar icon IMMEDIATELY (before animation)
+        setVisualTab(targetIndex);
+
         ts.animating = true;
         if (wrapperRef.current) {
             wrapperRef.current.style.transition = `transform ${SNAP_DURATION}ms ${SNAP_EASING}`;
@@ -201,7 +210,7 @@ const UserLayout = () => {
                         <Outlet />
                     </PageErrorBoundary>
                 </div>
-                {isMobile && <Navbar />}
+                {isMobile && <Navbar visualTab={visualTab} />}
             </div>
         );
     }
@@ -268,7 +277,7 @@ const UserLayout = () => {
             </div>
 
             {/* ═══ NAVBAR ═══ */}
-            <Navbar />
+            <Navbar visualTab={visualTab} />
         </div>
     );
 };

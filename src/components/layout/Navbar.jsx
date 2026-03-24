@@ -1,13 +1,20 @@
 import { useLocation, Link } from 'react-router-dom';
 import { Dumbbell, MessageCircle, Utensils } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ visualTab }) => {
     const { pathname } = useLocation();
 
-    let activeIndex = 1;
-    if (pathname === '/nutrition' || pathname.startsWith('/nutrition')) activeIndex = 0;
-    if (pathname === '/dashboard' || pathname.startsWith('/workout') || pathname.startsWith('/training')) activeIndex = 1;
-    if (pathname === '/chat' || pathname.startsWith('/chat')) activeIndex = 2;
+    // Use visualTab prop if provided (instant update from swipe),
+    // otherwise derive from pathname (fallback / non-swipe navigation)
+    let activeIndex;
+    if (typeof visualTab === 'number') {
+        activeIndex = visualTab;
+    } else {
+        activeIndex = 1;
+        if (pathname === '/nutrition' || pathname.startsWith('/nutrition')) activeIndex = 0;
+        if (pathname === '/dashboard' || pathname.startsWith('/workout') || pathname.startsWith('/training')) activeIndex = 1;
+        if (pathname === '/chat' || pathname.startsWith('/chat')) activeIndex = 2;
+    }
 
     const linkStyle = (idx) => ({
         display: 'flex',
