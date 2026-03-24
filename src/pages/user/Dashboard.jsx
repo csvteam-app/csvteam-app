@@ -20,14 +20,25 @@ const Dashboard = () => {
 
 
     return (
-        <div className="global-container" style={{
+        <div style={{
             height: '100%',
-            gap: '0',
-            overflow: 'visible',
-            paddingBottom: '0',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0 16px',
+            boxSizing: 'border-box',
+            overflow: 'auto',
+            WebkitOverflowScrolling: 'touch',
         }}>
-            {/* ═══ SECTION 1 – LOGO ═══ */}
-            <div className="flex-col items-center" style={{ flex: '0 0 auto', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)', paddingBottom: '8px' }}>
+            {/* ═══ SECTION 1 – LOGO (centered in top portion) ═══ */}
+            <div style={{
+                flex: '1 1 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '160px',
+                paddingTop: '12px',
+            }}>
                 <div
                     className="csv-logo-coin-3d"
                     style={{ width: '195px', cursor: 'pointer' }}
@@ -37,8 +48,8 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* ═══ Main Content Container ═══ */}
-            <div className="w-full" style={{ maxWidth: '1200px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '24px', paddingBottom: '20px' }}>
+            {/* ═══ Main Content Container (pushed to bottom of available space) ═══ */}
+            <div style={{ flex: '0 0 auto', maxWidth: '1200px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '16px' }}>
                 <div className="responsive-grid-2col">
                     {/* ═══ LEFT COLUMN (Status & Progress) ═══ */}
                     <div className="flex-col gap-4">
